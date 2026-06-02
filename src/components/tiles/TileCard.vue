@@ -55,7 +55,6 @@ const tileStyle = computed(() => ({
   left: 0;
   right: 0;
   height: 6rpx;
-  background: v-bind(color);
 }
 
 .tile-card__icon {

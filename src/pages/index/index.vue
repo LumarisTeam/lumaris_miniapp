@@ -1,12 +1,6 @@
 <template>
   <view class="home-page">
-    <AppNavbar title="光序">
-      <template #actions>
-        <view class="home-page__nav-action" @click="goLogin">
-          <LucideIcon name="user" :size="22" color="var(--color-primary)" />
-        </view>
-      </template>
-    </AppNavbar>
+    <AppNavbar title="光序"/>
 
     <view class="home-page__scroll">
       <!-- Today's Schedule Section -->
