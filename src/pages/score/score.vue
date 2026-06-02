@@ -26,7 +26,7 @@
           <ClubCard>
             <view class="score-page__stats">
               <view class="score-page__stat">
-                <LucideIcon name="star-filled" :size="32" color="#FF9500" />
+                <LucideIcon name="star" :size="32" color="#FF9500" />
                 <text class="score-page__stat-value">{{ gpa }}</text>
                 <text class="score-page__stat-label">平均绩点</text>
               </view>

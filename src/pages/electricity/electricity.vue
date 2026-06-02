@@ -12,7 +12,7 @@
         <view class="electricity-page__section">
           <ClubCard>
             <view class="electricity-page__balance">
-              <LucideIcon name="bolt-electric" :size="40" color="#FF9500" />
+              <LucideIcon name="zap" :size="40" color="#FF9500" />
               <text class="electricity-page__balance-label">当前余额</text>
               <text class="electricity-page__balance-value">{{ balanceText }}</text>
               <view class="electricity-page__balance-actions">
