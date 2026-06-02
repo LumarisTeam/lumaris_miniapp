@@ -26,14 +26,17 @@
           <ClubCard>
             <view class="score-page__stats">
               <view class="score-page__stat">
+                <LucideIcon name="star-filled" :size="32" color="#FF9500" />
                 <text class="score-page__stat-value">{{ gpa }}</text>
                 <text class="score-page__stat-label">平均绩点</text>
               </view>
               <view class="score-page__stat">
+                <LucideIcon name="book-open" :size="32" color="#007AFF" />
                 <text class="score-page__stat-value">{{ totalCourses }}</text>
                 <text class="score-page__stat-label">课程数</text>
               </view>
               <view class="score-page__stat">
+                <LucideIcon name="graduation-cap" :size="32" color="#34C759" />
                 <text class="score-page__stat-value">{{ totalCredits }}</text>
                 <text class="score-page__stat-label">总学分</text>
               </view>

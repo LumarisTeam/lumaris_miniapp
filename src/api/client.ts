@@ -1,6 +1,6 @@
 import type { ApiResponse } from '@/types'
 
-const BASE_URL = 'https://xauatapi.xauat.site'
+const BASE_URL = 'https://xauatapi.xauat.site/v1'
 
 interface RequestConfig {
   url: string

@@ -1,6 +1,13 @@
 <template>
   <view class="bus-page">
-    <AppNavbar title="校车" show-back />
+    <AppNavbar title="校车" show-back>
+      <template #default>
+        <view class="bus-page__nav-title">
+          <LucideIcon name="bus" :size="20" color="var(--color-primary)" />
+          <text class="bus-page__nav-title-text">校车</text>
+        </view>
+      </template>
+    </AppNavbar>
 
     <template v-if="!userStore.isLogin">
       <EmptyState icon="bus" title="请先登录" description="登录后可查看校车时刻表" padding-top="200rpx" />
@@ -35,6 +42,7 @@
                 :class="{ 'bus-page__item--last': idx === busItems.length - 1 }"
               >
                 <view class="bus-page__item-time">
+                  <LucideIcon name="clock" :size="20" color="var(--color-primary)" />
                   <text class="bus-page__item-hour">{{ item.departureTime }}</text>
                 </view>
                 <view class="bus-page__item-body">
@@ -191,8 +199,24 @@ onMounted(() => {
   border-bottom: none;
 }
 
+.bus-page__nav-title {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.bus-page__nav-title-text {
+  font-size: var(--font-title);
+  font-weight: 600;
+  color: var(--color-label);
+}
+
 .bus-page__item-time {
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
 }
 
 .bus-page__item-hour {

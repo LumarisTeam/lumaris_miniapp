@@ -1,6 +1,13 @@
 <template>
   <view class="schedule-page">
-    <AppNavbar title="课表" />
+    <AppNavbar title="课表">
+      <template #default>
+        <view class="schedule-page__nav-title">
+          <LucideIcon name="calendar-days" :size="20" color="var(--color-primary)" />
+          <text class="schedule-page__nav-title-text">课表</text>
+        </view>
+      </template>
+    </AppNavbar>
 
     <WeekSelector
       :current-week="scheduleStore.currentWeek"
@@ -41,6 +48,7 @@ import WeekSelector from '@/components/schedule/WeekSelector.vue'
 import ScheduleGrid from '@/components/schedule/ScheduleGrid.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
+import LucideIcon from '@/components/icons/LucideIcon.vue'
 import { useUserStore } from '@/stores/user'
 import { useCourseStore } from '@/stores/course'
 import { useScheduleStore } from '@/stores/schedule'
@@ -74,5 +82,17 @@ onMounted(() => {
 .schedule-page {
   min-height: 100vh;
   background-color: var(--color-grouped-bg);
+}
+
+.schedule-page__nav-title {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.schedule-page__nav-title-text {
+  font-size: var(--font-title);
+  font-weight: 600;
+  color: var(--color-label);
 }
 </style>

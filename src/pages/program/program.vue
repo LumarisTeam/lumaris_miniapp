@@ -10,7 +10,10 @@
       <scroll-view scroll-y class="program-page__scroll" v-if="!loading">
         <template v-if="planCourses.length > 0">
           <view class="program-page__section" v-for="(group, term) in groupedCourses" :key="term">
-            <view class="program-page__term-title">{{ term }}</view>
+            <view class="program-page__term-title">
+              <LucideIcon name="book-open" :size="18" color="var(--color-primary)" />
+              <text>{{ term }}</text>
+            </view>
             <ClubCard padding="0">
               <view
                 v-for="(item, idx) in group"
@@ -19,7 +22,10 @@
                 :class="{ 'program-page__item--last': idx === group.length - 1 }"
               >
                 <view class="program-page__item-body">
-                  <text class="program-page__item-name">{{ item.name }}</text>
+                  <view class="program-page__item-name-row">
+                    <LucideIcon name="clipboard" :size="16" color="var(--color-tertiary-label)" />
+                    <text class="program-page__item-name">{{ item.name }}</text>
+                  </view>
                   <text class="program-page__item-type">
                     {{ item.lessonType }} | {{ item.examMode }}
                   </text>
@@ -47,6 +53,7 @@ import AppNavbar from '@/components/common/AppNavbar.vue'
 import ClubCard from '@/components/common/ClubCard.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
+import LucideIcon from '@/components/icons/LucideIcon.vue'
 import { useUserStore } from '@/stores/user'
 import { getProgram } from '@/api/modules/program'
 import type { PlanCourse } from '@/types'
@@ -106,6 +113,15 @@ onMounted(() => {
   color: var(--color-label);
   letter-spacing: var(--letter-spacing-title);
   margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.program-page__item-name-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
 }
 
 .program-page__item {

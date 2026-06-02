@@ -11,6 +11,7 @@
       <view class="payment-page__balance-card">
         <ClubCard>
           <view class="payment-page__balance">
+            <LucideIcon name="credit-card" :size="40" color="var(--color-primary)" />
             <text class="payment-page__balance-label">卡内余额</text>
             <text class="payment-page__balance-value">¥ {{ balanceText }}</text>
           </view>
@@ -54,6 +55,7 @@ import AppNavbar from '@/components/common/AppNavbar.vue'
 import ClubCard from '@/components/common/ClubCard.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
+import LucideIcon from '@/components/icons/LucideIcon.vue'
 import { useUserStore } from '@/stores/user'
 import { getPaymentRecords } from '@/api/modules/payment'
 import type { PaymentRecord } from '@/types'
@@ -108,6 +110,7 @@ onMounted(() => {
 .payment-page__balance-label {
   font-size: var(--font-caption);
   color: var(--color-secondary-label);
+  margin-top: 16rpx;
 }
 
 .payment-page__balance-value {

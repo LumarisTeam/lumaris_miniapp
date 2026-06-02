@@ -5,7 +5,10 @@
     <scroll-view scroll-y class="link-page__scroll" v-if="!loading">
       <template v-if="links.length > 0">
         <view class="link-page__section" v-for="(group, category) in groupedLinks" :key="category">
-          <view class="link-page__category-title">{{ category }}</view>
+          <view class="link-page__category-title">
+            <LucideIcon name="link" :size="16" color="var(--color-secondary-label)" />
+            <text>{{ category }}</text>
+          </view>
           <ClubCard padding="0">
             <view
               v-for="(item, idx) in group"
@@ -15,8 +18,11 @@
               @click="openLink(item.url)"
             >
               <view class="link-page__item-body">
-                <text class="link-page__item-name">{{ item.name }}</text>
-                <text v-if="item.description" class="link-page__item-desc">{{ item.description }}</text>
+                <LucideIcon name="link" :size="18" color="var(--color-primary)" />
+                <view class="link-page__item-text">
+                  <text class="link-page__item-name">{{ item.name }}</text>
+                  <text v-if="item.description" class="link-page__item-desc">{{ item.description }}</text>
+                </view>
               </view>
               <LucideIcon name="external-link" :size="16" color="var(--color-tertiary-label)" />
             </view>
@@ -102,6 +108,22 @@ onMounted(() => {
   font-size: var(--font-caption-bold);
   color: var(--color-secondary-label);
   padding: 0 8rpx 16rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.link-page__item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.link-page__item-text {
+  flex: 1;
+  min-width: 0;
 }
 
 .link-page__item {

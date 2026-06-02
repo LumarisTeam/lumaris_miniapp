@@ -51,7 +51,10 @@
       <!-- Tiles Section -->
       <view class="home-page__section" v-if="visibleTiles.length > 0">
         <view class="home-page__section-header">
-          <text class="home-page__section-title">校园服务</text>
+          <view class="home-page__section-header-with-icon">
+            <LucideIcon name="layout" :size="20" color="var(--color-primary)" />
+            <text class="home-page__section-title">校园服务</text>
+          </view>
         </view>
         <view class="home-page__tiles-grid">
           <TileCard
@@ -202,10 +205,10 @@ onMounted(() => {
   padding: 32rpx;
 }
 
-.home-page__section-header {
+.home-page__section-header-with-icon {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  align-items: center;
+  gap: 12rpx;
   margin-bottom: 24rpx;
 }
 
