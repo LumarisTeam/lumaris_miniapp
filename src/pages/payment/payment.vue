@@ -88,7 +88,7 @@ async function fetchData() {
   loading.value = true
   errorMessage.value = ''
   try {
-    const studentId = userStore.studentId
+    const studentId = userStore.userData?.name || ''
     const res = await getPaymentRecords(studentId)
     records.value = res.data?.records ?? []
     balance.value = res.data?.balance ?? 0

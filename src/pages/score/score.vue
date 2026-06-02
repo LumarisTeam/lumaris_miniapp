@@ -55,7 +55,7 @@
                 :class="{ 'score-page__semester--active': currentSemester === sem.value }"
                 @click="selectSemester(sem.value)"
               >
-                <text>{{ sem.text }}</text>
+                <text>{{ sem.semester }}</text>
               </view>
             </view>
           </scroll-view>
@@ -86,7 +86,7 @@
             >
               <view class="score-page__item-indicator" :style="getIndicatorStyle(item.gpa)" />
               <view class="score-page__item-body">
-                <text class="score-page__item-name">{{ item.lessonName }}</text>
+                <text class="score-page__item-name">{{ item.name }}</text>
                 <view class="score-page__item-meta">
                   <text class="score-page__item-code">{{ item.lessonCode }}</text>
                   <text class="score-page__item-credit">{{ item.credit }}学分</text>
@@ -295,7 +295,7 @@ onShow(() => {
 
 .score-page__semester {
   padding: 16rpx 32rpx;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-xs);
   background-color: var(--color-card-bg);
   font-size: var(--font-caption-bold);
   color: var(--color-secondary-label);

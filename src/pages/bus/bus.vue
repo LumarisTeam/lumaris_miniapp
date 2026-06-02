@@ -42,7 +42,7 @@
                 :class="{ 'bus-page__item--last': idx === busItems.length - 1 }"
               >
                 <view class="bus-page__item-time">
-                  <LucideIcon name="clock" :size="20" color="var(--color-primary)" />
+                  <LucideIcon name="clock" :size="16" color="var(--color-primary)" />
                   <text class="bus-page__item-hour">{{ item.departureTime }}</text>
                 </view>
                 <view class="bus-page__item-body">
@@ -160,7 +160,7 @@ onMounted(() => {
 }
 
 .bus-page__date-label {
-  font-size: var(--font-caption);
+  font-size: var(--font-xs);
   color: var(--color-secondary-label);
 }
 
@@ -220,7 +220,7 @@ onMounted(() => {
 }
 
 .bus-page__item-hour {
-  font-size: 32rpx;
+  font-size: 24rpx;
   font-weight: 600;
   color: var(--color-primary);
 }
