@@ -33,6 +33,15 @@ const iconStyle = computed(() => ({
   height: iconSize.value,
 }))
 
+const colorTokenMap: Record<string, string> = {
+  'var(--color-primary)': '#007aff',
+  'var(--color-secondary-label)': '#3c3c4399',
+  'var(--color-tertiary-label)': '#3c3c434d',
+  'var(--color-label)': '#000000',
+  'var(--color-on-accent)': '#ffffff',
+  'var(--color-danger)': '#ff3b30',
+}
+
 const iconPaths: Record<string, string> = {
   house: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10',
   'calendar-days':
@@ -115,24 +124,31 @@ const iconPaths: Record<string, string> = {
     'M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2 M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2 M10 6h4 M10 10h4 M10 14h4 M10 18h4',
   'file-lock':
     'M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z M14 2v4a2 2 0 0 0 2 2h4 M17 13h-2v-1.5a1.5 1.5 0 0 1 3 0V13 M15 13v3h4v-3',
+  'notebook-pen':
+    'M13.4 2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8 M2 6h4 M2 10h4 M2 14h4 M2 18h4 M14 2v4a2 2 0 0 0 2 2h4 M15 18l3-3 3 3 M18 15v7',
   clipboard:
     'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z',
   inbox:
     'M22 12h-6l-2 3H10l-2-3H2 M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z',
 }
 
+function toBase64(value: string) {
+  const buffer = new TextEncoder().encode(value)
+  return uni.arrayBufferToBase64(buffer.buffer)
+}
+
 const svgDataUri = computed(() => {
   const paths = iconPaths[props.name]
   if (!paths) return ''
 
-  const color = props.color || 'currentColor'
+  const color = colorTokenMap[props.color || ''] || props.color || '#000000'
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${props.strokeWidth}" stroke-linecap="round" stroke-linejoin="round">${paths
     .split(/\s+(?=M\d)/)
     .map((d) => `<path d="${d}"/>`)
     .join('')}</svg>`
 
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`
+  return `data:image/svg+xml;base64,${toBase64(svg)}`
 })
 </script>
 

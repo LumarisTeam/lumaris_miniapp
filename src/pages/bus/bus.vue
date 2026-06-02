@@ -37,7 +37,7 @@
             <ClubCard padding="0">
               <view
                 v-for="(item, idx) in busItems"
-                :key="idx"
+                :key="item.id || idx"
                 class="bus-page__item"
                 :class="{ 'bus-page__item--last': idx === busItems.length - 1 }"
               >

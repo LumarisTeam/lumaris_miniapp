@@ -1,4 +1,4 @@
-import type { Course, ExamItem, NumericLike, PaymentRecord, Semester, TimeInfo } from '@/types'
+import type { BusItem, Course, ExamItem, NumericLike, PaymentRecord, Semester, TimeInfo } from '@/types'
 
 const CANTANG_START = ['8:00', '8:30', '9:20', '10:25', '11:15', '12:10', '13:00', '14:00', '14:50', '15:45', '16:35', '19:30', '20:20']
 const CANTANG_END = ['8:20', '9:15', '10:05', '11:10', '12:00', '12:55', '13:45', '14:45', '15:35', '16:30', '17:20', '20:15', '21:05']
@@ -104,6 +104,22 @@ export function normalizeExam(item: Record<string, unknown>): ExamItem {
     time: String(item.time ?? item.examTime ?? ''),
     location: String(item.location ?? item.room ?? ''),
     seat: String(item.seat ?? item.seatNo ?? ''),
+  }
+}
+
+export function normalizeBusItem(item: Record<string, unknown>, index = 0): BusItem {
+  const departureStation = String(item.departureStation ?? item.from ?? item.start ?? '')
+  const arrivalStation = String(item.arrivalStation ?? item.to ?? item.end ?? '')
+  const departureTime = String(item.departureTime ?? item.runTime ?? item.time ?? '')
+  const lineName = String(item.lineName ?? item.name ?? '')
+  const description = String(item.description ?? item.campus ?? '')
+
+  return {
+    id: String(item.id ?? `${departureTime}-${departureStation}-${arrivalStation}-${index}`),
+    departureTime: departureTime.replace(/:\d{2}$/, ''),
+    departureStation,
+    arrivalStation,
+    campus: description || lineName,
   }
 }
 

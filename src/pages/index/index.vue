@@ -98,6 +98,12 @@ import { getStorage, STORAGE_KEYS } from '@/utils/storage'
 import type { Course, TileType } from '@/types'
 import { getCourseTimeRange, isCourseActiveForToday } from '@/utils/education'
 
+const TILE_TYPES: TileType[] = ['electricity', 'bus', 'payment']
+
+function isTileType(value: unknown): value is TileType {
+  return typeof value === 'string' && TILE_TYPES.includes(value as TileType)
+}
+
 const userStore = useUserStore()
 const courseStore = useCourseStore()
 const settingsStore = useSettingsStore()
@@ -133,7 +139,9 @@ const todaySchedules = computed(() => {
 })
 
 const visibleTiles = computed(() =>
-  settingsStore.tiles.filter((t) => t.visible).sort((a, b) => a.order - b.order),
+  settingsStore.tiles
+    .filter((tile) => tile.visible && isTileType(tile.type))
+    .sort((a, b) => a.order - b.order),
 )
 
 function getTileIcon(type: TileType): string {
@@ -142,7 +150,7 @@ function getTileIcon(type: TileType): string {
     bus: 'bus',
     payment: 'credit-card',
   }
-  return map[type]
+  return map[type] || 'layout'
 }
 
 function getTileColor(type: TileType): string {
@@ -151,7 +159,7 @@ function getTileColor(type: TileType): string {
     bus: '#5856D6',
     payment: '#34C759',
   }
-  return map[type]
+  return map[type] || '#007AFF'
 }
 
 function getTileLabel(type: TileType): string {
@@ -160,7 +168,7 @@ function getTileLabel(type: TileType): string {
     bus: '校车',
     payment: '饭卡',
   }
-  return map[type]
+  return map[type] || '校园服务'
 }
 
 function getTileValue(_type: TileType): string {
