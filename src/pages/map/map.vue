@@ -1,41 +1,77 @@
 <template>
   <view class="map-page">
     <AppNavbar title="校园地图" show-back />
-    <map
-      class="map-page__map"
-      :latitude="center.latitude"
-      :longitude="center.longitude"
-      :scale="mapScale"
-      :markers="markers"
-      :show-location="true"
-    />
-    <view class="map-page__controls">
-      <view class="map-page__zoom-btn" @click="zoomIn">
-        <LucideIcon name="plus" :size="20" color="var(--color-primary)" />
+    <view class="map-page__body" :style="{ height: mapBodyHeight }">
+      <map
+        class="map-page__map"
+        :latitude="center.latitude"
+        :longitude="center.longitude"
+        :scale="mapScale"
+        :markers="markers"
+        :show-location="true"
+      />
+
+      <view v-if="loading" class="map-page__status">
+        <LoadingState padding-top="0" text="正在加载校园地图..." />
       </view>
-      <view class="map-page__zoom-divider" />
-      <view class="map-page__zoom-btn" @click="zoomOut">
-        <LucideIcon name="minus" :size="20" color="var(--color-primary)" />
+
+      <view v-else-if="errorMessage" class="map-page__status">
+        <ErrorState
+          padding-top="0"
+          title="地图加载失败"
+          :message="errorMessage"
+          retry-text="重新加载"
+          @retry="fetchMapData"
+        />
       </view>
-      <view class="map-page__locate-btn" @click="locateMe">
-        <LucideIcon name="map-pin" :size="20" color="var(--color-primary)" />
+
+      <view v-else-if="markers.length === 0" class="map-page__status">
+        <EmptyState
+          padding-top="0"
+          icon="map"
+          title="暂无地图点位"
+          description="暂时没有可显示的校园地点信息"
+        />
+      </view>
+
+      <view class="map-page__controls">
+        <view class="map-page__zoom-btn" @click="zoomIn">
+          <LucideIcon name="plus" :size="20" color="var(--color-primary)" />
+        </view>
+        <view class="map-page__zoom-divider" />
+        <view class="map-page__zoom-btn" @click="zoomOut">
+          <LucideIcon name="minus" :size="20" color="var(--color-primary)" />
+        </view>
+        <view class="map-page__locate-btn" @click="locateMe">
+          <LucideIcon name="map-pin" :size="20" color="var(--color-primary)" />
+        </view>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import AppNavbar from '@/components/common/AppNavbar.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
+import ErrorState from '@/components/common/ErrorState.vue'
+import LoadingState from '@/components/common/LoadingState.vue'
 import LucideIcon from '@/components/icons/LucideIcon.vue'
 import { getMapData } from '@/api/modules/map'
+import { getStatusBarHeight } from '@/utils/platform'
 
 const center = ref({ latitude: 34.233, longitude: 108.91 })
 const mapScale = ref(15)
+const loading = ref(false)
+const errorMessage = ref('')
+const statusBarHeight = getStatusBarHeight()
+const mapBodyHeight = computed(() => `${Math.max(360, uni.getSystemInfoSync().windowHeight - statusBarHeight - 88)}px`)
 
 const markers = ref<Array<{ id: number; latitude: number; longitude: number; title: string; callout: { content: string } }>>([])
 
 async function fetchMapData() {
+  loading.value = true
+  errorMessage.value = ''
   try {
     const res = await getMapData()
     if (res.data) {
@@ -58,7 +94,11 @@ async function fetchMapData() {
       }
     }
   } catch (e) {
+    markers.value = []
+    errorMessage.value = e instanceof Error ? e.message : '请稍后重试'
     console.error('Failed to fetch map data:', e)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -94,11 +134,28 @@ onMounted(() => {
 .map-page {
   min-height: 100vh;
   background-color: var(--color-grouped-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.map-page__body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .map-page__map {
   width: 100%;
-  height: calc(100vh - 88px - env(safe-area-inset-top));
+  height: 100%;
+}
+
+.map-page__status {
+  position: absolute;
+  left: 32rpx;
+  right: 32rpx;
+  top: 32rpx;
+  z-index: 5;
 }
 
 .map-page__controls {

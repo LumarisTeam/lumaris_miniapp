@@ -42,10 +42,16 @@ function getAuthHeaders() {
     return {}
   }
 
-  return {
-    Cookie: cookie,
+  const headers: Record<string, string> = {
     xauat: cookie,
   }
+
+  // H5 forbids setting the Cookie header manually, but the backend also accepts `xauat`.
+  // #ifndef H5
+  headers.Cookie = cookie
+  // #endif
+
+  return headers
 }
 
 function buildHeaders(header: Record<string, string>) {

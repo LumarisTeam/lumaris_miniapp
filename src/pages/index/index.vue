@@ -104,6 +104,10 @@ function isTileType(value: unknown): value is TileType {
   return typeof value === 'string' && TILE_TYPES.includes(value as TileType)
 }
 
+function hasWeek(weeks: unknown, week: number): boolean {
+  return Array.isArray(weeks) && weeks.includes(week)
+}
+
 const userStore = useUserStore()
 const courseStore = useCourseStore()
 const settingsStore = useSettingsStore()
@@ -117,7 +121,7 @@ const todayDate = computed(() => {
 
 const hasGuestCourses = computed(() => {
   const guest = getStorage<Course[]>(STORAGE_KEYS.GUEST_COURSE_DATA)
-  return guest && guest.length > 0
+  return Array.isArray(guest) && guest.length > 0
 })
 
 const todaySchedules = computed(() => {
@@ -127,7 +131,7 @@ const todaySchedules = computed(() => {
     ...courseStore.visibleCourses.filter((course) => {
       return (
         course.dayOfWeek === dayOfWeek &&
-        course.weeks.includes(scheduleStore.currentWeek) &&
+        hasWeek(course.weeks, scheduleStore.currentWeek) &&
         isCourseActiveForToday(course, now)
       )
     }),
@@ -139,7 +143,7 @@ const todaySchedules = computed(() => {
 })
 
 const visibleTiles = computed(() =>
-  settingsStore.tiles
+  (Array.isArray(settingsStore.tiles) ? settingsStore.tiles : [])
     .filter((tile) => tile.visible && isTileType(tile.type))
     .sort((a, b) => a.order - b.order),
 )
