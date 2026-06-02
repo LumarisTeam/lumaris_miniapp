@@ -1,5 +1,5 @@
 <template>
-  <view class="week-selector">
+  <!-- <view class="week-selector">
     <view class="week-selector__nav">
       <view class="week-selector__arrow" @click="$emit('prev')">
         <LucideIcon name="chevron-left" :size="22" color="var(--color-primary)" />
@@ -12,7 +12,7 @@
         <LucideIcon name="chevron-right" :size="22" color="var(--color-primary)" />
       </view>
     </view>
-  </view>
+  </view> -->
   <wd-picker
     v-model="pickerValue"
     :columns="pickerColumns"

@@ -9,14 +9,14 @@
       </template>
     </AppNavbar>
 
-    <!-- <WeekSelector
+    <WeekSelector
       :current-week="scheduleStore.currentWeek"
       :total-weeks="scheduleStore.totalWeeks"
       :label="scheduleStore.weekLabel"
       @prev="scheduleStore.prevWeek()"
       @next="scheduleStore.nextWeek()"
       @select="scheduleStore.setCurrentWeek"
-    /> -->
+    />
 
     <template v-if="!userStore.isLogin && allCourses.length === 0">
       <EmptyState
