@@ -1,13 +1,19 @@
 <script setup lang="ts">
-import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
+import { onLaunch, onShow, onHide } from '@dcloudio/uni-app'
+
 onLaunch(() => {
-  console.log("App Launch");
-});
+  console.log('光序 App Launch')
+})
+
 onShow(() => {
-  console.log("App Show");
-});
+  console.log('光序 App Show')
+})
+
 onHide(() => {
-  console.log("App Hide");
-});
+  console.log('光序 App Hide')
+})
 </script>
-<style></style>
+
+<style>
+@import '@/styles/global.scss';
+</style>

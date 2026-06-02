@@ -1,0 +1,138 @@
+:root {
+  /* ---- Semantic Colors (Light) ---- */
+  --color-app-bg: #ffffff;
+  --color-grouped-bg: #f8f8f8;
+  --color-card-bg: #ffffff;
+  --color-card-overlay: #b3ffffff;
+  --color-surface-raised: #f2f2f7;
+  --color-surface-muted: #efeff4;
+  --color-surface-sunken: #e5e5ea;
+  --color-separator: rgba(60, 60, 67, 0.2);
+  --color-border-strong: #d1d1d6;
+
+  --color-label: #000000;
+  --color-secondary-label: rgba(60, 60, 67, 0.6);
+  --color-tertiary-label: rgba(60, 60, 67, 0.3);
+  --color-quaternary-label: rgba(60, 60, 67, 0.18);
+  --color-inverse-label: #ffffff;
+
+  --color-primary: #007aff;
+  --color-success: #34c759;
+  --color-warning: #ff9500;
+  --color-danger: #ff3b30;
+  --color-indigo: #5856d6;
+  --color-purple: #af52de;
+  --color-pink: #ff2d55;
+  --color-cyan: #5ac8fa;
+  --color-yellow: #ffcc00;
+
+  --color-primary-soft: rgba(0, 122, 255, 0.12);
+  --color-success-soft: rgba(52, 199, 89, 0.12);
+  --color-warning-soft: rgba(255, 149, 0, 0.12);
+  --color-danger-soft: rgba(255, 59, 48, 0.12);
+  --color-indigo-soft: rgba(88, 86, 214, 0.12);
+  --color-purple-soft: rgba(175, 82, 222, 0.12);
+  --color-pink-soft: rgba(255, 45, 85, 0.12);
+  --color-cyan-soft: rgba(90, 200, 250, 0.12);
+  --color-yellow-soft: rgba(255, 204, 0, 0.12);
+
+  --color-on-accent: #ffffff;
+  --color-selection-fill: rgba(120, 120, 128, 0.12);
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-skeleton-base: #ebebf4;
+  --color-skeleton-highlight: #f4f4f4;
+
+  /* ---- Radii ---- */
+  --radius-xs: 8rpx;
+  --radius-sm: 16rpx;
+  --radius-md: 24rpx;
+  --radius-lg: 32rpx;
+  --radius-xl: 40rpx;
+  --radius-xxl: 48rpx;
+  --radius-card: 36rpx;
+  --radius-tile: 44rpx;
+  --radius-panel: 32rpx;
+  --radius-indicator: 4rpx;
+
+  /* ---- Spacing ---- */
+  --space-xs: 8rpx;
+  --space-sm: 16rpx;
+  --space-md: 24rpx;
+  --space-lg: 32rpx;
+  --space-xl: 48rpx;
+  --space-page-h: 32rpx;
+  --space-page-v: 32rpx;
+
+  /* ---- Typography ---- */
+  --font-page-title: bold 48rpx;
+  --font-section-title: bold 44rpx;
+  --font-card-title: bold 32rpx;
+  --font-body: 28rpx;
+  --font-body-bold: bold 28rpx;
+  --font-caption: 24rpx;
+  --font-caption-bold: bold 24rpx;
+  --font-small: 22rpx;
+  --font-small-bold: bold 22rpx;
+  --font-xs: 18rpx;
+  --font-tile-value: bold 48rpx;
+  --font-tile-label: 26rpx;
+  --font-nav-title: bold 36rpx;
+  --letter-spacing-title: -0.5px;
+
+  /* ---- Shadows ---- */
+  --shadow-card: 0 8rpx 40rpx -4rpx rgba(0, 0, 0, 0.1);
+  --shadow-nav: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+
+  /* ---- Animation ---- */
+  --transition-fast: 200ms ease-in-out;
+  --transition-normal: 300ms ease-in-out;
+  --transition-slow: 400ms ease-in-out;
+  --press-scale: 0.95;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-app-bg: #000000;
+    --color-grouped-bg: #000000;
+    --color-card-bg: #1c1c1e;
+    --color-card-overlay: rgba(235, 235, 245, 0.12);
+    --color-surface-raised: #2c2c2e;
+    --color-surface-muted: #242426;
+    --color-surface-sunken: #3a3a3c;
+    --color-separator: rgba(84, 84, 88, 0.2);
+    --color-border-strong: #545458;
+
+    --color-label: #ffffff;
+    --color-secondary-label: rgba(235, 235, 245, 0.6);
+    --color-tertiary-label: rgba(235, 235, 245, 0.3);
+    --color-quaternary-label: rgba(235, 235, 245, 0.18);
+    --color-inverse-label: #000000;
+
+    --color-primary: #0a84ff;
+    --color-success: #30d158;
+    --color-warning: #ff9f0a;
+    --color-danger: #ff453a;
+    --color-indigo: #5e5ce6;
+    --color-purple: #bf5af2;
+    --color-pink: #ff375f;
+    --color-cyan: #64d2ff;
+    --color-yellow: #ffd60a;
+
+    --color-primary-soft: rgba(10, 132, 255, 0.15);
+    --color-success-soft: rgba(48, 209, 88, 0.15);
+    --color-warning-soft: rgba(255, 159, 10, 0.15);
+    --color-danger-soft: rgba(255, 69, 58, 0.15);
+    --color-indigo-soft: rgba(94, 92, 230, 0.15);
+    --color-purple-soft: rgba(191, 90, 242, 0.15);
+    --color-pink-soft: rgba(255, 55, 95, 0.15);
+    --color-cyan-soft: rgba(100, 210, 255, 0.15);
+    --color-yellow-soft: rgba(255, 214, 10, 0.15);
+
+    --color-on-accent: #ffffff;
+    --color-shadow: rgba(0, 0, 0, 0);
+    --color-skeleton-base: #2c2c2e;
+    --color-skeleton-highlight: #3a3a3c;
+    --shadow-card: none;
+    --shadow-nav: 0 2rpx 16rpx rgba(0, 0, 0, 0.2);
+  }
+}
