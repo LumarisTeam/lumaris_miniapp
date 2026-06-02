@@ -148,5 +148,4 @@ export interface TileConfig {
   order: number
 }
 
-export type ThemeMode = 'system' | 'light' | 'dark'
 export type Locale = 'zh-CN' | 'en'

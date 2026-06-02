@@ -3,18 +3,6 @@
     <AppNavbar title="设置" show-back />
 
     <scroll-view scroll-y class="settings-page__scroll">
-      <!-- Appearance -->
-      <view class="settings-page__section">
-        <view class="settings-page__section-title">外观</view>
-        <ClubCard padding="0">
-          <ClubListTile title="深色模式" subtitle="跟随系统 / 浅色 / 深色">
-            <template #leading>
-              <LucideIcon name="moon" :size="20" color="var(--color-indigo)" />
-            </template>
-          </ClubListTile>
-        </ClubCard>
-      </view>
-
       <!-- Language -->
       <view class="settings-page__section">
         <view class="settings-page__section-title">语言</view>

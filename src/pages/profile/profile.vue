@@ -106,12 +106,11 @@ const services = [
   { name: '校车', icon: 'bus', route: '/pages/bus/bus', color: '#5856D6' },
   { name: '饭卡', icon: 'credit-card', route: '/pages/payment/payment', color: '#34C759' },
   { name: '校园地图', icon: 'map', route: '/pages/map/map', color: '#007AFF' },
-  { name: '校园网', icon: 'wifi', route: '/pages/network/network', color: '#5AC8FA' },
+  { name: '快速链接', icon: 'link', route: '/pages/link/link', color: '#007AFF' },
   { name: '培养计划', icon: 'book-open', route: '/pages/program/program', color: '#AF52DE' },
 ]
 
 const otherItems = [
-  { name: '快速链接', icon: 'link', route: '/pages/link/link', color: '#007AFF' },
   { name: '设置', icon: 'settings', route: '/pages/settings/settings', color: '#8E8E93' },
   { name: '关于', icon: 'info', route: '/pages/about/about', color: '#8E8E93' },
 ]

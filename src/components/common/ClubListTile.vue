@@ -44,6 +44,7 @@ function handleClick() {
   padding: 24rpx 32rpx;
   background-color: var(--color-card-bg);
   min-height: 96rpx;
+  border-radius: var(--radius-card);
 }
 
 .club-list-tile--tappable {
