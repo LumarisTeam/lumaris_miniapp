@@ -140,6 +140,19 @@ export interface ReleaseInfo {
   createdAt: string
 }
 
+export interface ElectricitySubscriptionQueryResponse {
+  email: string
+  hasSubscription: boolean
+  subscriptionId: string
+  threshold: number
+}
+
+export interface ElectricitySubscriptionRequest {
+  url: string
+  email: string
+  threshold: number
+}
+
 export type TileType = 'electricity' | 'bus' | 'payment'
 
 export interface TileConfig {

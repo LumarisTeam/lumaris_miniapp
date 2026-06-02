@@ -50,4 +50,6 @@ export const STORAGE_KEYS = {
   TILE_CONFIGS: 'tileConfigs',
   SCHOOL_CONFIG: 'schoolConfig',
   CREDENTIALS: 'credentials',
+  ELECTRICITY_URL: 'electricityUrl',
+  ELECTRICITY_SUBSCRIPTION_EMAIL: 'electricitySubscriptionEmail',
 }
