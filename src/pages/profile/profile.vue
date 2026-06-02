@@ -1,7 +1,5 @@
 <template>
   <view class="profile-page">
-    <AppNavbar title="我的" />
-
     <scroll-view scroll-y class="profile-page__scroll">
       <!-- User Header -->
       <view class="profile-page__header">
@@ -91,7 +89,6 @@
 </template>
 
 <script setup lang="ts">
-import AppNavbar from '@/components/common/AppNavbar.vue'
 import ClubCard from '@/components/common/ClubCard.vue'
 import ClubListTile from '@/components/common/ClubListTile.vue'
 import LucideIcon from '@/components/icons/LucideIcon.vue'
@@ -145,7 +142,7 @@ function handleLogout() {
 }
 
 .profile-page__scroll {
-  height: calc(100vh - 88px - env(safe-area-inset-top));
+  height: 100vh;
 }
 
 .profile-page__header {

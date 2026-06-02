@@ -28,7 +28,7 @@ const props = withDefaults(
   {
     title: '',
     showBack: false,
-    backgroundColor: 'var(--color-app-bg)',
+    backgroundColor: 'var(--color-grouped-bg)',
   },
 )
 
@@ -57,6 +57,7 @@ function handleBack() {
   align-items: center;
   padding: 0 32rpx;
   box-sizing: border-box;
+  background-color: var(--color-grouped-bg);
 }
 
 .app-navbar__back {

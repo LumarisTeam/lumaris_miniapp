@@ -27,7 +27,7 @@
     {
       "path": "pages/profile/profile",
       "style": {
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "我的"
       }
     },
     {

@@ -8,7 +8,7 @@
       </template>
     </AppNavbar>
 
-    <scroll-view scroll-y class="home-page__scroll">
+    <view class="home-page__scroll">
       <!-- Today's Schedule Section -->
       <view class="home-page__section">
         <view class="home-page__section-header">
@@ -77,7 +77,7 @@
       </view>
 
       <view class="home-page__bottom" />
-    </scroll-view>
+    </view>
   </view>
 </template>
 
@@ -242,7 +242,7 @@ onShow(() => {
 }
 
 .home-page__scroll {
-  height: calc(100vh - 88px - env(safe-area-inset-top));
+  padding-bottom: 120rpx;
 }
 
 .home-page__section {
@@ -301,6 +301,6 @@ onShow(() => {
 }
 
 .home-page__bottom {
-  height: 120rpx;
+  height: 0;
 }
 </style>
