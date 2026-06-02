@@ -13,6 +13,12 @@ export function getStorage<T>(name: string): T | null {
   }
 }
 
+/** Safely retrieve an array from storage. Returns [] if the stored value is missing or not an array. */
+export function getStorageArray<T>(name: string): T[] {
+  const val = getStorage<T[]>(name)
+  return Array.isArray(val) ? val : []
+}
+
 export function setStorage(name: string, value: unknown): void {
   try {
     uni.setStorageSync(key(name), value)

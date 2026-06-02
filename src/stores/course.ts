@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Course } from '@/types'
-import { getStorage, setStorage, STORAGE_KEYS } from '@/utils/storage'
+import { getStorage, getStorageArray, setStorage, STORAGE_KEYS } from '@/utils/storage'
 import { getCourses } from '@/api/modules/course'
 
 const COURSE_COLORS = [
@@ -25,9 +25,9 @@ function assignColors(courses: Course[]): Course[] {
 }
 
 export const useCourseStore = defineStore('course', () => {
-  const courses = ref<Course[]>(getStorage<Course[]>(STORAGE_KEYS.COURSE_DATA) ?? [])
-  const ignoredCourses = ref<string[]>(getStorage<string[]>(STORAGE_KEYS.IGNORED_COURSES) ?? [])
-  const customCourses = ref<Course[]>(getStorage<Course[]>(STORAGE_KEYS.CUSTOM_COURSES) ?? [])
+  const courses = ref<Course[]>(getStorageArray<Course>(STORAGE_KEYS.COURSE_DATA))
+  const ignoredCourses = ref<string[]>(getStorageArray<string>(STORAGE_KEYS.IGNORED_COURSES))
+  const customCourses = ref<Course[]>(getStorageArray<Course>(STORAGE_KEYS.CUSTOM_COURSES))
   const loading = ref(false)
   const error = ref('')
 

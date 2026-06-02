@@ -6,7 +6,10 @@
       <!-- Today's Schedule Section -->
       <view class="home-page__section">
         <view class="home-page__section-header">
-          <text class="home-page__section-title">今日课程</text>
+          <view class="home-page__section-header-with-icon">
+            <LucideIcon name="school" :size="20" color="var(--color-primary)" />
+            <text class="home-page__section-title">今日课程</text>
+          </view>
           <text class="home-page__section-date">{{ todayDate }}</text>
         </view>
 
@@ -251,6 +254,12 @@ onShow(() => {
   display: flex;
   align-items: center;
   gap: 12rpx;
+}
+
+.home-page__section-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 24rpx;
 }
 
