@@ -49,6 +49,7 @@ import type { Course } from '@/types'
 const props = defineProps<{
   courses: Course[]
   currentWeek: number
+  weekStartDate: Date
 }>()
 
 defineEmits<{
@@ -58,18 +59,19 @@ defineEmits<{
 const weekdays = computed(() => {
   const labels = ['一', '二', '三', '四', '五', '六', '日']
   const today = new Date()
-  const currentDayOfWeek = today.getDay() || 7
-  const startOfWeek = new Date(today)
-  startOfWeek.setDate(today.getDate() - currentDayOfWeek + 1)
+  const startOfWeek = new Date(props.weekStartDate)
 
   return labels.map((label, i) => {
     const date = new Date(startOfWeek)
     date.setDate(date.getDate() + i)
+    const isToday = date.getFullYear() === today.getFullYear()
+      && date.getMonth() === today.getMonth()
+      && date.getDate() === today.getDate()
     return {
       key: i + 1,
       label,
       date: `${date.getMonth() + 1}/${date.getDate()}`,
-      isToday: i + 1 === currentDayOfWeek,
+      isToday,
     }
   })
 })

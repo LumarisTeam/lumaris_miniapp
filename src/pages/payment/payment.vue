@@ -19,6 +19,15 @@
       </view>
 
       <scroll-view scroll-y class="payment-page__scroll" v-if="!loading">
+        <view class="payment-page__section" v-if="errorMessage">
+          <ErrorState
+            title="消费记录加载失败"
+            :message="errorMessage"
+            retry-text="重试"
+            @retry="fetchData"
+          />
+        </view>
+
         <view class="payment-page__section" v-if="records.length > 0">
           <ClubCard padding="0">
             <view
@@ -33,15 +42,15 @@
               </view>
               <text
                 class="payment-page__item-amount"
-                :class="{ 'payment-page__item-amount--positive': item.tranamt > 0 }"
+                :class="{ 'payment-page__item-amount--positive': amountOf(item) > 0 }"
               >
-                {{ item.tranamt > 0 ? '+' : '' }}{{ item.tranamt.toFixed(2) }}
+                {{ amountOf(item) > 0 ? '+' : '' }}{{ amountOf(item).toFixed(2) }}
               </text>
             </view>
           </ClubCard>
         </view>
 
-        <EmptyState v-else icon="credit-card" title="暂无消费记录" :padding-top="'120rpx'" />
+        <EmptyState v-else-if="!errorMessage" icon="credit-card" title="暂无消费记录" :padding-top="'120rpx'" />
       </scroll-view>
 
       <LoadingState v-else text="加载中..." padding-top="120rpx" />
@@ -50,41 +59,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import AppNavbar from '@/components/common/AppNavbar.vue'
 import ClubCard from '@/components/common/ClubCard.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
+import ErrorState from '@/components/common/ErrorState.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
 import LucideIcon from '@/components/icons/LucideIcon.vue'
 import { useUserStore } from '@/stores/user'
 import { getPaymentRecords } from '@/api/modules/payment'
 import type { PaymentRecord } from '@/types'
+import { toNumber } from '@/utils/education'
 
 const userStore = useUserStore()
 const records = ref<PaymentRecord[]>([])
 const balance = ref(0)
 const loading = ref(false)
+const errorMessage = ref('')
 
 const balanceText = computed(() => balance.value.toFixed(2))
 
+function amountOf(record: PaymentRecord): number {
+  return toNumber(record.tranamt)
+}
+
 async function fetchData() {
   loading.value = true
+  errorMessage.value = ''
   try {
     const studentId = userStore.studentId
     const res = await getPaymentRecords(studentId)
-    if (res.data) {
-      records.value = res.data
-      const total = res.data.reduce((sum, r) => sum + r.tranamt, 0)
-      balance.value = res.total ?? (100 - total)
-    }
+    records.value = res.data?.records ?? []
+    balance.value = res.data?.balance ?? 0
   } catch (e) {
-    console.error('Failed to fetch payment data:', e)
+    errorMessage.value = e instanceof Error ? e.message : '获取消费记录失败'
+    records.value = []
+    balance.value = 0
   } finally {
     loading.value = false
   }
 }
 
-onMounted(() => {
+onShow(() => {
   if (userStore.isLogin) {
     fetchData()
   }

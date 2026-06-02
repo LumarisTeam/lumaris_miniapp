@@ -25,29 +25,31 @@ function assignColors(courses: Course[]): Course[] {
 }
 
 export const useCourseStore = defineStore('course', () => {
-  const courses = ref<Course[]>([])
+  const courses = ref<Course[]>(getStorage<Course[]>(STORAGE_KEYS.COURSE_DATA) ?? [])
   const ignoredCourses = ref<string[]>(getStorage<string[]>(STORAGE_KEYS.IGNORED_COURSES) ?? [])
   const customCourses = ref<Course[]>(getStorage<Course[]>(STORAGE_KEYS.CUSTOM_COURSES) ?? [])
   const loading = ref(false)
+  const error = ref('')
 
   const visibleCourses = computed(() =>
     courses.value.filter((c) => !ignoredCourses.value.includes(c.name)),
   )
 
-  const todayCourses = computed(() => {
-    const now = new Date()
-    const dayOfWeek = now.getDay() || 7
-    return visibleCourses.value.filter((c) => c.dayOfWeek === dayOfWeek)
-  })
-
   async function fetchCourses(studentId: string) {
     loading.value = true
+    error.value = ''
     try {
       const res = await getCourses(studentId)
-      if (res.data?.courses) {
-        courses.value = assignColors(res.data.courses)
-        setStorage(STORAGE_KEYS.COURSE_DATA, assignColors(res.data.courses))
+      const normalizedCourses = assignColors(res.data ?? [])
+      courses.value = normalizedCourses
+      setStorage(STORAGE_KEYS.COURSE_DATA, normalizedCourses)
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : '课程加载失败'
+      const cachedCourses = getStorage<Course[]>(STORAGE_KEYS.COURSE_DATA)
+      if (cachedCourses) {
+        courses.value = assignColors(cachedCourses)
       }
+      throw err
     } finally {
       loading.value = false
     }
@@ -96,8 +98,8 @@ export const useCourseStore = defineStore('course', () => {
     customCourses,
     ignoredCourses,
     visibleCourses,
-    todayCourses,
     loading,
+    error,
     fetchCourses,
     loadGuestCourses,
     addCustomCourse,

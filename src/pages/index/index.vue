@@ -38,7 +38,7 @@
         <template v-else>
           <CourseCard
             v-for="course in todaySchedules"
-            :key="course.name"
+            :key="`${course.name}-${course.dayOfWeek}-${course.startSlot}`"
             :name="course.name"
             :location="course.location"
             :teacher="course.teacher"
@@ -72,27 +72,36 @@
         </view>
       </view>
 
+      <view class="home-page__section" v-if="userStore.isLogin">
+        <HomeExamCard :student-id="userStore.studentId" />
+      </view>
+
       <view class="home-page__bottom" />
     </scroll-view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import AppNavbar from '@/components/common/AppNavbar.vue'
 import ClubCard from '@/components/common/ClubCard.vue'
 import CourseCard from '@/components/schedule/CourseCard.vue'
 import TileCard from '@/components/tiles/TileCard.vue'
 import LucideIcon from '@/components/icons/LucideIcon.vue'
+import HomeExamCard from '@/components/home/HomeExamCard.vue'
 import { useUserStore } from '@/stores/user'
 import { useCourseStore } from '@/stores/course'
 import { useSettingsStore } from '@/stores/settings'
+import { useScheduleStore } from '@/stores/schedule'
 import { getStorage, STORAGE_KEYS } from '@/utils/storage'
 import type { Course, TileType } from '@/types'
+import { getCourseTimeRange, isCourseActiveForToday } from '@/utils/education'
 
 const userStore = useUserStore()
 const courseStore = useCourseStore()
 const settingsStore = useSettingsStore()
+const scheduleStore = useScheduleStore()
 
 const todayDate = computed(() => {
   const d = new Date()
@@ -106,11 +115,17 @@ const hasGuestCourses = computed(() => {
 })
 
 const todaySchedules = computed(() => {
+  const now = new Date()
+  const dayOfWeek = now.getDay() || 7
   const all = [
-    ...courseStore.todayCourses,
+    ...courseStore.visibleCourses.filter((course) => {
+      return (
+        course.dayOfWeek === dayOfWeek &&
+        course.weeks.includes(scheduleStore.currentWeek) &&
+        isCourseActiveForToday(course, now)
+      )
+    }),
     ...courseStore.customCourses.filter((c) => {
-      const now = new Date()
-      const dayOfWeek = now.getDay() || 7
       return c.dayOfWeek === dayOfWeek
     }),
   ]
@@ -166,13 +181,34 @@ function goLogin() {
 }
 
 function showCourseDetail(course: Course) {
-  uni.showToast({ title: `${course.name}\n${course.location}`, icon: 'none' })
+  const time = getCourseTimeRange(course)
+  const detailLines = [course.name]
+  if (course.location) detailLines.push(course.location)
+  if (time.start && time.end) detailLines.push(`${time.start}-${time.end}`)
+  uni.showToast({ title: detailLines.join('\n'), icon: 'none' })
 }
 
-onMounted(() => {
+async function syncHomeData() {
   if (!userStore.isLogin) {
     courseStore.loadGuestCourses()
+    return
   }
+
+  try {
+    await scheduleStore.fetchTimeInfo()
+  } catch {
+    // Let the page fall back to the currently selected week.
+  }
+
+  try {
+    await courseStore.fetchCourses(userStore.studentId)
+  } catch {
+    // Keep cached course data if the network call fails.
+  }
+}
+
+onShow(() => {
+  syncHomeData()
 })
 </script>
 

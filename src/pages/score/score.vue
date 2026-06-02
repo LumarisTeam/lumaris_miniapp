@@ -66,6 +66,16 @@
           <LoadingState :padding-top="'60rpx'" text="加载成绩中..." />
         </view>
 
+        <view class="score-page__section" v-else-if="errorMessage">
+          <ErrorState
+            :padding-top="'60rpx'"
+            title="成绩加载失败"
+            :message="errorMessage"
+            retry-text="重试"
+            @retry="refreshScores"
+          />
+        </view>
+
         <view class="score-page__section" v-else-if="scores.length > 0">
           <ClubCard padding="0">
             <view
@@ -103,67 +113,96 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import AppNavbar from '@/components/common/AppNavbar.vue'
 import ClubCard from '@/components/common/ClubCard.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
+import ErrorState from '@/components/common/ErrorState.vue'
 import LoadingState from '@/components/common/LoadingState.vue'
 import LucideIcon from '@/components/icons/LucideIcon.vue'
 import { useUserStore } from '@/stores/user'
-import { getSemesters, getScores } from '@/api/modules/score'
+import { getCurrentSemester, getSemesters, getScores } from '@/api/modules/score'
 import type { ScoreItem, Semester } from '@/types'
+import { toNumber } from '@/utils/education'
 
 const userStore = useUserStore()
 const scores = ref<ScoreItem[]>([])
 const semesters = ref<Semester[]>([])
 const currentSemester = ref('')
 const loading = ref(false)
+const errorMessage = ref('')
 
 const gpa = computed(() => {
   if (scores.value.length === 0) return '--'
-  const total = scores.value.reduce((sum, s) => sum + s.gpa * s.credit, 0)
-  const totalCredits = scores.value.reduce((sum, s) => sum + s.credit, 0)
+  const total = scores.value.reduce((sum, s) => sum + toNumber(s.gpa) * toNumber(s.credit), 0)
+  const totalCredits = scores.value.reduce((sum, s) => sum + toNumber(s.credit), 0)
   return totalCredits > 0 ? (total / totalCredits).toFixed(2) : '--'
 })
 
 const totalCourses = computed(() => scores.value.length)
 
 const totalCredits = computed(() =>
-  scores.value.reduce((sum, s) => sum + s.credit, 0).toFixed(0),
+  scores.value.reduce((sum, s) => sum + toNumber(s.credit), 0).toFixed(0),
 )
 
-function getIndicatorStyle(gpa: number) {
-  if (gpa >= 3.7) return { backgroundColor: '#34C759' }
-  if (gpa >= 2.7) return { backgroundColor: '#007AFF' }
-  if (gpa >= 1.7) return { backgroundColor: '#FF9500' }
+function getIndicatorStyle(rawGpa: number | string | null | undefined) {
+  const value = toNumber(rawGpa)
+  if (value >= 3.7) return { backgroundColor: '#34C759' }
+  if (value >= 2.7) return { backgroundColor: '#007AFF' }
+  if (value >= 1.7) return { backgroundColor: '#FF9500' }
   return { backgroundColor: '#FF3B30' }
 }
 
 async function fetchSemesters() {
+  errorMessage.value = ''
   try {
-    const res = await getSemesters(userStore.studentId)
-    if (res.data) {
-      semesters.value = res.data
-      if (res.data.length > 0) {
-        currentSemester.value = res.data[0].value
-        fetchScores()
-      }
+    const [semesterRes, currentRes] = await Promise.allSettled([
+      getSemesters(userStore.studentId),
+      getCurrentSemester(),
+    ])
+
+    if (semesterRes.status === 'fulfilled' && semesterRes.value.data) {
+      semesters.value = semesterRes.value.data
+    } else {
+      semesters.value = []
     }
+
+    if (semesters.value.length === 0) {
+      currentSemester.value = ''
+      scores.value = []
+      return
+    }
+
+    if (currentRes.status === 'fulfilled' && currentRes.value.data?.value) {
+      currentSemester.value = currentRes.value.data.value
+    } else {
+      currentSemester.value = semesters.value[0].value
+    }
+
+    if (!semesters.value.some((semester) => semester.value === currentSemester.value)) {
+      currentSemester.value = semesters.value[0].value
+    }
+
+    await fetchScores()
   } catch (e) {
-    console.error('Failed to fetch semesters:', e)
+    errorMessage.value = e instanceof Error ? e.message : '获取学期失败'
   }
 }
 
 async function fetchScores() {
-  if (!currentSemester.value) return
+  if (!currentSemester.value) {
+    scores.value = []
+    return
+  }
   loading.value = true
+  errorMessage.value = ''
   try {
     const res = await getScores(userStore.studentId, currentSemester.value)
-    if (res.data) {
-      scores.value = res.data
-    }
+    scores.value = res.data ?? []
   } catch (e) {
-    console.error('Failed to fetch scores:', e)
+    errorMessage.value = e instanceof Error ? e.message : '获取成绩失败'
+    scores.value = []
   } finally {
     loading.value = false
   }
@@ -175,14 +214,18 @@ function selectSemester(value: string) {
 }
 
 function refreshScores() {
-  fetchScores()
+  if (semesters.value.length === 0) {
+    fetchSemesters()
+  } else {
+    fetchScores()
+  }
 }
 
 function goLogin() {
   uni.navigateTo({ url: '/pages/login/login' })
 }
 
-onMounted(() => {
+onShow(() => {
   if (userStore.isLogin) {
     fetchSemesters()
   }

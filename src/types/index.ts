@@ -5,6 +5,8 @@ export interface ApiResponse<T> {
   total?: number | null
 }
 
+export type NumericLike = number | string | null | undefined
+
 export interface LoginResponse {
   success: boolean
   studentId: string
@@ -26,6 +28,7 @@ export interface Course {
   dayOfWeek: number
   startSlot: number
   endSlot: number
+  campus?: string
   color?: string
   isCustom?: boolean
 }
@@ -35,13 +38,15 @@ export interface ScoreItem {
   lessonCode: string
   lessonName: string
   grade: string
-  gpa: number
+  gpa: NumericLike
   gradeDetail: string
-  credit: number
+  credit: NumericLike
   isMinor: boolean
 }
 
 export interface Semester {
+  semester: string
+  name: string
   value: string
   text: string
 }
@@ -70,7 +75,7 @@ export interface PaymentRecord {
   turnoverType: string
   datetimeStr: string
   resume: string
-  tranamt: number
+  tranamt: NumericLike
 }
 
 export interface PlanCourse {
@@ -116,6 +121,14 @@ export interface School {
   name: string
   website: string
   features: string[]
+}
+
+export interface TimeInfo {
+  startTime: string
+  endTime: string
+  semester: string
+  currentWeek?: number
+  extra?: Record<string, string>
 }
 
 export interface ReleaseInfo {

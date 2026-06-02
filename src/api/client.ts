@@ -1,4 +1,5 @@
 import type { ApiResponse } from '@/types'
+import { getStorage, STORAGE_KEYS } from '@/utils/storage'
 
 const BASE_URL = 'https://xauatapi.xauat.site/v1'
 
@@ -19,28 +20,54 @@ interface Interceptor {
 let globalInterceptor: Interceptor | null = null
 let reLoginLock: Promise<boolean> | null = null
 let isRelogging = false
+let reLoginFn: (() => Promise<boolean>) | null = null
 
 export function setInterceptor(interceptor: Interceptor) {
   globalInterceptor = interceptor
 }
 
 export function setReLoginFn(fn: () => Promise<boolean>) {
-  // Will be called when 401/403 detected
+  reLoginFn = fn
 }
-
-let reLoginFn: (() => Promise<boolean>) | null = null
 
 export function registerReLogin(fn: () => Promise<boolean>) {
   reLoginFn = fn
 }
 
-export async function request<T>(config: RequestConfig): Promise<ApiResponse<T>> {
-  const { url, method = 'GET', data, header = {}, showLoading = false } = config
+function getAuthHeaders() {
+  const userData = getStorage<{ cookie?: string }>(STORAGE_KEYS.USER_DATA)
+  const cookie = userData?.cookie?.trim()
 
+  if (!cookie) {
+    return {}
+  }
+
+  return {
+    Cookie: cookie,
+    xauat: cookie,
+  }
+}
+
+function buildHeaders(header: Record<string, string>) {
+  return {
+    'Content-Type': 'application/json',
+    ...getAuthHeaders(),
+    ...header,
+  }
+}
+
+export async function request<T>(config: RequestConfig): Promise<ApiResponse<T>> {
   let finalConfig = { ...config }
   if (globalInterceptor?.onRequest) {
     finalConfig = globalInterceptor.onRequest(finalConfig)
   }
+  const {
+    url,
+    method = 'GET',
+    data,
+    header = {},
+    showLoading = false,
+  } = finalConfig
 
   if (showLoading) {
     uni.showLoading({ title: '', mask: true })
@@ -54,10 +81,7 @@ export async function request<T>(config: RequestConfig): Promise<ApiResponse<T>>
       uni.request({
         url: BASE_URL + url,
         method,
-        header: {
-          'Content-Type': 'application/json',
-          ...header,
-        },
+        header: buildHeaders(header),
         data,
         success: (res) => {
           resolve({ statusCode: res.statusCode, data: res.data as ApiResponse<T> })
@@ -71,6 +95,8 @@ export async function request<T>(config: RequestConfig): Promise<ApiResponse<T>>
     if (showLoading) {
       uni.hideLoading()
     }
+
+    globalInterceptor?.onResponse?.(response as { statusCode: number; data: ApiResponse<unknown> })
 
     if ((response.statusCode === 401 || response.statusCode === 403) && reLoginFn) {
       if (!isRelogging) {
@@ -89,10 +115,7 @@ export async function request<T>(config: RequestConfig): Promise<ApiResponse<T>>
         uni.request({
           url: BASE_URL + url,
           method,
-          header: {
-            'Content-Type': 'application/json',
-            ...header,
-          },
+          header: buildHeaders(header),
           data,
           success: (res) => {
             resolve({ statusCode: res.statusCode, data: res.data as ApiResponse<T> })
@@ -102,6 +125,7 @@ export async function request<T>(config: RequestConfig): Promise<ApiResponse<T>>
           },
         })
       })
+      globalInterceptor?.onResponse?.(retryResponse as { statusCode: number; data: ApiResponse<unknown> })
       return retryResponse.data
     }
 
@@ -109,6 +133,9 @@ export async function request<T>(config: RequestConfig): Promise<ApiResponse<T>>
   } catch (error) {
     if (showLoading) {
       uni.hideLoading()
+    }
+    if (typeof error === 'object' && error && 'statusCode' in error && 'data' in error) {
+      globalInterceptor?.onError?.(error as { statusCode: number; data: ApiResponse<unknown> })
     }
     throw error
   }

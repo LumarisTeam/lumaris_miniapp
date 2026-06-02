@@ -1,14 +1,23 @@
 import { apiGet } from '../client'
 import type { ApiResponse, ScoreItem, Semester } from '@/types'
+import { normalizeSemester } from '@/utils/education'
 
-export function getSemesters(studentId: string): Promise<ApiResponse<Semester[]>> {
-  return apiGet('/Score/Semester', { studentId })
+export async function getSemesters(studentId: string): Promise<ApiResponse<Semester[]>> {
+  const response = await apiGet<Record<string, unknown>[]>('/Score/Semester', { studentId })
+  return {
+    ...response,
+    data: Array.isArray(response.data) ? response.data.map((semester) => normalizeSemester(semester)) : [],
+  }
 }
 
 export function getScores(studentId: string, semester: string): Promise<ApiResponse<ScoreItem[]>> {
   return apiGet('/Score', { studentId, semester })
 }
 
-export function getCurrentSemester(): Promise<ApiResponse<{ value: string; text: string }>> {
-  return apiGet('/Score/ThisSemester')
+export async function getCurrentSemester(): Promise<ApiResponse<Semester>> {
+  const response = await apiGet<Record<string, unknown>>('/Score/ThisSemester')
+  return {
+    ...response,
+    data: response.data ? normalizeSemester(response.data) : normalizeSemester({}),
+  }
 }
