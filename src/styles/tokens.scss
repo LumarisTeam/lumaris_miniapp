@@ -1,4 +1,4 @@
-:root {
+page, :root {
   /* ---- Semantic Colors (Light) ---- */
   --color-app-bg: #ffffff;
   --color-grouped-bg: #f8f8f8;
@@ -43,16 +43,16 @@
   --color-skeleton-highlight: #f4f4f4;
 
   /* ---- Radii ---- */
-  --radius-xs: 8rpx;
-  --radius-sm: 16rpx;
-  --radius-md: 24rpx;
-  --radius-lg: 32rpx;
-  --radius-xl: 40rpx;
-  --radius-xxl: 48rpx;
-  --radius-card: 36rpx;
-  --radius-tile: 44rpx;
-  --radius-panel: 32rpx;
-  --radius-indicator: 4rpx;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-xxl: 24px;
+  --radius-card: 18px;
+  --radius-tile: 22px;
+  --radius-panel: 16px;
+  --radius-indicator: 2px;
 
   /* ---- Spacing ---- */
   --space-xs: 8rpx;
@@ -80,8 +80,8 @@
   --letter-spacing-title: -0.5px;
 
   /* ---- Shadows ---- */
-  --shadow-card: 0 8rpx 40rpx -4rpx rgba(0, 0, 0, 0.1);
-  --shadow-nav: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.1);
+  --shadow-nav: 0 1px 8px rgba(0, 0, 0, 0.04);
 
   /* ---- Animation ---- */
   --transition-fast: 200ms ease-in-out;

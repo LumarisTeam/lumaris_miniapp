@@ -28,3 +28,14 @@ export function rpxToPx(rpx: number): number {
   const info = getSystemInfo()
   return (rpx * info.windowWidth) / 750
 }
+
+export function getMenuButtonInfo(): UniApp.GetMenuButtonBoundingClientRectRes | null {
+  // #ifdef MP-WEIXIN
+  try {
+    return uni.getMenuButtonBoundingClientRect()
+  } catch {
+    return null
+  }
+  // #endif
+  return null
+}

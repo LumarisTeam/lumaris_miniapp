@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { getStatusBarHeight } from '@/utils/platform'
+import { getStatusBarHeight, getMenuButtonInfo, getWindowWidth } from '@/utils/platform'
 import LucideIcon from '../icons/LucideIcon.vue'
 
 const props = withDefaults(
@@ -33,13 +33,31 @@ const props = withDefaults(
 )
 
 const statusBarHeight = getStatusBarHeight()
-const navBarHeight = 88
+const menuButtonInfo = getMenuButtonInfo()
 
-const navbarStyle = computed(() => ({
-  paddingTop: statusBarHeight + 'px',
-  height: navBarHeight + 'px',
-  backgroundColor: props.backgroundColor,
-}))
+// Calculate navbar content height to vertically align with the WeChat capsule button.
+// Falls back to 44px on non-WeChat platforms.
+const navBarHeight = menuButtonInfo
+  ? (menuButtonInfo.top - statusBarHeight) * 2 + menuButtonInfo.height
+  : 44
+
+// Calculate right padding to avoid overlapping the WeChat capsule buttons.
+// Adds 8px extra margin beyond the capsule edge.
+const capsuleRightPadding = menuButtonInfo
+  ? getWindowWidth() - menuButtonInfo.left + 8
+  : 0
+
+const navbarStyle = computed(() => {
+  const style: Record<string, string> = {
+    paddingTop: statusBarHeight + 'px',
+    height: statusBarHeight + navBarHeight + 'px',
+    backgroundColor: props.backgroundColor,
+  }
+  if (capsuleRightPadding > 0) {
+    style.paddingRight = capsuleRightPadding + 'px'
+  }
+  return style
+})
 
 function handleBack() {
   uni.navigateBack()
