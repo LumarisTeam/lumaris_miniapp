@@ -299,12 +299,12 @@ onShow(() => {
 
 .home-page__tiles-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24rpx;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16rpx;
 }
 
 .home-page__tile {
-  aspect-ratio: 1;
+  min-width: 0;
 }
 
 .home-page__bottom {

@@ -1,11 +1,13 @@
 <template>
   <view class="profile-page">
+    <AppNavbar title="我的"/>
+
     <scroll-view scroll-y class="profile-page__scroll">
       <!-- User Header -->
       <view class="profile-page__header">
         <template v-if="userStore.isLogin">
           <view class="profile-page__avatar">
-            <LucideIcon name="user" :size="36" color="var(--color-on-accent)" />
+            <LucideIcon name="user" :size="24" color="var(--color-on-accent)" />
           </view>
           <view class="profile-page__user-info">
             <text class="profile-page__username">{{ userStore.userData?.name || '同学' }}</text>
@@ -14,7 +16,7 @@
         </template>
         <template v-else>
           <view class="profile-page__avatar profile-page__avatar--ghost">
-            <LucideIcon name="user" :size="36" color="var(--color-tertiary-label)" />
+            <LucideIcon name="user" :size="24" color="var(--color-tertiary-label)" />
           </view>
           <view class="profile-page__user-info">
             <text class="profile-page__username">未登录</text>
@@ -90,6 +92,7 @@
 
 <script setup lang="ts">
 import ClubCard from '@/components/common/ClubCard.vue'
+import AppNavbar from '@/components/common/AppNavbar.vue'
 import ClubListTile from '@/components/common/ClubListTile.vue'
 import LucideIcon from '@/components/icons/LucideIcon.vue'
 import { useUserStore } from '@/stores/user'
@@ -142,7 +145,7 @@ function handleLogout() {
 }
 
 .profile-page__scroll {
-  height: 100vh;
+  height: calc(100vh - 88px - env(safe-area-inset-top));
 }
 
 .profile-page__header {
@@ -153,8 +156,8 @@ function handleLogout() {
 }
 
 .profile-page__avatar {
-  width: 128rpx;
-  height: 128rpx;
+  width: 80rpx;
+  height: 80rpx;
   border-radius: var(--radius-tile);
   background: linear-gradient(135deg, var(--color-primary), var(--color-indigo));
   display: flex;

@@ -1,7 +1,7 @@
 @import './tokens.scss';
 
 page {
-  background-color: #f8f8f8;
+  background-color: var(--color-grouped-bg);
   color: var(--color-label);
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC',
     'Helvetica Neue', Helvetica, Arial, sans-serif;
