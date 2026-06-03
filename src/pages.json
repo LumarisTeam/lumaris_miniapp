@@ -96,7 +96,8 @@
     "navigationBarTitleText": "光序",
     "navigationBarBackgroundColor": "#FFFFFF",
     "backgroundColor": "#F8F8F8",
-    "navigationStyle": "custom"
+    "navigationStyle": "custom",
+    "styleIsolation": "apply-shared"
   },
   "tabBar": {
     "color": "rgba(60,60,67,0.6)",

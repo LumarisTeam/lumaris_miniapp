@@ -11,5 +11,13 @@ export default defineConfig({
       ),
     },
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData:
+          `$app-bg: #ffffff;\n$grouped-bg: #e5e5ea;\n$card-bg: #ffffff;\n`,
+      },
+    },
+  },
   plugins: [uni()],
 });
