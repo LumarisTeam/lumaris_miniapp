@@ -2,7 +2,7 @@
   <view class="link-page">
     <AppNavbar title="快速链接" show-back />
 
-    <scroll-view scroll-y class="link-page__scroll" v-if="!loading">
+    <scroll-view scroll-y class="link-page__scroll" v-if="!loading" :refresher-enabled="true" :refresher-triggered="isRefreshing" @refresherrefresh="onPullRefresh">
       <template v-if="links.length > 0">
         <view class="link-page__section" v-for="(group, category) in groupedLinks" :key="category">
           <view class="link-page__category-title">
@@ -49,6 +49,7 @@ import type { LinkItem } from '@/types'
 
 const links = ref<LinkItem[]>([])
 const loading = ref(false)
+const isRefreshing = ref(false)
 
 const groupedLinks = computed(() => {
   const groups: Record<string, LinkItem[]> = {}
@@ -83,6 +84,12 @@ async function fetchData() {
   } finally {
     loading.value = false
   }
+}
+
+async function onPullRefresh() {
+  isRefreshing.value = true
+  await fetchData()
+  isRefreshing.value = false
 }
 
 onMounted(() => {

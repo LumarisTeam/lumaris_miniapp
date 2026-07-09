@@ -106,8 +106,8 @@ export interface MapPoi {
   id: number
   name: string
   category: string
-  latitude: number
-  longitude: number
+  latitude: number | string
+  longitude: number | string
   description: string
   address: string
   campus: string

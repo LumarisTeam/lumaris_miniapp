@@ -18,7 +18,7 @@
         </ClubCard>
       </view>
 
-      <scroll-view scroll-y class="payment-page__scroll" v-if="!loading">
+      <scroll-view scroll-y class="payment-page__scroll" v-if="!loading" :refresher-enabled="true" :refresher-triggered="isRefreshing" @refresherrefresh="onPullRefresh">
         <view class="payment-page__section" v-if="errorMessage">
           <ErrorState
             title="消费记录加载失败"
@@ -76,6 +76,7 @@ const userStore = useUserStore()
 const records = ref<PaymentRecord[]>([])
 const balance = ref(0)
 const loading = ref(false)
+const isRefreshing = ref(false)
 const errorMessage = ref('')
 
 const balanceText = computed(() => balance.value.toFixed(2))
@@ -99,6 +100,12 @@ async function fetchData() {
   } finally {
     loading.value = false
   }
+}
+
+async function onPullRefresh() {
+  isRefreshing.value = true
+  await fetchData()
+  isRefreshing.value = false
 }
 
 onShow(() => {

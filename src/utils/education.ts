@@ -156,6 +156,21 @@ export function getCourseTimeRange(course: Course, now = new Date()): { start: s
   }
 }
 
+export function getSlotTimeInfo(slot: number, campus?: string, now = new Date()): { start: string; end: string } {
+  const isCaoTang = campus === '草堂校区'
+  const month = now.getMonth() + 1
+  const useSummerTime = month >= 5 && month < 10
+  const startTable = isCaoTang ? CANTANG_START : useSummerTime ? YANTA_SUMMER_START : YANTA_WINTER_START
+  const endTable = isCaoTang ? CANTANG_END : useSummerTime ? YANTA_SUMMER_END : YANTA_WINTER_END
+
+  return {
+    start: startTable[slot] ?? '',
+    end: endTable[slot] ?? '',
+  }
+}
+
+export const MAX_PERIOD_COUNT = 13
+
 export function isCourseActiveForToday(course: Course, now = new Date()): boolean {
   const { end } = getCourseTimeRange(course, now)
   if (!end) {

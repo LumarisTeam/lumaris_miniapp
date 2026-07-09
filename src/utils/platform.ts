@@ -39,3 +39,24 @@ export function getMenuButtonInfo(): UniApp.GetMenuButtonBoundingClientRectRes |
   // #endif
   return null
 }
+
+export const FEATURES = {
+  timetable: 'timetable',
+  gradeQuery: 'grade_query',
+  gpaCalculation: 'gpa_calculation',
+  courseSelection: 'course_schedule',
+  examSchedule: 'exam_schedule',
+  login: 'login',
+  busSchedule: 'bus_schedule',
+  program: 'program',
+  studyProgress: 'study_progress',
+  electricity: 'electricity',
+  payment: 'payment',
+  map: 'map',
+} as const
+
+const ENABLED_FEATURES: string[] = Object.values(FEATURES)
+
+export function supportsFeature(feature: string): boolean {
+  return ENABLED_FEATURES.includes(feature)
+}

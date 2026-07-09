@@ -7,7 +7,7 @@
     </template>
 
     <template v-else>
-      <scroll-view scroll-y class="program-page__scroll" v-if="!loading">
+      <scroll-view scroll-y class="program-page__scroll" v-if="!loading" :refresher-enabled="true" :refresher-triggered="isRefreshing" @refresherrefresh="onPullRefresh">
         <template v-if="planCourses.length > 0">
           <view class="program-page__section" v-for="(group, term) in groupedCourses" :key="term">
             <view class="program-page__term-title">
@@ -61,6 +61,7 @@ import type { PlanCourse } from '@/types'
 const userStore = useUserStore()
 const planCourses = ref<PlanCourse[]>([])
 const loading = ref(false)
+const isRefreshing = ref(false)
 
 const groupedCourses = computed(() => {
   const groups: Record<string, PlanCourse[]> = {}
@@ -84,6 +85,12 @@ async function fetchData() {
   } finally {
     loading.value = false
   }
+}
+
+async function onPullRefresh() {
+  isRefreshing.value = true
+  await fetchData()
+  isRefreshing.value = false
 }
 
 onMounted(() => {

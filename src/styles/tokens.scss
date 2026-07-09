@@ -52,6 +52,7 @@ page {
   --radius-card: 18px;
   --radius-tile: 22px;
   --radius-panel: 16px;
+  --radius-pill: 100px;
   --radius-indicator: 2px;
 
   /* ---- Spacing ---- */
@@ -88,4 +89,54 @@ page {
   --transition-normal: 300ms ease-in-out;
   --transition-slow: 400ms ease-in-out;
   --press-scale: 0.95;
+}
+
+/* ---- Semantic Colors (Dark) ---- */
+@media (prefers-color-scheme: dark) {
+  page {
+    --color-app-bg: #1a1a1a;
+    --color-grouped-bg: #121212;
+    --color-card-bg: #1e1e1e;
+    --color-card-overlay: #b31e1e1e;
+    --color-surface-raised: #2c2c2e;
+    --color-surface-muted: #3a3a3c;
+    --color-surface-sunken: #1c1c1e;
+    --color-separator: rgba(84, 84, 88, 0.65);
+    --color-border-strong: #38383a;
+
+    --color-label: #ffffff;
+    --color-secondary-label: rgba(235, 235, 245, 0.6);
+    --color-tertiary-label: rgba(235, 235, 245, 0.3);
+    --color-quaternary-label: rgba(235, 235, 245, 0.18);
+    --color-inverse-label: #000000;
+
+    --color-primary: #0a84ff;
+    --color-success: #30d158;
+    --color-warning: #ff9f0a;
+    --color-danger: #ff453a;
+    --color-indigo: #5e5ce6;
+    --color-purple: #bf5af2;
+    --color-pink: #ff375f;
+    --color-cyan: #64d2ff;
+    --color-yellow: #ffd60a;
+
+    --color-primary-soft: rgba(10, 132, 255, 0.18);
+    --color-success-soft: rgba(48, 209, 88, 0.18);
+    --color-warning-soft: rgba(255, 159, 10, 0.18);
+    --color-danger-soft: rgba(255, 69, 58, 0.18);
+    --color-indigo-soft: rgba(94, 92, 230, 0.18);
+    --color-purple-soft: rgba(191, 90, 242, 0.18);
+    --color-pink-soft: rgba(255, 55, 95, 0.18);
+    --color-cyan-soft: rgba(100, 210, 255, 0.18);
+    --color-yellow-soft: rgba(255, 214, 10, 0.18);
+
+    --color-on-accent: #ffffff;
+    --color-selection-fill: rgba(120, 120, 128, 0.36);
+    --color-shadow: rgba(0, 0, 0, 0.3);
+    --color-skeleton-base: #2c2c2e;
+    --color-skeleton-highlight: #3a3a3c;
+
+    --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+    --shadow-nav: 0 1px 8px rgba(0, 0, 0, 0.2);
+  }
 }
