@@ -1,0 +1,8 @@
+.payment-balance { display: block; margin-top: 14rpx; font-size: 60rpx; font-weight: 750; }
+.payment-query { margin-top: 24rpx; }
+.payment-error { display: block; margin-top: 16rpx; color: var(--danger); font-size: 22rpx; }
+.payment-row { min-height: 108rpx; padding: 20rpx 24rpx; display: flex; align-items: center; gap: 18rpx; border-bottom: 1rpx solid var(--separator); }
+.payment-row:last-child { border-bottom: 0; }
+.payment-row__title { display: block; overflow-wrap: anywhere; font-size: 26rpx; font-weight: 600; }
+.payment-row__meta { display: block; margin-top: 7rpx; color: var(--secondary-label); font-size: 21rpx; }
+.payment-row__amount { flex: none; color: var(--danger); font-size: 28rpx; font-weight: 700; }

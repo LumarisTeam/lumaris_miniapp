@@ -1,5 +1,5 @@
 import { defineConfig, type UserConfigExport } from '@tarojs/cli'
-import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
+import path from 'node:path'
 import devConfig from './dev'
 import prodConfig from './prod'
 import vitePluginImp from 'vite-plugin-imp'
@@ -7,6 +7,9 @@ import vitePluginImp from 'vite-plugin-imp'
 export default defineConfig<'vite'>(async (merge, { command, mode }) => {
   const baseConfig: UserConfigExport<'vite'> = {
     projectName: 'lumaris_miniapp',
+    alias: {
+      '@': path.resolve(__dirname, '..', 'src')
+    },
     date: '2026-8-31',
     designWidth: 375,
     deviceRatio: {

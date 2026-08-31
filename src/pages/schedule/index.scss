@@ -1,0 +1,39 @@
+.schedule-weekbar {
+  height: 112rpx;
+  padding: 16rpx 32rpx;
+  display: grid;
+  grid-template-columns: 72rpx 1fr 72rpx;
+  align-items: center;
+  gap: 20rpx;
+  background: var(--app-bg);
+  border-bottom: 1rpx solid var(--separator);
+}
+
+.schedule-weekbar__button { width: 64rpx; height: 64rpx; display: flex; align-items: center; justify-content: center; color: var(--primary); background: var(--primary-soft); border-radius: 50%; }
+.schedule-weekbar__center { min-width: 0; text-align: center; }
+.schedule-weekbar__title { display: block; font-size: 30rpx; font-weight: 700; }
+.schedule-weekbar__subtitle { display: block; margin-top: 4rpx; color: var(--secondary-label); font-size: 20rpx; }
+.schedule-scroll { width: 100%; height: calc(100vh - 200rpx - env(safe-area-inset-top)); }
+
+.schedule-grid {
+  width: 1280rpx;
+  padding: 16rpx;
+  display: grid;
+  grid-template-columns: 72rpx repeat(7, 168rpx);
+  grid-template-rows: 68rpx repeat(13, 92rpx);
+  gap: 4rpx;
+  position: relative;
+}
+
+.schedule-grid__corner, .schedule-grid__day, .schedule-grid__slot { display: flex; align-items: center; justify-content: center; color: var(--secondary-label); font-size: 21rpx; }
+.schedule-grid__corner { grid-column: 1; grid-row: 1; }
+.schedule-grid__day { background: var(--surface); border-radius: 8rpx; }
+.schedule-grid__day:nth-of-type(2) { grid-column: 2; }
+.schedule-grid__cell { min-width: 0; min-height: 0; background: var(--surface); border-radius: 5rpx; }
+.schedule-grid__course { z-index: 2; min-width: 0; margin: 2rpx; padding: 10rpx; overflow: hidden; display: flex; flex-direction: column; gap: 4rpx; color: #fff; border-radius: 9rpx; box-shadow: 0 3rpx 10rpx rgba(0, 0, 0, 0.15); }
+.schedule-grid__course-name { overflow-wrap: anywhere; font-size: 21rpx; line-height: 1.25; font-weight: 700; }
+.schedule-grid__course-meta { overflow-wrap: anywhere; font-size: 17rpx; line-height: 1.25; opacity: 0.9; }
+
+.schedule-list { padding: 24rpx 32rpx 40rpx; }
+.schedule-list__day { display: block; margin: 24rpx 0 12rpx; color: var(--secondary-label); font-size: 24rpx; font-weight: 600; }
+.schedule-list__day:first-child { margin-top: 0; }

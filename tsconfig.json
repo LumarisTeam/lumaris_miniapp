@@ -12,8 +12,12 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strictNullChecks": true,
+    "skipLibCheck": true,
     "sourceMap": true,
     "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
     "rootDir": ".",
     "jsx": "react-jsx",
     "allowJs": true,
@@ -22,6 +26,6 @@
       "node_modules/@types"
     ]
   },
-  "include": ["./src", "./types"],
+  "include": ["./src", "./types", "./__test__", "./jest.config.js"],
   "compileOnSave": false
 }

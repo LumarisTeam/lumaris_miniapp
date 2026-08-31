@@ -1,0 +1,8 @@
+.login-page { min-height: 100vh; background: var(--grouped-bg); }
+.login-brand { padding: 64rpx 32rpx 24rpx; display: flex; flex-direction: column; align-items: center; }
+.login-brand__logo { width: 144rpx; height: 144rpx; border-radius: 32rpx; box-shadow: var(--shadow); }
+.login-brand__title { margin-top: 22rpx; font-size: 42rpx; font-weight: 750; }
+.login-brand__subtitle { margin-top: 8rpx; color: var(--secondary-label); font-size: 24rpx; }
+.login-error { display: block; margin-top: 18rpx; color: var(--danger); font-size: 23rpx; }
+.login-submit { margin-top: 30rpx; }
+.login-note { margin-top: 24rpx; }

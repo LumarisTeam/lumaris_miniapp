@@ -1,19 +1,19 @@
-import React, { useEffect } from 'react'
-import { useDidShow, useDidHide } from '@tarojs/taro'
-// 全局样式
+import type { PropsWithChildren } from 'react'
+import Taro, { useLaunch } from '@tarojs/taro'
+import { useAppStore } from '@/stores/app'
 import './app.scss'
 
-function App(props) {
-  // 可以使用所有的 React Hooks
-  useEffect(() => {})
+function App({ children }: PropsWithChildren) {
+  useLaunch(() => {
+    const startPage = useAppStore.getState().settings.startPage
+    if (startPage !== 'home') {
+      setTimeout(() => {
+        void Taro.switchTab({ url: `/pages/${startPage}/index` })
+      }, 0)
+    }
+  })
 
-  // 对应 onShow
-  useDidShow(() => {})
-
-  // 对应 onHide
-  useDidHide(() => {})
-
-  return props.children
+  return children
 }
 
 export default App

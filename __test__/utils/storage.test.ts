@@ -1,0 +1,46 @@
+/* eslint-disable import/first */
+const mockStorage: Record<string, unknown> = {}
+
+jest.mock('@tarojs/taro', () => ({
+  __esModule: true,
+  default: {
+    getStorageSync: jest.fn((key: string) => mockStorage[key] ?? ''),
+    setStorageSync: jest.fn((key: string, value: unknown) => { mockStorage[key] = value }),
+    removeStorageSync: jest.fn((key: string) => { delete mockStorage[key] }),
+  },
+}))
+
+import { migrateLegacyStorage, readStorage, removeStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage'
+
+describe('versioned storage', () => {
+  beforeEach(() => {
+    Object.keys(mockStorage).forEach((key) => delete mockStorage[key])
+  })
+
+  test('reads, writes and removes namespaced values', () => {
+    writeStorage(STORAGE_KEYS.SETTINGS, { theme: 'dark' })
+    expect(mockStorage['lumaris:v1:settings']).toEqual({ theme: 'dark' })
+    expect(readStorage(STORAGE_KEYS.SETTINGS, {})).toEqual({ theme: 'dark' })
+    removeStorage(STORAGE_KEYS.SETTINGS)
+    expect(readStorage(STORAGE_KEYS.SETTINGS, { theme: 'system' })).toEqual({ theme: 'system' })
+  })
+
+  test('migrates valid legacy data without persisting credentials', () => {
+    mockStorage.lm_courseData = [{ name: '课程' }]
+    mockStorage.lm_userData = { studentId: '20260001', name: '同学', cookie: 'session-cookie', schoolCode: 'XAUAT' }
+    mockStorage.lm_credentials = { username: '20260001', password: 'secret' }
+    migrateLegacyStorage()
+
+    expect(mockStorage['lumaris:v1:courses']).toEqual([{ name: '课程' }])
+    expect(mockStorage['lumaris:v1:session']).toMatchObject({ studentId: '20260001', cookie: 'session-cookie' })
+    const migratedValues = Object.fromEntries(Object.entries(mockStorage).filter(([key]) => key.startsWith('lumaris:v1:')))
+    expect(JSON.stringify(migratedValues)).not.toContain('secret')
+    expect(mockStorage['lumaris:v1:legacy-migrated']).toBe(true)
+  })
+
+  test('discards incomplete legacy sessions', () => {
+    mockStorage.lm_userData = { studentId: '20260001', cookie: '' }
+    migrateLegacyStorage()
+    expect(mockStorage['lumaris:v1:session']).toBeUndefined()
+  })
+})

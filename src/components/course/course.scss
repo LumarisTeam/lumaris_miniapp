@@ -1,0 +1,18 @@
+.course-card {
+  min-width: 0;
+  padding: 22rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+  background: var(--card-bg);
+  border-left: 8rpx solid var(--primary);
+  border-radius: 12rpx;
+  box-shadow: var(--shadow);
+}
+
+.course-card + .course-card { margin-top: 16rpx; }
+.course-card__name { overflow-wrap: anywhere; font-size: 29rpx; line-height: 1.35; font-weight: 650; }
+.course-card__meta { color: var(--secondary-label); font-size: 23rpx; line-height: 1.35; }
+.course-card--compact { padding: 14rpx; gap: 3rpx; box-shadow: none; }
+.course-card--compact .course-card__name { font-size: 23rpx; }
+.course-card--compact .course-card__meta { font-size: 19rpx; }

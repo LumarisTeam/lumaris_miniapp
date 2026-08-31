@@ -1,0 +1,9 @@
+.profile-header { padding: 48rpx 36rpx 34rpx; display: flex; align-items: center; gap: 24rpx; background: var(--app-bg); }
+.profile-header__avatar { width: 112rpx; height: 112rpx; border-radius: 28rpx; box-shadow: var(--shadow); }
+.profile-header__name { display: block; overflow-wrap: anywhere; font-size: 38rpx; font-weight: 750; }
+.profile-header__meta { display: block; margin-top: 8rpx; color: var(--secondary-label); font-size: 23rpx; line-height: 1.4; }
+.profile-header__login { flex: none; padding: 14rpx 24rpx; color: #fff; background: var(--primary); border-radius: 10rpx; font-size: 24rpx; }
+.profile-progress__title { font-size: 29rpx; font-weight: 650; }
+.profile-progress__value { color: var(--secondary-label); font-size: 23rpx; }
+.profile-progress__track { height: 12rpx; margin-top: 24rpx; overflow: hidden; background: var(--surface); border-radius: 6rpx; }
+.profile-progress__fill { height: 100%; background: var(--success); border-radius: 6rpx; }

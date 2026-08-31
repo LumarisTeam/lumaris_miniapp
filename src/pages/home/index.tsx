@@ -1,0 +1,181 @@
+import { useMemo, useState } from 'react'
+import { Button, Checkbox, Input, Picker, Text, View } from '@tarojs/components'
+import Taro, { useDidShow, usePullDownRefresh } from '@tarojs/taro'
+import { Dialog } from '@nutui/nutui-react-taro'
+import { PageShell } from '@/components/common/PageShell'
+import { ClubCard } from '@/components/common/ClubCard'
+import { SectionHeader } from '@/components/common/SectionHeader'
+import { StateView } from '@/components/common/StateView'
+import { AppIcon } from '@/components/common/AppIcon'
+import { CourseCard } from '@/components/course/CourseCard'
+import { fetchExams } from '@/api/education'
+import { useAuthStore } from '@/stores/auth'
+import { useCourseStore } from '@/stores/course'
+import { useAppStore } from '@/stores/app'
+import { useTodoStore } from '@/stores/todo'
+import type { Course, Exam, Feature, ServiceType } from '@/types/domain'
+import { coursesForDay, getCourseTime } from '@/utils/education'
+import { readStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage'
+import '@/styles/pages.scss'
+import './index.scss'
+
+const SERVICE_ROUTES: Record<ServiceType, { label: string; hint: string; route: string; icon: 'notice' | 'service' | 'card'; feature: Feature }> = {
+  electricity: { label: '电费', hint: '余额与趋势', route: '/subpackages/services/electricity/index', icon: 'notice', feature: 'electricity' },
+  bus: { label: '校车', hint: '今日班次', route: '/subpackages/services/bus/index', icon: 'service', feature: 'bus_schedule' },
+  payment: { label: '校园卡', hint: '余额与流水', route: '/subpackages/services/payment/index', icon: 'card', feature: 'payment' },
+}
+
+function remainingCourses(courses: Course[], now: Date): Course[] {
+  return courses.filter((course) => {
+    const { end } = getCourseTime(course, now)
+    if (!end) return true
+    const [hour, minute] = end.split(':').map(Number)
+    const endTime = new Date(now)
+    endTime.setHours(hour, minute, 0, 0)
+    return endTime.getTime() >= now.getTime()
+  })
+}
+
+export default function HomePage() {
+  const session = useAuthStore((state) => state.session)
+  const settings = useAppStore((state) => state.settings)
+  const school = useAppStore((state) => state.school)
+  const courses = useCourseStore((state) => state.courses)
+  const customCourses = useCourseStore((state) => state.customCourses)
+  const ignoredNames = useCourseStore((state) => state.ignoredCourseNames)
+  const currentWeek = useCourseStore((state) => state.currentWeek)
+  const refreshCourses = useCourseStore((state) => state.refresh)
+  const loading = useCourseStore((state) => state.loading)
+  const todos = useTodoStore((state) => state.todos)
+  const addTodo = useTodoStore((state) => state.add)
+  const toggleTodo = useTodoStore((state) => state.toggle)
+  const removeTodo = useTodoStore((state) => state.remove)
+  const [exams, setExams] = useState<Exam[]>(() => readStorage(STORAGE_KEYS.EXAMS, []))
+  const [todoDialog, setTodoDialog] = useState(false)
+  const [todoTitle, setTodoTitle] = useState('')
+  const [todoDate, setTodoDate] = useState(new Date().toISOString().slice(0, 10))
+
+  const sync = async () => {
+    if (!session) return
+    const [, examResult] = await Promise.allSettled([
+      refreshCourses(session.studentId),
+      fetchExams(session.studentId),
+    ])
+    if (examResult.status === 'fulfilled') {
+      setExams(examResult.value)
+      writeStorage(STORAGE_KEYS.EXAMS, examResult.value)
+    }
+  }
+
+  useDidShow(() => { void sync() })
+  usePullDownRefresh(() => { void sync().finally(() => Taro.stopPullDownRefresh()) })
+
+  const now = new Date()
+  const visibleCourses = useMemo(() => {
+    const ignored = new Set(ignoredNames)
+    return [...courses.filter((course) => !ignored.has(course.name)), ...customCourses]
+  }, [courses, customCourses, ignoredNames])
+  const day = now.getDay() || 7
+  let todayCourses = remainingCourses(coursesForDay(visibleCourses, currentWeek, day), now)
+  let scheduleTitle = '今日课程'
+  if (todayCourses.length === 0 && settings.showTomorrow) {
+    todayCourses = coursesForDay(visibleCourses, currentWeek, day === 7 ? 1 : day + 1)
+    scheduleTitle = '明日课程'
+  }
+  const upcomingExams = exams.slice(0, 3)
+
+  const submitTodo = () => {
+    if (!todoTitle.trim()) {
+      Taro.showToast({ title: '请输入待办内容', icon: 'none' })
+      return
+    }
+    addTodo(todoTitle, `${todoDate} 23:59`)
+    setTodoTitle('')
+    setTodoDialog(false)
+  }
+
+  return (
+    <PageShell title='光序'>
+      <View className='page-section'>
+        <SectionHeader title={scheduleTitle} icon='calendar' trailing={`${now.getMonth() + 1}月${now.getDate()}日`} />
+        {!session ? (
+          <ClubCard><StateView state='login' compact title='登录后查看课程表' actionLabel='去登录' onAction={() => Taro.navigateTo({ url: '/pages/login/index' })} /></ClubCard>
+        ) : loading && visibleCourses.length === 0 ? (
+          <ClubCard><StateView state='loading' compact title='正在同步课表' /></ClubCard>
+        ) : todayCourses.length === 0 ? (
+          <ClubCard><StateView state='empty' compact title='没有待上的课程' description='享受一段自由时间吧' /></ClubCard>
+        ) : (
+          <View className='stack'>{todayCourses.map((course) => <CourseCard course={course} key={course.id} />)}</View>
+        )}
+      </View>
+
+      {session ? (
+        <View className='page-section'>
+          <SectionHeader title='校园服务' icon='service' />
+          <View className='service-grid'>
+            {settings.visibleServices.filter((service) => school.features.includes(SERVICE_ROUTES[service].feature)).map((service) => {
+              const item = SERVICE_ROUTES[service]
+              return (
+                <View className='service-tile pressable' key={service} onClick={() => Taro.navigateTo({ url: item.route })}>
+                  <View className='service-tile__icon'><AppIcon name={item.icon} size={23} /></View>
+                  <View><Text className='service-tile__label'>{item.label}</Text><Text className='service-tile__hint'>{item.hint}</Text></View>
+                </View>
+              )
+            })}
+          </View>
+        </View>
+      ) : null}
+
+      {session ? (
+        <View className='page-section'>
+          <SectionHeader title='考试安排' icon='book' />
+          <ClubCard padding='none'>
+            {upcomingExams.length === 0 ? <StateView state='empty' compact title='暂无考试安排' /> : upcomingExams.map((exam) => (
+              <View className='home-exam' key={exam.id}>
+                <View className='home-exam__date'><AppIcon name='clock' size={20} color='var(--warning)' /></View>
+                <View className='grow'><Text className='home-exam__name'>{exam.name}</Text><Text className='home-exam__meta'>{exam.time}</Text><Text className='home-exam__meta'>{exam.location}{exam.seat ? ` · ${exam.seat}` : ''}</Text></View>
+              </View>
+            ))}
+          </ClubCard>
+        </View>
+      ) : null}
+
+      <View className='page-section'>
+        <View className='row row--between'>
+          <SectionHeader title='待办事项' icon='check' />
+          <View className='icon-action pressable' onClick={() => setTodoDialog(true)}><AppIcon name='add' size={21} /></View>
+        </View>
+        <ClubCard padding='none'>
+          {todos.length === 0 ? <StateView state='empty' compact title='暂无待办事项' description='添加一项，让今天更有条理' /> : todos.map((todo) => {
+            const expired = !todo.isCompleted && new Date(todo.deadline.replace(' ', 'T')).getTime() < Date.now()
+            return (
+              <View className='home-todo' key={todo.id}>
+                <Checkbox value={todo.id} checked={todo.isCompleted} onClick={() => toggleTodo(todo.id)} />
+                <View className='grow' onClick={() => toggleTodo(todo.id)}>
+                  <Text className={`home-todo__title ${todo.isCompleted ? 'home-todo__title--done' : ''}`}>{todo.title}</Text>
+                  <Text className={`home-todo__deadline ${expired ? 'danger' : ''}`}>{expired ? '已到期 · ' : ''}{todo.deadline}</Text>
+                </View>
+                <View className='home-todo__delete pressable' onClick={() => removeTodo(todo.id)}><AppIcon name='delete' size={18} color='var(--danger)' /></View>
+              </View>
+            )
+          })}
+        </ClubCard>
+      </View>
+
+      <Dialog title='添加待办' visible={todoDialog} footer={null} onClose={() => setTodoDialog(false)}>
+        <View className='dialog-form'>
+          <Text className='form-label'>待办内容</Text>
+          <Input className='form-input' value={todoTitle} maxlength={40} placeholder='例如：提交实验报告' onInput={(event) => setTodoTitle(event.detail.value)} />
+          <Text className='form-label'>截止日期</Text>
+          <Picker mode='date' value={todoDate} onChange={(event) => setTodoDate(String(event.detail.value))}>
+            <View className='form-picker'>{todoDate}</View>
+          </Picker>
+          <View className='dialog-actions'>
+            <Button className='secondary-button' onClick={() => setTodoDialog(false)}>取消</Button>
+            <Button className='primary-button' onClick={submitTodo}>添加</Button>
+          </View>
+        </View>
+      </Dialog>
+    </PageShell>
+  )
+}

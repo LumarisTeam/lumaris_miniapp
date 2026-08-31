@@ -4,7 +4,7 @@
 	"description": "光序小程序版",
 	"appid": "touristappid",
 	"setting": {
-		"urlCheck": true,
+		"urlCheck": false,
 		"es6": false,
     "enhance": false,
     "compileHotReLoad": false,

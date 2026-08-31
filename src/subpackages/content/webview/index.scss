@@ -1,0 +1,4 @@
+.webview-fallback { min-height: 70vh; padding: 80rpx 48rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.webview-fallback__title { font-size: 32rpx; font-weight: 700; }
+.webview-fallback__description { margin: 16rpx 0 32rpx; color: var(--secondary-label); font-size: 24rpx; line-height: 1.6; }
+.webview-fallback .primary-button { width: 260rpx; }
