@@ -55,13 +55,13 @@ export default function CustomCoursePage() {
   const openForm = (course?: Course) => {
     setForm(course ? {
       id: course.id,
-      name: course.name,
-      teacher: course.teacher,
-      location: course.location,
-      weeksText: course.weeks.join(','),
-      day: course.dayOfWeek,
-      start: course.startSlot,
-      end: course.endSlot,
+      name: course.courseName,
+      teacher: course.teachers.join('、'),
+      location: course.room,
+      weeksText: course.weekIndexes.join(','),
+      day: course.weekday,
+      start: course.startUnit,
+      end: course.endUnit,
       color: course.color,
     } : { ...EMPTY_FORM, id: `custom-${Date.now()}`, color: COLORS[courses.length % COLORS.length] })
     setVisible(true)
@@ -75,14 +75,17 @@ export default function CustomCoursePage() {
     }
     save({
       id: form.id,
-      name: form.name.trim(),
-      teacher: form.teacher.trim(),
-      location: form.location.trim(),
+      weekIndexes: weeks,
+      teachers: form.teacher.split(/[、,，]/).map((item) => item.trim()).filter(Boolean),
+      room: form.location.trim(),
+      courseName: form.name.trim(),
+      courseCode: '',
+      weekday: form.day,
+      startUnit: form.start,
+      endUnit: form.end,
+      credits: '',
+      lessonId: form.id,
       campus: '',
-      weeks,
-      dayOfWeek: form.day,
-      startSlot: form.start,
-      endSlot: form.end,
       color: form.color,
       isCustom: true,
     })
@@ -96,7 +99,7 @@ export default function CustomCoursePage() {
     <PageShell title='自定义课程' showBack action={action}>
       <View className='page-section'>
         <ClubCard padding='none'>
-          {courses.length === 0 ? <StateView state='empty' title='还没有自定义课程' description='适合游客课表或教务系统外的课程' actionLabel='添加课程' onAction={() => openForm()} /> : courses.map((course) => <ListRow key={course.id} title={course.name} subtitle={`${DAYS[course.dayOfWeek - 1]} · 第 ${course.startSlot}-${course.endSlot} 节 · ${course.location || '未填写地点'}`} icon='calendar' iconColor={course.color} onClick={() => openForm(course)} />)}
+          {courses.length === 0 ? <StateView state='empty' title='还没有自定义课程' description='适合游客课表或教务系统外的课程' actionLabel='添加课程' onAction={() => openForm()} /> : courses.map((course) => <ListRow key={course.id} title={course.courseName} subtitle={`${DAYS[course.weekday - 1]} · 第 ${course.startUnit}-${course.endUnit} 节 · ${course.room || '未填写地点'}`} icon='calendar' iconColor={course.color} onClick={() => openForm(course)} />)}
         </ClubCard>
       </View>
 

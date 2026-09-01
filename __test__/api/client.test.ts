@@ -23,6 +23,14 @@ describe('API client', () => {
     expect(mockRequest).toHaveBeenCalledWith(expect.objectContaining({ header: expect.objectContaining({ xauat: 'cookie-value' }) }))
   })
 
+  test('routes education requests through the selected school endpoint', async () => {
+    mockStorage['lumaris:v1:school'] = { website: 'https://school.example.edu/', code: 'DEMO' }
+    mockRequest.mockResolvedValue({ statusCode: 200, data: { code: 200, message: 'ok', data: [] } })
+    await request('/Course')
+    expect(mockRequest).toHaveBeenCalledWith(expect.objectContaining({ url: 'https://school.example.edu/v1/Course' }))
+    delete mockStorage['lumaris:v1:school']
+  })
+
   test('invokes unauthorized handler on 401', async () => {
     const handler = jest.fn()
     setUnauthorizedHandler(handler)

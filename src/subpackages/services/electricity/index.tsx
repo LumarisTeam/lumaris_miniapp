@@ -10,54 +10,60 @@ import { StateView } from '@/components/common/StateView'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { AppIcon } from '@/components/common/AppIcon'
 import { ListRow } from '@/components/common/ListRow'
+import { FeatureGuard } from '@/components/common/FeatureGuard'
 import {
   createElectricitySubscription,
   deleteElectricitySubscription,
-  fetchElectricity,
   fetchElectricitySubscription,
-  fetchElectricityWeekly,
   fetchRechargeUrl,
 } from '@/api/education'
 import { useAuthStore } from '@/stores/auth'
+import { useAppStore } from '@/stores/app'
 import type { ElectricPoint, ElectricitySubscription } from '@/types/domain'
+import { getElectricitySnapshot } from '@/services/domainRepository'
 import { openExternalUrl } from '@/utils/platform'
 import { readStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage'
+import { summarizeElectricity } from '@/utils/education'
 import '@/styles/pages.scss'
 import './index.scss'
 
-export default function ElectricityPage() {
+function ElectricityContent() {
   const session = useAuthStore((state) => state.session)
+  const schoolCode = useAppStore((state) => state.school.code)
   const [sourceUrl, setSourceUrl] = useState(() => readStorage(STORAGE_KEYS.ELECTRICITY_URL, ''))
   const [balance, setBalance] = useState<number | null>(null)
   const [points, setPoints] = useState<ElectricPoint[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [isStale, setIsStale] = useState(false)
   const [sourceDialog, setSourceDialog] = useState(false)
   const [subscriptionDialog, setSubscriptionDialog] = useState(false)
   const [email, setEmail] = useState(() => readStorage(STORAGE_KEYS.ELECTRICITY_EMAIL, ''))
   const [threshold, setThreshold] = useState('20')
   const [subscription, setSubscription] = useState<ElectricitySubscription | null>(null)
 
-  const load = async () => {
+  const load = async (force = false) => {
     if (!session) return
     setLoading(true)
     setError('')
-    const [balanceResult, pointsResult] = await Promise.allSettled([
-      fetchElectricity(sourceUrl || undefined),
-      fetchElectricityWeekly(sourceUrl || undefined),
-    ])
-    if (balanceResult.status === 'fulfilled') setBalance(balanceResult.value)
-    if (pointsResult.status === 'fulfilled') setPoints(pointsResult.value)
-    if (balanceResult.status === 'rejected' && pointsResult.status === 'rejected') setError(balanceResult.reason instanceof Error ? balanceResult.reason.message : '电费数据加载失败')
+    try {
+      const snapshot = await getElectricitySnapshot(session.studentId, schoolCode, sourceUrl, force ? 'refresh' : 'local-first')
+      setBalance(snapshot.data.balance); setPoints(snapshot.data.points); setIsStale(snapshot.isStale)
+      if (!force && snapshot.isFromLocal) {
+        const refreshed = await getElectricitySnapshot(session.studentId, schoolCode, sourceUrl, 'refresh')
+        setBalance(refreshed.data.balance); setPoints(refreshed.data.points); setIsStale(refreshed.isStale)
+      }
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : '电费数据加载失败')
+    }
     setLoading(false)
   }
 
   useDidShow(() => { void load() })
-  usePullDownRefresh(() => { void load().finally(() => Taro.stopPullDownRefresh()) })
+  usePullDownRefresh(() => { void load(true).finally(() => Taro.stopPullDownRefresh()) })
 
   const chartData = useMemo(() => points.slice(-24).map((point) => ({ time: point.timestamp.slice(11, 16) || point.timestamp.slice(5, 10), value: point.value })), [points])
-  const total = points.reduce((sum, point) => sum + point.value, 0)
-  const peak = points.reduce((maximum, point) => Math.max(maximum, point.value), 0)
+  const summary = useMemo(() => summarizeElectricity(points), [points])
   const status = balance === null ? '待获取' : balance < 10 ? '余额较低' : '余额充足'
 
   const saveSource = () => {
@@ -93,6 +99,7 @@ export default function ElectricityPage() {
     <PageShell title='电费' showBack action={<View className='icon-action pressable' onClick={() => void load()}><AppIcon name='refresh' size={20} /></View>}>
       {!session ? <StateView state='login' title='登录后查看电费信息' actionLabel='去登录' onAction={() => Taro.navigateTo({ url: '/pages/login/index' })} /> : (
         <>
+          {isStale ? <View className='page-note'>刷新失败，当前显示本地电费缓存</View> : null}
           <View className='page-section'>
             <ClubCard>
               <Text className='electricity-balance__label'>当前余额</Text>
@@ -107,9 +114,10 @@ export default function ElectricityPage() {
               {loading && points.length === 0 ? <StateView state='loading' compact title='正在读取用电数据' /> : chartData.length === 0 ? <StateView state='empty' compact title='暂无用电趋势' actionLabel='配置数据源' onAction={() => setSourceDialog(true)} /> : (
                 <>
                   <View className='metric-grid'>
-                    <View className='metric'><Text className='metric__value'>¥{total.toFixed(1)}</Text><Text className='metric__label'>累计消耗</Text></View>
-                    <View className='metric'><Text className='metric__value'>¥{(total / Math.max(1, points.length)).toFixed(2)}</Text><Text className='metric__label'>时均消耗</Text></View>
-                    <View className='metric'><Text className='metric__value'>¥{peak.toFixed(2)}</Text><Text className='metric__label'>峰值</Text></View>
+                    <View className='metric'><Text className='metric__value'>¥{summary.total.toFixed(2)}</Text><Text className='metric__label'>累计消耗</Text></View>
+                    <View className='metric'><Text className='metric__value'>¥{summary.today.toFixed(2)}</Text><Text className='metric__label'>今日消耗</Text></View>
+                    <View className='metric'><Text className='metric__value'>¥{summary.averageDaily.toFixed(2)}</Text><Text className='metric__label'>日均消耗</Text></View>
+                    <View className='metric'><Text className='metric__value'>{summary.peak ? `${new Date(summary.peak.timestamp).getHours()}:00 / ¥${summary.peak.value.toFixed(1)}` : '--'}</Text><Text className='metric__label'>峰值时段</Text></View>
                   </View>
                   <View className='electricity-chart'>
                     <F2Canvas id='electricity-line-chart'>
@@ -149,4 +157,8 @@ export default function ElectricityPage() {
       </Dialog>
     </PageShell>
   )
+}
+
+export default function ElectricityPage() {
+  return <FeatureGuard feature='electricity' title='电费'><ElectricityContent /></FeatureGuard>
 }

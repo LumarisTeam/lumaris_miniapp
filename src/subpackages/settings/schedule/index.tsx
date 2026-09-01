@@ -17,7 +17,7 @@ export default function ScheduleSettingsPage() {
   const ignored = useCourseStore((state) => state.ignoredCourseNames)
   const toggleIgnored = useCourseStore((state) => state.toggleIgnored)
   const refresh = useCourseStore((state) => state.refresh)
-  const names = Array.from(new Set(courses.map((course) => course.name))).sort()
+  const names = Array.from(new Set(courses.map((course) => course.courseName))).sort()
 
   return (
     <PageShell title='课表设置' showBack>

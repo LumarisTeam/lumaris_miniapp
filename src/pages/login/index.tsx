@@ -29,9 +29,9 @@ export default function LoginPage() {
     }
     const school = schools[schoolIndex] || schools[0]
     if (!school) return
+    setSchool(school)
     const success = await login(username, password, school)
     if (success) {
-      setSchool(school)
       Taro.showToast({ title: '登录成功', icon: 'success' })
       setTimeout(() => Taro.navigateBack(), 350)
     }

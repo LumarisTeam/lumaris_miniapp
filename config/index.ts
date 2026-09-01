@@ -3,6 +3,10 @@ import path from 'node:path'
 import devConfig from './dev'
 import prodConfig from './prod'
 import vitePluginImp from 'vite-plugin-imp'
+
+const DEFAULT_API_BASE_URL = 'https://xauatapi.xauat.site/v1'
+const DEFAULT_BASIC_API_BASE_URL = 'https://xauatapi.xauat.site'
+
 // https://taro-docs.jd.com/docs/next/config#defineconfig-辅助函数
 export default defineConfig<'vite'>(async (merge, { command, mode }) => {
   const baseConfig: UserConfigExport<'vite'> = {
@@ -21,6 +25,10 @@ export default defineConfig<'vite'>(async (merge, { command, mode }) => {
     sourceRoot: 'src',
     outputRoot: 'dist',
     plugins: ['@tarojs/plugin-html'],
+    env: {
+      TARO_APP_API_BASE_URL: JSON.stringify(process.env.TARO_APP_API_BASE_URL || DEFAULT_API_BASE_URL),
+      TARO_APP_BASIC_API_BASE_URL: JSON.stringify(process.env.TARO_APP_BASIC_API_BASE_URL || DEFAULT_BASIC_API_BASE_URL),
+    },
     defineConstants: {
     },
     copy: {

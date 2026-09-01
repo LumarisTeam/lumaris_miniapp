@@ -8,7 +8,7 @@ import { CourseCard } from '@/components/course/CourseCard'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 import { useCourseStore } from '@/stores/course'
-import { calculateCurrentWeek, coursesForWeek, getCourseTime } from '@/utils/education'
+import { coursesForWeek, getCourseTime, orderedWeekdays } from '@/utils/education'
 import '@/styles/pages.scss'
 import './index.scss'
 
@@ -20,23 +20,28 @@ export default function SchedulePage() {
   const customCourses = useCourseStore((state) => state.customCourses)
   const ignored = useCourseStore((state) => state.ignoredCourseNames)
   const week = useCourseStore((state) => state.currentWeek)
-  const timeInfo = useCourseStore((state) => state.timeInfo)
+  const weekNow = useCourseStore((state) => state.weekNow)
+  const maxWeek = useCourseStore((state) => state.maxWeek)
   const setWeek = useCourseStore((state) => state.setCurrentWeek)
   const refresh = useCourseStore((state) => state.refresh)
+  const isStale = useCourseStore((state) => state.isStale)
   const showCourseGrid = useAppStore((state) => state.settings.showCourseGrid)
+  const weekStartDay = useAppStore((state) => state.school.weekStartDay)
+  const supportsTimetable = useAppStore((state) => state.school.features.includes('timetable'))
+  const weekdays = orderedWeekdays(weekStartDay)
 
-  useDidShow(() => { if (session && courses.length === 0) void refresh(session.studentId) })
+  useDidShow(() => { if (session && supportsTimetable && courses.length === 0) void refresh(session.studentId, 'local-first') })
   usePullDownRefresh(() => {
-    if (!session) return Taro.stopPullDownRefresh()
+    if (!session || !supportsTimetable) return Taro.stopPullDownRefresh()
     void refresh(session.studentId).finally(() => Taro.stopPullDownRefresh())
   })
 
   const visibleCourses = useMemo(() => {
     const ignoredNames = new Set(ignored)
-    return [...courses.filter((course) => !ignoredNames.has(course.name)), ...customCourses]
+    return [...courses.filter((course) => !ignoredNames.has(course.courseName)), ...customCourses]
   }, [courses, customCourses, ignored])
   const weekCourses = useMemo(
-    () => coursesForWeek(visibleCourses, week).sort((left, right) => left.dayOfWeek - right.dayOfWeek || left.startSlot - right.startSlot),
+    () => coursesForWeek(visibleCourses, week).sort((left, right) => left.weekday - right.weekday || left.startUnit - right.startUnit),
     [visibleCourses, week],
   )
 
@@ -46,11 +51,15 @@ export default function SchedulePage() {
     </View>
   )
 
+  if (!supportsTimetable) {
+    return <PageShell title='课表'><StateView state='empty' title='当前学校暂不支持课表' /></PageShell>
+  }
+
   return (
     <PageShell title='课表' action={action}>
       <View className='schedule-weekbar'>
         <View className='schedule-weekbar__button pressable' onClick={() => setWeek(week - 1)}><AppIcon name='back' size={18} /></View>
-        <View className='schedule-weekbar__center' onClick={() => setWeek(calculateCurrentWeek(timeInfo))}><Text className='schedule-weekbar__title'>第 {week} 周</Text><Text className='schedule-weekbar__subtitle'>点击回到当前周</Text></View>
+        <View className='schedule-weekbar__center' onClick={() => setWeek(weekNow)}><Text className='schedule-weekbar__title'>{week === 0 ? '全部课程' : `第 ${week} 周`}</Text><Text className='schedule-weekbar__subtitle'>{maxWeek > 0 ? `共 ${maxWeek} 周 · 点击回到当前周` : '学期时间未同步'}</Text></View>
         <View className='schedule-weekbar__button pressable' onClick={() => setWeek(week + 1)}><AppIcon name='right' size={18} /></View>
       </View>
 
@@ -60,8 +69,10 @@ export default function SchedulePage() {
         <StateView state='empty' title={`第 ${week} 周没有课程`} actionLabel='添加自定义课程' onAction={() => Taro.navigateTo({ url: '/subpackages/settings/custom-course/index' })} />
       ) : !showCourseGrid ? (
         <View className='schedule-list'>
-          {DAY_NAMES.map((day, index) => {
-            const dayCourses = weekCourses.filter((course) => course.dayOfWeek === index + 1)
+          {isStale ? <View className='page-note'>刷新失败，当前显示本地课表缓存</View> : null}
+          {weekdays.map((weekday) => {
+            const day = DAY_NAMES[weekday - 1]
+            const dayCourses = weekCourses.filter((course) => course.weekday === weekday)
             return dayCourses.length ? (
               <View key={day}>
                 <Text className='schedule-list__day'>周{day}</Text>
@@ -74,7 +85,7 @@ export default function SchedulePage() {
         <ScrollView scrollX className='schedule-scroll' enhanced showScrollbar={false}>
           <View className='schedule-grid'>
             <View className='schedule-grid__corner'>节次</View>
-            {DAY_NAMES.map((day) => <View className='schedule-grid__day' key={day}>周{day}</View>)}
+            {weekdays.map((weekday) => <View className='schedule-grid__day' key={weekday}>周{DAY_NAMES[weekday - 1]}</View>)}
             {Array.from({ length: 13 }, (_, index) => (
               <View className='schedule-grid__slot' style={{ gridColumn: 1, gridRow: index + 2 }} key={`slot-${index + 1}`}>
                 <Text>{index + 1}</Text>
@@ -93,15 +104,15 @@ export default function SchedulePage() {
                 <View
                   className='schedule-grid__course pressable'
                   style={{
-                    gridColumn: course.dayOfWeek + 1,
-                    gridRow: `${course.startSlot + 1} / span ${Math.max(1, course.endSlot - course.startSlot + 1)}`,
+                    gridColumn: weekdays.indexOf(course.weekday) + 2,
+                    gridRow: `${course.startUnit + 1} / span ${Math.max(1, course.endUnit - course.startUnit + 1)}`,
                     backgroundColor: course.color,
                   }}
                   key={course.id}
-                  onClick={() => Taro.showModal({ title: course.name, content: `${course.location}\n${course.teacher}\n${time.start}-${time.end}\n第 ${course.startSlot}-${course.endSlot} 节`, showCancel: false })}
+                  onClick={() => Taro.showModal({ title: course.courseName, content: `${course.room}\n${course.teachers.join('、')}\n${time.start}-${time.end}\n第 ${course.startUnit}-${course.endUnit} 节`, showCancel: false })}
                 >
-                  <Text className='schedule-grid__course-name'>{course.name}</Text>
-                  <Text className='schedule-grid__course-meta'>{course.location}</Text>
+                  <Text className='schedule-grid__course-name'>{course.courseName}</Text>
+                  <Text className='schedule-grid__course-meta'>{course.room}</Text>
                 </View>
               )
             })}

@@ -8,14 +8,13 @@ import { SectionHeader } from '@/components/common/SectionHeader'
 import { StateView } from '@/components/common/StateView'
 import { AppIcon } from '@/components/common/AppIcon'
 import { CourseCard } from '@/components/course/CourseCard'
-import { fetchExams } from '@/api/education'
 import { useAuthStore } from '@/stores/auth'
 import { useCourseStore } from '@/stores/course'
 import { useAppStore } from '@/stores/app'
 import { useTodoStore } from '@/stores/todo'
-import type { Course, Exam, Feature, ServiceType } from '@/types/domain'
-import { coursesForDay, getCourseTime } from '@/utils/education'
-import { readStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage'
+import type { Exam, Feature, ServiceType, TodoItem } from '@/types/domain'
+import { getHomeCourses } from '@/utils/education'
+import { getExamSnapshot, readExamSnapshot } from '@/services/examRepository'
 import '@/styles/pages.scss'
 import './index.scss'
 
@@ -25,17 +24,6 @@ const SERVICE_ROUTES: Record<ServiceType, { label: string; hint: string; route: 
   payment: { label: '校园卡', hint: '余额与流水', route: '/subpackages/services/payment/index', icon: 'card', feature: 'payment' },
 }
 
-function remainingCourses(courses: Course[], now: Date): Course[] {
-  return courses.filter((course) => {
-    const { end } = getCourseTime(course, now)
-    if (!end) return true
-    const [hour, minute] = end.split(':').map(Number)
-    const endTime = new Date(now)
-    endTime.setHours(hour, minute, 0, 0)
-    return endTime.getTime() >= now.getTime()
-  })
-}
-
 export default function HomePage() {
   const session = useAuthStore((state) => state.session)
   const settings = useAppStore((state) => state.settings)
@@ -43,27 +31,33 @@ export default function HomePage() {
   const courses = useCourseStore((state) => state.courses)
   const customCourses = useCourseStore((state) => state.customCourses)
   const ignoredNames = useCourseStore((state) => state.ignoredCourseNames)
-  const currentWeek = useCourseStore((state) => state.currentWeek)
+  const timeInfo = useCourseStore((state) => state.timeInfo)
   const refreshCourses = useCourseStore((state) => state.refresh)
   const loading = useCourseStore((state) => state.loading)
   const todos = useTodoStore((state) => state.todos)
   const addTodo = useTodoStore((state) => state.add)
+  const updateTodo = useTodoStore((state) => state.update)
   const toggleTodo = useTodoStore((state) => state.toggle)
   const removeTodo = useTodoStore((state) => state.remove)
-  const [exams, setExams] = useState<Exam[]>(() => readStorage(STORAGE_KEYS.EXAMS, []))
+  const examScope = session ? `${school.code.toUpperCase()}:${session.studentId}` : ''
+  const [exams, setExams] = useState<Exam[]>(() => {
+    if (!examScope) return []
+    return readExamSnapshot(session!.studentId, school.code).data
+  })
   const [todoDialog, setTodoDialog] = useState(false)
   const [todoTitle, setTodoTitle] = useState('')
   const [todoDate, setTodoDate] = useState(new Date().toISOString().slice(0, 10))
+  const [todoTime, setTodoTime] = useState('23:59')
+  const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null)
 
   const sync = async () => {
     if (!session) return
     const [, examResult] = await Promise.allSettled([
-      refreshCourses(session.studentId),
-      fetchExams(session.studentId),
+      school.features.includes('timetable') ? refreshCourses(session.studentId) : Promise.resolve(),
+      school.features.includes('exam_schedule') ? getExamSnapshot(session.studentId, school.code, 'refresh') : Promise.resolve({ data: [], isFromLocal: false, isStale: false }),
     ])
     if (examResult.status === 'fulfilled') {
-      setExams(examResult.value)
-      writeStorage(STORAGE_KEYS.EXAMS, examResult.value)
+      setExams(examResult.value.data)
     }
   }
 
@@ -73,15 +67,11 @@ export default function HomePage() {
   const now = new Date()
   const visibleCourses = useMemo(() => {
     const ignored = new Set(ignoredNames)
-    return [...courses.filter((course) => !ignored.has(course.name)), ...customCourses]
+    return [...courses.filter((course) => !ignored.has(course.courseName)), ...customCourses]
   }, [courses, customCourses, ignoredNames])
-  const day = now.getDay() || 7
-  let todayCourses = remainingCourses(coursesForDay(visibleCourses, currentWeek, day), now)
-  let scheduleTitle = '今日课程'
-  if (todayCourses.length === 0 && settings.showTomorrow) {
-    todayCourses = coursesForDay(visibleCourses, currentWeek, day === 7 ? 1 : day + 1)
-    scheduleTitle = '明日课程'
-  }
+  const homeSchedule = getHomeCourses(visibleCourses, timeInfo, school.weekStartDay, settings.showTomorrow, now)
+  const todayCourses = homeSchedule.courses
+  const scheduleTitle = homeSchedule.isTomorrow ? '明日课程' : '今日课程'
   const upcomingExams = exams.slice(0, 3)
 
   const submitTodo = () => {
@@ -89,9 +79,24 @@ export default function HomePage() {
       Taro.showToast({ title: '请输入待办内容', icon: 'none' })
       return
     }
-    addTodo(todoTitle, `${todoDate} 23:59`)
+    const deadline = `${todoDate} ${todoTime}`
+    if (editingTodo) {
+      updateTodo({ ...editingTodo, title: todoTitle.trim(), deadline })
+    } else {
+      addTodo(todoTitle, deadline)
+    }
     setTodoTitle('')
+    setEditingTodo(null)
     setTodoDialog(false)
+  }
+
+  const openTodoDialog = (todo?: TodoItem) => {
+    setEditingTodo(todo ?? null)
+    setTodoTitle(todo?.title ?? '')
+    const [date = new Date().toISOString().slice(0, 10), time = '23:59'] = todo?.deadline.split(' ') ?? []
+    setTodoDate(date)
+    setTodoTime(time)
+    setTodoDialog(true)
   }
 
   return (
@@ -109,7 +114,7 @@ export default function HomePage() {
         )}
       </View>
 
-      {session ? (
+      {session && school.features.includes('exam_schedule') ? (
         <View className='page-section'>
           <SectionHeader title='校园服务' icon='service' />
           <View className='service-grid'>
@@ -143,7 +148,7 @@ export default function HomePage() {
       <View className='page-section'>
         <View className='row row--between'>
           <SectionHeader title='待办事项' icon='check' />
-          <View className='icon-action pressable' onClick={() => setTodoDialog(true)}><AppIcon name='add' size={21} /></View>
+          <View className='icon-action pressable' onClick={() => openTodoDialog()}><AppIcon name='add' size={21} /></View>
         </View>
         <ClubCard padding='none'>
           {todos.length === 0 ? <StateView state='empty' compact title='暂无待办事项' description='添加一项，让今天更有条理' /> : todos.map((todo) => {
@@ -151,7 +156,7 @@ export default function HomePage() {
             return (
               <View className='home-todo' key={todo.id}>
                 <Checkbox value={todo.id} checked={todo.isCompleted} onClick={() => toggleTodo(todo.id)} />
-                <View className='grow' onClick={() => toggleTodo(todo.id)}>
+                <View className='grow' onClick={() => openTodoDialog(todo)}>
                   <Text className={`home-todo__title ${todo.isCompleted ? 'home-todo__title--done' : ''}`}>{todo.title}</Text>
                   <Text className={`home-todo__deadline ${expired ? 'danger' : ''}`}>{expired ? '已到期 · ' : ''}{todo.deadline}</Text>
                 </View>
@@ -162,7 +167,7 @@ export default function HomePage() {
         </ClubCard>
       </View>
 
-      <Dialog title='添加待办' visible={todoDialog} footer={null} onClose={() => setTodoDialog(false)}>
+      <Dialog title={editingTodo ? '编辑待办' : '添加待办'} visible={todoDialog} footer={null} onClose={() => { setTodoDialog(false); setEditingTodo(null) }}>
         <View className='dialog-form'>
           <Text className='form-label'>待办内容</Text>
           <Input className='form-input' value={todoTitle} maxlength={40} placeholder='例如：提交实验报告' onInput={(event) => setTodoTitle(event.detail.value)} />
@@ -170,9 +175,13 @@ export default function HomePage() {
           <Picker mode='date' value={todoDate} onChange={(event) => setTodoDate(String(event.detail.value))}>
             <View className='form-picker'>{todoDate}</View>
           </Picker>
+          <Text className='form-label'>截止时间</Text>
+          <Picker mode='time' value={todoTime} onChange={(event) => setTodoTime(String(event.detail.value))}>
+            <View className='form-picker'>{todoTime}</View>
+          </Picker>
           <View className='dialog-actions'>
-            <Button className='secondary-button' onClick={() => setTodoDialog(false)}>取消</Button>
-            <Button className='primary-button' onClick={submitTodo}>添加</Button>
+            <Button className='secondary-button' onClick={() => { setTodoDialog(false); setEditingTodo(null) }}>取消</Button>
+            <Button className='primary-button' onClick={submitTodo}>{editingTodo ? '保存' : '添加'}</Button>
           </View>
         </View>
       </Dialog>

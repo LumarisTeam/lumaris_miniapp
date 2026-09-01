@@ -5,7 +5,7 @@ import { PageShell } from '@/components/common/PageShell'
 import { ClubCard } from '@/components/common/ClubCard'
 import { ListRow } from '@/components/common/ListRow'
 import { StateView } from '@/components/common/StateView'
-import { fetchStudyProgress } from '@/api/education'
+import { getStudyProgressSnapshot } from '@/services/domainRepository'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
 import type { Feature, StudyModule } from '@/types/domain'
@@ -43,9 +43,12 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (studentId && canShowProgress) {
-      void fetchStudyProgress().then(setProgress).catch(() => setProgress([]))
+      void getStudyProgressSnapshot(studentId, school.code, 'local-first').then(async (snapshot) => {
+        setProgress(snapshot.data)
+        if (snapshot.isFromLocal) setProgress((await getStudyProgressSnapshot(studentId, school.code, 'refresh')).data)
+      }).catch(() => setProgress([]))
     }
-  }, [studentId, canShowProgress])
+  }, [studentId, canShowProgress, school.code])
 
   const entries = ENTRIES.filter((entry) => !entry.feature || school.features.includes(entry.feature))
   const completed = progress.reduce((sum, item) => sum + Number(item.total.actual || 0), 0)

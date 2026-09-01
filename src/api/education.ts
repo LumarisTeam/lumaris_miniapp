@@ -5,7 +5,7 @@ import type {
   ElectricPoint,
   ElectricitySubscription,
   Exam,
-  LinkItem,
+  LinkCategory,
   LoginResult,
   MapPoi,
   PaymentRecord,
@@ -78,8 +78,16 @@ export async function fetchScores(studentId: string, semester: string): Promise<
   return asRecords(raw).map(normalizeScore)
 }
 
-export function fetchStudyProgress(): Promise<StudyModule[]> {
-  return request<StudyModule[]>('/Info/Completion')
+export async function fetchStudyProgress(): Promise<StudyModule[]> {
+  const raw = await request<unknown>('/Info/Completion')
+  return asRecords(raw).map((module) => {
+    const total = module.total && typeof module.total === 'object' ? module.total as Record<string, unknown> : {}
+    return {
+      type: String(module.type ?? ''),
+      total: { name: String(total.name ?? ''), actual: toNumber(total.actual), full: toNumber(total.full) },
+      other: asRecords(module.other).map((item) => ({ name: String(item.name ?? ''), actual: toNumber(item.actual), full: toNumber(item.full) })),
+    }
+  })
 }
 
 export async function fetchBus(date: string): Promise<BusTrip[]> {
@@ -95,7 +103,7 @@ export async function fetchElectricity(url?: string): Promise<number> {
 
 export async function fetchElectricityWeekly(url?: string): Promise<ElectricPoint[]> {
   const raw = await request<unknown>(withQuery('/Electricity/WeeklyData', { url }))
-  return asRecords(raw).map((item) => ({ timestamp: String(item.timestamp ?? item.time ?? ''), value: toNumber(item.value) }))
+  return asRecords(raw).map((item) => ({ timestamp: String(item.timestamp ?? item.Timestamp ?? item.time ?? ''), value: toNumber(item.value ?? item.Value) }))
 }
 
 export function fetchRechargeUrl(url?: string): Promise<string> {
@@ -119,28 +127,44 @@ export async function fetchPayment(id: string, password?: string): Promise<{ bal
   return { balance: toNumber(raw?.balance), records: asRecords(raw?.records).map(normalizePayment) }
 }
 
-export async function fetchProgram(id: string, name: string): Promise<PlanCourse[]> {
-  const raw = await request<unknown>(withQuery('/Program', { id, name }))
-  return asRecords(raw).map((item, index) => ({
-    id: String(item.id ?? `${item.name ?? ''}-${index}`),
-    name: String(item.name ?? ''),
-    lessonType: String(item.lessonType ?? ''),
-    examMode: String(item.examMode ?? ''),
-    courseTypeName: String(item.courseTypeName ?? ''),
-    credits: toNumber(item.credits),
-    term: String(item.termStr ?? ''),
-  }))
+export async function fetchProgram(id: string, _name?: string): Promise<PlanCourse[]> {
+  const raw = await request<unknown>(withQuery('/Program/GetDic', { id }))
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return []
+  return Object.entries(raw as Record<string, unknown>).flatMap(([term, value]) => asRecords(value).map((item, index) => ({
+    id: String(item.id ?? `${term}-${item.name ?? item.Name ?? ''}-${index}`),
+    name: String(item.name ?? item.Name ?? ''),
+    lessonType: String(item.lessonType ?? item.LessonType ?? ''),
+    examMode: String(item.examMode ?? item.ExamMode ?? ''),
+    courseTypeName: String(item.courseTypeName ?? item.CourseTypeName ?? ''),
+    credits: toNumber(item.credits ?? item.Credits),
+    term,
+  })))
 }
 
-export function fetchLinks(): Promise<LinkItem[]> {
-  return request<LinkItem[]>('/SchoolNav')
+export async function fetchLinks(): Promise<LinkCategory[]> {
+  const raw = await request<unknown>('/SchoolNav')
+  return asRecords(raw).map((category) => ({
+    key: String(category.key ?? ''),
+    name: String(category.name ?? ''),
+    description: category.description == null ? null : String(category.description),
+    icon: String(category.icon ?? ''),
+    index: toNumber(category.index),
+    links: asRecords(category.links).map((link) => ({
+      key: String(link.key ?? ''),
+      name: String(link.name ?? ''),
+      icon: link.icon == null ? null : String(link.icon),
+      url: String(link.url ?? ''),
+      description: link.description == null ? null : String(link.description),
+      index: toNumber(link.index),
+    })).sort((left, right) => left.index - right.index),
+  })).sort((left, right) => left.index - right.index)
 }
 
 export async function fetchMapPois(): Promise<MapPoi[]> {
   const raw = await request<unknown>('/Map')
   return asRecords(raw)
     .map((item) => ({
-      id: toNumber(item.id),
+      id: String(item.id ?? ''),
       name: String(item.name ?? ''),
       category: String(item.category ?? '其他'),
       latitude: toNumber(item.latitude),
@@ -148,7 +172,10 @@ export async function fetchMapPois(): Promise<MapPoi[]> {
       description: String(item.description ?? ''),
       address: String(item.address ?? ''),
       campus: String(item.campus ?? ''),
-      isActive: item.isActive !== false,
+      icon: String(item.icon ?? ''),
+      isActive: (item.is_active ?? item.isActive) !== false,
+      sortOrder: String(item.sort_order ?? item.sortOrder ?? ''),
     }))
-    .filter((item) => item.latitude !== 0 && item.longitude !== 0 && item.isActive)
+    .filter((item) => item.id && item.latitude !== 0 && item.longitude !== 0 && item.isActive)
+    .sort((left, right) => left.sortOrder.localeCompare(right.sortOrder, undefined, { numeric: true }) || left.name.localeCompare(right.name, 'zh-CN'))
 }

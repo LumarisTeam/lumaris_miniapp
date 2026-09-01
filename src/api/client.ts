@@ -1,10 +1,17 @@
 import Taro from '@tarojs/taro'
-import type { ApiResponse, AuthSession } from '@/types/domain'
+import type { ApiResponse, AuthSession, School } from '@/types/domain'
 import { readStorage, STORAGE_KEYS } from '@/utils/storage'
 
 const API_BASE_URL = process.env.TARO_APP_API_BASE_URL || 'https://xauatapi.xauat.site/v1'
 const BASIC_API_BASE_URL = process.env.TARO_APP_BASIC_API_BASE_URL || 'https://xauatapi.xauat.site'
 const REQUEST_TIMEOUT = 15000
+
+function educationApiBaseUrl(): string {
+  const school = readStorage<School | null>(STORAGE_KEYS.SCHOOL, null)
+  const website = school?.website?.trim().replace(/\/+$/, '')
+  if (!website) return API_BASE_URL
+  return website.endsWith('/v1') ? website : `${website}/v1`
+}
 
 export class ApiError extends Error {
   constructor(
@@ -41,7 +48,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
 
   try {
     const response = await Taro.request<unknown>({
-      url: `${options.basic ? BASIC_API_BASE_URL : API_BASE_URL}${path}`,
+      url: `${options.basic ? BASIC_API_BASE_URL : educationApiBaseUrl()}${path}`,
       method: options.method ?? 'GET',
       data: options.data,
       header,

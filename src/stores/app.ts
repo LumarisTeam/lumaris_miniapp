@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { listSchools } from '@/api/education'
 import type { AppSettings, Feature, School, ServiceType } from '@/types/domain'
-import { initializeStorage, readStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage'
+import { clearEducationCache, initializeStorage, readStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage'
 
 initializeStorage()
 
@@ -58,6 +58,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ settings })
   },
   setSchool: (school) => {
+    if (get().school.code.toUpperCase() !== school.code.toUpperCase()) clearEducationCache()
     writeStorage(STORAGE_KEYS.SCHOOL, school)
     set({ school })
   },

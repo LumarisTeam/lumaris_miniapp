@@ -3,6 +3,8 @@ import { login as loginRequest } from '@/api/education'
 import { setUnauthorizedHandler } from '@/api/client'
 import type { AuthSession, School } from '@/types/domain'
 import { initializeStorage, readStorage, removeStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage'
+import { useCourseStore } from '@/stores/course'
+import { useScoreStore } from '@/stores/score'
 
 initializeStorage()
 
@@ -19,6 +21,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   loading: false,
   error: '',
   login: async (username, password, school) => {
+    useCourseStore.getState().clearRemote()
+    useScoreStore.getState().clear()
     set({ loading: true, error: '' })
     try {
       const result = await loginRequest(username.trim(), password)
@@ -44,6 +48,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   logout: (reason = '') => {
     removeStorage(STORAGE_KEYS.SESSION)
+    useCourseStore.getState().clearRemote()
+    useScoreStore.getState().clear()
     set({ session: null, error: reason })
   },
 }))

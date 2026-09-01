@@ -44,14 +44,17 @@ export interface LoginResult {
 
 export interface Course {
   id: string
-  name: string
-  teacher: string
-  location: string
+  weekIndexes: number[]
+  teachers: string[]
+  room: string
+  courseName: string
+  courseCode: string
+  weekday: number
+  startUnit: number
+  endUnit: number
+  credits: string
+  lessonId: string
   campus: string
-  weeks: number[]
-  dayOfWeek: number
-  startSlot: number
-  endSlot: number
   color: string
   isCustom: boolean
 }
@@ -60,7 +63,15 @@ export interface TimeInfo {
   startTime: string
   endTime: string
   semester: string
-  currentWeek?: number
+  extra?: Record<string, string>
+}
+
+export type FetchPolicy = 'local-first' | 'refresh' | 'fallback-to-local'
+
+export interface FetchSnapshot<T> {
+  data: T
+  isFromLocal: boolean
+  isStale: boolean
 }
 
 export interface Exam {
@@ -78,20 +89,30 @@ export interface Semester {
 
 export interface Score {
   id: string
+  name: string
   lessonCode: string
   lessonName: string
   grade: string
-  gpa: number
+  gpa: string
   gradeDetail: string
-  credit: number
+  credit: string
   isMinor: boolean
+}
+
+export interface ScoreList {
+  semester: Semester
+  list: Score[]
 }
 
 export interface BusTrip {
   id: string
+  lineName: string
+  description: string
   departureTime: string
   departureStation: string
   arrivalStation: string
+  arrivalStationTime: string
+  arrivalTime: string
   campus: string
 }
 
@@ -140,8 +161,17 @@ export interface LinkItem {
   index: number
 }
 
+export interface LinkCategory {
+  key: string
+  name: string
+  description: string | null
+  icon: string
+  index: number
+  links: LinkItem[]
+}
+
 export interface MapPoi {
-  id: number
+  id: string
   name: string
   category: string
   latitude: number
@@ -149,7 +179,9 @@ export interface MapPoi {
   description: string
   address: string
   campus: string
+  icon: string
   isActive: boolean
+  sortOrder: string
 }
 
 export interface TodoItem {
@@ -157,6 +189,8 @@ export interface TodoItem {
   title: string
   deadline: string
   isCompleted: boolean
+  description?: string
+  key?: string
 }
 
 export type ThemeMode = 'system' | 'light' | 'dark'
