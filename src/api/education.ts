@@ -127,7 +127,7 @@ export async function fetchPayment(id: string, password?: string): Promise<{ bal
   return { balance: toNumber(raw?.balance), records: asRecords(raw?.records).map(normalizePayment) }
 }
 
-export async function fetchProgram(id: string, _name?: string): Promise<PlanCourse[]> {
+export async function fetchProgram(id: string): Promise<PlanCourse[]> {
   const raw = await request<unknown>(withQuery('/Program/GetDic', { id }))
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return []
   return Object.entries(raw as Record<string, unknown>).flatMap(([term, value]) => asRecords(value).map((item, index) => ({

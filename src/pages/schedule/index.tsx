@@ -30,10 +30,10 @@ export default function SchedulePage() {
   const supportsTimetable = useAppStore((state) => state.school.features.includes('timetable'))
   const weekdays = orderedWeekdays(weekStartDay)
 
-  useDidShow(() => { if (session && supportsTimetable && courses.length === 0) void refresh(session.studentId, 'local-first') })
+  useDidShow(() => { if (session && supportsTimetable && courses.length === 0) void refresh(session.educationId, 'local-first') })
   usePullDownRefresh(() => {
     if (!session || !supportsTimetable) return Taro.stopPullDownRefresh()
-    void refresh(session.studentId).finally(() => Taro.stopPullDownRefresh())
+    void refresh(session.educationId).finally(() => Taro.stopPullDownRefresh())
   })
 
   const visibleCourses = useMemo(() => {

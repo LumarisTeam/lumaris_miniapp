@@ -27,20 +27,30 @@ describe('versioned storage', () => {
 
   test('migrates valid legacy data without persisting credentials', () => {
     mockStorage.lm_courseData = [{ name: '课程' }]
-    mockStorage.lm_userData = { studentId: '20260001', name: '同学', cookie: 'session-cookie', schoolCode: 'XAUAT' }
-    mockStorage.lm_credentials = { username: '20260001', password: 'secret' }
+    mockStorage.lm_userData = { studentId: '84721', name: '错误的旧显示名', cookie: 'session-cookie', schoolCode: 'XAUAT' }
+    mockStorage.lm_credentials = { username: '2026123456', password: 'secret' }
     migrateLegacyStorage()
 
     expect(mockStorage['lumaris:v1:courses']).toEqual([{ name: '课程' }])
-    expect(mockStorage['lumaris:v1:session']).toMatchObject({ studentId: '20260001', cookie: 'session-cookie' })
+    expect(mockStorage['lumaris:v1:session']).toEqual({ username: '2026123456', educationId: '84721', cookie: 'session-cookie', schoolCode: 'XAUAT' })
     const migratedValues = Object.fromEntries(Object.entries(mockStorage).filter(([key]) => key.startsWith('lumaris:v1:')))
     expect(JSON.stringify(migratedValues)).not.toContain('secret')
     expect(mockStorage['lumaris:v1:legacy-migrated']).toBe(true)
   })
 
-  test('discards incomplete legacy sessions', () => {
-    mockStorage.lm_userData = { studentId: '20260001', cookie: '' }
+  test('discards a legacy session when the login username cannot be recovered', () => {
+    mockStorage.lm_userData = { studentId: '84721', cookie: 'session-cookie' }
     migrateLegacyStorage()
+    expect(mockStorage['lumaris:v1:session']).toBeUndefined()
+  })
+
+  test('discards a current session that conflates the response id with the username', () => {
+    mockStorage['lumaris:v1:legacy-migrated'] = true
+    mockStorage['lumaris:v1:session'] = { studentId: '84721', displayName: '2026123456', cookie: 'session-cookie', schoolCode: 'XAUAT' }
+
+    const { initializeStorage } = require('@/utils/storage') as typeof import('@/utils/storage')
+    initializeStorage()
+
     expect(mockStorage['lumaris:v1:session']).toBeUndefined()
   })
 

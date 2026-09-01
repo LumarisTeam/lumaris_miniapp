@@ -1,7 +1,7 @@
 /* eslint-disable import/first */
 const mockRequest = jest.fn()
 const mockStorage: Record<string, unknown> = {
-  'lumaris:v1:session': { studentId: '20260001', displayName: '同学', cookie: 'cookie-value', schoolCode: 'XAUAT' },
+  'lumaris:v1:session': { username: '2026123456', educationId: '84721', cookie: 'cookie-value', schoolCode: 'XAUAT' },
 }
 
 jest.mock('@tarojs/taro', () => ({

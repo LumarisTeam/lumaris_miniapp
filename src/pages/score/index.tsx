@@ -44,11 +44,11 @@ export default function ScorePage() {
   const [foolish, setFoolish] = useState(false)
 
   useEffect(() => {
-    if (session && school.features.includes('grade_query')) void load(session.studentId)
+    if (session && school.features.includes('grade_query')) void load(session.educationId)
   }, [session, school.features, load])
   usePullDownRefresh(() => {
     if (!session || !school.features.includes('grade_query')) return Taro.stopPullDownRefresh()
-    void load(session.studentId, 'refresh').finally(() => Taro.stopPullDownRefresh())
+    void load(session.educationId, 'refresh').finally(() => Taro.stopPullDownRefresh())
   })
 
   const displayLists = useMemo(() => mode === 'year' ? groupByAcademicYear(scoreLists) : scoreLists, [mode, scoreLists])
@@ -75,7 +75,7 @@ export default function ScorePage() {
   const action = (
     <View className='score-actions'>
       {!foolish ? <View className='icon-action pressable' onClick={() => { setFoolish(true); Taro.showToast({ title: '愚人模式已开启', icon: 'none' }) }}><AppIcon name='success' size={20} /></View> : null}
-      <View className='icon-action pressable' onClick={() => void load(session.studentId, 'refresh')}><AppIcon name='refresh' size={20} /></View>
+      <View className='icon-action pressable' onClick={() => void load(session.educationId, 'refresh')}><AppIcon name='refresh' size={20} /></View>
     </View>
   )
 
@@ -102,9 +102,9 @@ export default function ScorePage() {
       </View>
 
       {error && scoreLists.length === 0 ? (
-        <StateView state='error' title='成绩加载失败' description={error} actionLabel='重试' onAction={() => void load(session.studentId, 'refresh')} />
+        <StateView state='error' title='成绩加载失败' description={error} actionLabel='重试' onAction={() => void load(session.educationId, 'refresh')} />
       ) : !active ? (
-        <StateView state='empty' title='暂无成绩' description='可以刷新后重试' actionLabel='刷新数据' onAction={() => void load(session.studentId, 'refresh')} />
+        <StateView state='empty' title='暂无成绩' description='可以刷新后重试' actionLabel='刷新数据' onAction={() => void load(session.educationId, 'refresh')} />
       ) : (
         <View className='page-section'>
           {mode === 'year' ? (

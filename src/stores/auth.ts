@@ -5,6 +5,7 @@ import type { AuthSession, School } from '@/types/domain'
 import { initializeStorage, readStorage, removeStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage'
 import { useCourseStore } from '@/stores/course'
 import { useScoreStore } from '@/stores/score'
+import { createAuthSession } from '@/utils/auth'
 
 initializeStorage()
 
@@ -26,15 +27,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ loading: true, error: '' })
     try {
       const result = await loginRequest(username.trim(), password)
-      if (!result.success || !result.studentId || !result.cookie) {
+      const session = createAuthSession(username, result, school)
+      if (!session) {
         set({ error: '账号或密码错误' })
         return false
-      }
-      const session: AuthSession = {
-        studentId: result.studentId,
-        displayName: result.name || username.trim(),
-        cookie: result.cookie,
-        schoolCode: school.code,
       }
       writeStorage(STORAGE_KEYS.SESSION, session)
       set({ session })

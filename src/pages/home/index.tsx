@@ -39,10 +39,10 @@ export default function HomePage() {
   const updateTodo = useTodoStore((state) => state.update)
   const toggleTodo = useTodoStore((state) => state.toggle)
   const removeTodo = useTodoStore((state) => state.remove)
-  const examScope = session ? `${school.code.toUpperCase()}:${session.studentId}` : ''
+  const examScope = session ? `${school.code.toUpperCase()}:${session.educationId}` : ''
   const [exams, setExams] = useState<Exam[]>(() => {
     if (!examScope) return []
-    return readExamSnapshot(session!.studentId, school.code).data
+    return readExamSnapshot(session!.educationId, school.code).data
   })
   const [todoDialog, setTodoDialog] = useState(false)
   const [todoTitle, setTodoTitle] = useState('')
@@ -53,8 +53,8 @@ export default function HomePage() {
   const sync = async () => {
     if (!session) return
     const [, examResult] = await Promise.allSettled([
-      school.features.includes('timetable') ? refreshCourses(session.studentId) : Promise.resolve(),
-      school.features.includes('exam_schedule') ? getExamSnapshot(session.studentId, school.code, 'refresh') : Promise.resolve({ data: [], isFromLocal: false, isStale: false }),
+      school.features.includes('timetable') ? refreshCourses(session.educationId) : Promise.resolve(),
+      school.features.includes('exam_schedule') ? getExamSnapshot(session.educationId, school.code, 'refresh') : Promise.resolve({ data: [], isFromLocal: false, isStale: false }),
     ])
     if (examResult.status === 'fulfilled') {
       setExams(examResult.value.data)

@@ -26,10 +26,10 @@ function ProgramContent() {
     setLoading(true)
     setError('')
     try {
-      const snapshot = await getProgramSnapshot(session.studentId, session.displayName, schoolCode, force ? 'refresh' : 'local-first')
+      const snapshot = await getProgramSnapshot(session.educationId, schoolCode, force ? 'refresh' : 'local-first')
       setCourses(snapshot.data); setIsStale(snapshot.isStale)
       if (!force && snapshot.isFromLocal) {
-        const refreshed = await getProgramSnapshot(session.studentId, session.displayName, schoolCode, 'refresh')
+        const refreshed = await getProgramSnapshot(session.educationId, schoolCode, 'refresh')
         setCourses(refreshed.data); setIsStale(refreshed.isStale)
       }
     }

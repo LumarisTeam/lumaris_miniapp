@@ -17,7 +17,7 @@ import './index.scss'
 function PaymentContent() {
   const session = useAuthStore((state) => state.session)
   const schoolCode = useAppStore((state) => state.school.code)
-  const [cardId, setCardId] = useState(() => readStorage(STORAGE_KEYS.PAYMENT_ID, session?.studentId || ''))
+  const [cardId, setCardId] = useState(() => readStorage(STORAGE_KEYS.PAYMENT_ID, session?.username || ''))
   const [password, setPassword] = useState('')
   const [balance, setBalance] = useState<number | null>(null)
   const [records, setRecords] = useState<PaymentRecord[]>([])

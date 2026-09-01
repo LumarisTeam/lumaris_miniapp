@@ -29,8 +29,10 @@ export interface School {
 }
 
 export interface AuthSession {
-  studentId: string
-  displayName: string
+  /** 登录时输入的教务账号，也是 Flutter 中展示和校园卡使用的真实学号。 */
+  username: string
+  /** 登录响应的 studentId，是课程、考试、成绩和培养计划接口使用的内部标识。 */
+  educationId: string
   cookie: string
   schoolCode: string
 }
@@ -39,7 +41,6 @@ export interface LoginResult {
   success: boolean
   studentId: string
   cookie: string
-  name?: string
 }
 
 export interface Course {

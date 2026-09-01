@@ -46,7 +46,7 @@ describe('domain repository fetch policy', () => {
 
   test('writes fresh remote results using the date and school scope', async () => {
     mockFetchBus.mockResolvedValue(cachedTrips)
-    await expect(getBusSnapshot('2026-09-01', 'XAUAT', 'refresh')).resolves.toMatchObject({ data: cachedTrips, isFromLocal: false })
-    expect(mockWriteCache).toHaveBeenCalledWith('bus-cache', cachedTrips, 'XAUAT:2026-09-01', expect.any(Number))
+    await expect(getBusSnapshot('2099-09-01', 'XAUAT', 'refresh')).resolves.toMatchObject({ data: cachedTrips, isFromLocal: false })
+    expect(mockWriteCache).toHaveBeenCalledWith('bus-cache', cachedTrips, 'XAUAT:2099-09-01', expect.any(Number))
   })
 })

@@ -24,6 +24,7 @@
 | 成绩计算 | `ScoreList.totalCredit/totalCourse/totalGpa`，处理重修、辅修、0 绩点和无效值 | 当前简单加权平均，重修/辅修结果不同 | 直接移植 Flutter 测试向量并逐项相等 |
 | 成绩加载 | local-first 立即展示，后台并行刷新所有学期，单学期失败保留旧缓存 | 当前串行读取当前学期，无完整离线状态 | 全学期并行合并、stale 提示、学期/学年切换一致 |
 | 认证 | Flutter 有 20 分钟 Cookie 与安全存储自动重登；本计划明确不保存密码、不自动重登 | 当前会话无时间元数据 | 保留计划差异：会话失效退出；文档和测试明确，不伪装成 Flutter 行为 |
+| 认证身份字段 | Flutter 将登录输入保存为 `PrefsKeys.USERNAME`，登录响应 `studentId` 存入 `UserData`；个人页和校园卡使用前者，教务业务 API 使用后者 | 已拆分为 `AuthSession.username` 与 `AuthSession.educationId` | 已纠正；缺少真实学号的旧会话不做猜测性迁移，要求重新登录 |
 | 学校 | `School.features` 枚举、enabled、weekStartDay、fallback/cache 与客户端切换 | 当前只隐藏部分入口，直接页面访问仍请求 | 所有入口与页面均 Feature 守卫；切校清理教务缓存 |
 | 待办 | `TodoItem` 支持新增、编辑、完成、删除和截止日期时间 | 当前缺少编辑，截止时间固定 23:59 | CRUD 与日期时间编辑完整，持久化测试通过 |
 | 考试 | `ExamService` 解析结束时间、过滤过期、缓存并控制刷新周期 | 当前只取前三条原始数据 | 过滤、排序、缓存、过期与空状态一致 |
@@ -44,4 +45,3 @@
 - 不实现 HTML/WebView 课表导入、桌面小组件、后台任务、托盘、安装包下载和任意时间本地通知。
 - 课程/待办通知降级为应用内状态，并保留微信订阅消息接口。
 - 外链、地图和更新分别使用微信 `web-view`/剪贴板、原生 `Map`、`UpdateManager`。
-

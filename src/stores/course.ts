@@ -39,7 +39,7 @@ interface CourseState {
 const initialSession = readStorage<AuthSession | null>(STORAGE_KEYS.SESSION, null)
 const initialSchool = useAppStore.getState().school
 const initialBundle = initialSession
-  ? readCourseBundle(initialSession.studentId, initialSchool.code).data
+  ? readCourseBundle(initialSession.educationId, initialSchool.code).data
   : { courses: [], timeInfo: null }
 const initialTimeInfo = initialBundle.timeInfo
 const initialWeekInfo = calculateWeekInfo(initialTimeInfo, new Date(), useAppStore.getState().school.weekStartDay)

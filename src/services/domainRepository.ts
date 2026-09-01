@@ -36,8 +36,8 @@ export function getBusSnapshot(date: string, schoolCode: string, policy: FetchPo
   return getSnapshot(STORAGE_KEYS.BUS_CACHE, `${schoolCode.toUpperCase()}:${date}`, async () => filterUpcomingBusTrips(await fetchBus(date), date), policy, isDomainArray<BusTrip>)
 }
 
-export function getProgramSnapshot(studentId: string, name: string, schoolCode: string, policy: FetchPolicy): Promise<FetchSnapshot<PlanCourse[]>> {
-  return getSnapshot(STORAGE_KEYS.PROGRAM_CACHE, `${schoolCode.toUpperCase()}:${studentId}`, () => fetchProgram(studentId, name), policy, isDomainArray<PlanCourse>, LONG_TTL)
+export function getProgramSnapshot(educationId: string, schoolCode: string, policy: FetchPolicy): Promise<FetchSnapshot<PlanCourse[]>> {
+  return getSnapshot(STORAGE_KEYS.PROGRAM_CACHE, `${schoolCode.toUpperCase()}:${educationId}`, () => fetchProgram(educationId), policy, isDomainArray<PlanCourse>, LONG_TTL)
 }
 
 export function getStudyProgressSnapshot(studentId: string, schoolCode: string, policy: FetchPolicy): Promise<FetchSnapshot<StudyModule[]>> {

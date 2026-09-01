@@ -47,10 +47,10 @@ function ElectricityContent() {
     setLoading(true)
     setError('')
     try {
-      const snapshot = await getElectricitySnapshot(session.studentId, schoolCode, sourceUrl, force ? 'refresh' : 'local-first')
+      const snapshot = await getElectricitySnapshot(session.username, schoolCode, sourceUrl, force ? 'refresh' : 'local-first')
       setBalance(snapshot.data.balance); setPoints(snapshot.data.points); setIsStale(snapshot.isStale)
       if (!force && snapshot.isFromLocal) {
-        const refreshed = await getElectricitySnapshot(session.studentId, schoolCode, sourceUrl, 'refresh')
+        const refreshed = await getElectricitySnapshot(session.username, schoolCode, sourceUrl, 'refresh')
         setBalance(refreshed.data.balance); setPoints(refreshed.data.points); setIsStale(refreshed.isStale)
       }
     } catch (loadError) {

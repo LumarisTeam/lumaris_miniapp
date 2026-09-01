@@ -142,6 +142,13 @@
   - 验证：存储、认证、状态选择器单元测试
   - 结果：Store 初始化前执行迁移且不保存密码；远端缓存已增加作用域、时间戳、校验和异常清理，退出登录清空敏感内存状态；Store 状态机测试仍有限
 
+- [x] T03-03 纠正登录学号与服务端教育标识的字段语义
+  - 依赖：T03-01、T03-02
+  - Flutter 参考：`lib/ui/pages/login_page/login_page.dart` 的 `_saveLoginInfo()`、`lib/features/education/models/login_response.dart`、`lib/features/education/models/user_data.dart`、`lib/features/education/services/{course,exam,score,program}_service.dart`、`lib/state/payment_store.dart`、`lib/ui/pages/profile_page/profile_page.dart`
+  - 验收：登录输入 `username` 作为真实学号用于个人页、校园卡默认卡号和用户级本地作用域；登录响应 `studentId` 仅作为教务内部标识用于课程、考试、成绩和培养计划；两者不相等时仍各自传递正确；不得从响应 ID 或旧显示名猜测学号
+  - 验证：`pnpm typecheck && pnpm lint && pnpm test && pnpm build:weapp`
+  - 结果：`AuthSession` 已拆为 `username` 与 `educationId`，移除 Flutter 登录响应不存在的 `displayName/name` 假设；缺少真实 `username` 的旧会话会失效并要求重新登录；回归夹具固定 `username=2026123456`、`studentId=84721`。2026-09-01 验证：typecheck、lint、38 项 Jest 与 weapp 构建全部通过
+
 ## T04 课程主链路
 
 - [~] T04-01 实现首页课程、考试、服务磁贴和本地待办

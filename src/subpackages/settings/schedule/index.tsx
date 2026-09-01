@@ -26,7 +26,7 @@ export default function ScheduleSettingsPage() {
           <ListRow title='显示课表网格' subtitle='在课表页按星期和节次排列课程' icon='category' trailing={<Switch checked={settings.showCourseGrid} color='#007aff' onChange={(event) => setSettings({ showCourseGrid: event.detail.value })} />} />
           <ListRow title='无剩余课程时显示明日' subtitle='首页今日课程结束后切换到明日课程' icon='calendar' trailing={<Switch checked={settings.showTomorrow} color='#007aff' onChange={(event) => setSettings({ showTomorrow: event.detail.value })} />} />
           <ListRow title='自定义课程' subtitle='手工新增、编辑或删除课程' icon='edit' onClick={() => Taro.navigateTo({ url: '/subpackages/settings/custom-course/index' })} />
-          <ListRow title='立即同步课表' subtitle={session ? '从教务系统获取最新数据' : '登录后可用'} icon='refresh' onClick={session ? () => void refresh(session.studentId).then(() => Taro.showToast({ title: '同步完成', icon: 'success' })) : undefined} />
+          <ListRow title='立即同步课表' subtitle={session ? '从教务系统获取最新数据' : '登录后可用'} icon='refresh' onClick={session ? () => void refresh(session.educationId).then(() => Taro.showToast({ title: '同步完成', icon: 'success' })) : undefined} />
         </ClubCard>
       </View>
 

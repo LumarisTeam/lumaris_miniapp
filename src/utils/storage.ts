@@ -112,11 +112,20 @@ function validSession(value: unknown): value is AuthSession {
   if (!value || typeof value !== 'object') return false
   const session = value as Partial<AuthSession>
   return Boolean(
-    typeof session.studentId === 'string' &&
-      session.studentId &&
+    typeof session.username === 'string' &&
+      session.username &&
+      typeof session.educationId === 'string' &&
+      session.educationId &&
       typeof session.cookie === 'string' &&
-      session.cookie,
+      session.cookie &&
+      typeof session.schoolCode === 'string' &&
+      session.schoolCode,
   )
+}
+
+function discardInvalidCurrentSession(): void {
+  const session = readStorage<unknown>(STORAGE_KEYS.SESSION, null)
+  if (session && !validSession(session)) removeStorage(STORAGE_KEYS.SESSION)
 }
 
 const LEGACY_MAPPINGS: Array<[string, StorageKey]> = [
@@ -144,9 +153,10 @@ export function migrateLegacyStorage(): void {
 
   try {
     const oldUser = Taro.getStorageSync('lm_userData') as Record<string, unknown> | undefined
+    const oldCredentials = Taro.getStorageSync('lm_credentials') as Record<string, unknown> | undefined
     const candidate: AuthSession = {
-      studentId: String(oldUser?.studentId ?? ''),
-      displayName: String(oldUser?.name ?? oldUser?.studentId ?? ''),
+      username: String(oldCredentials?.username ?? ''),
+      educationId: String(oldUser?.studentId ?? ''),
       cookie: String(oldUser?.cookie ?? ''),
       schoolCode: String(oldUser?.schoolCode ?? 'XAUAT'),
     }
@@ -160,4 +170,5 @@ export function migrateLegacyStorage(): void {
 
 export function initializeStorage(): void {
   migrateLegacyStorage()
+  discardInvalidCurrentSession()
 }

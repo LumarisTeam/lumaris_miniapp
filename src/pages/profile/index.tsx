@@ -38,17 +38,17 @@ export default function ProfilePage() {
   const logout = useAuthStore((state) => state.logout)
   const school = useAppStore((state) => state.school)
   const [progress, setProgress] = useState<StudyModule[]>([])
-  const studentId = session?.studentId
+  const username = session?.username
   const canShowProgress = school.features.includes('study_progress')
 
   useEffect(() => {
-    if (studentId && canShowProgress) {
-      void getStudyProgressSnapshot(studentId, school.code, 'local-first').then(async (snapshot) => {
+    if (username && canShowProgress) {
+      void getStudyProgressSnapshot(username, school.code, 'local-first').then(async (snapshot) => {
         setProgress(snapshot.data)
-        if (snapshot.isFromLocal) setProgress((await getStudyProgressSnapshot(studentId, school.code, 'refresh')).data)
+        if (snapshot.isFromLocal) setProgress((await getStudyProgressSnapshot(username, school.code, 'refresh')).data)
       }).catch(() => setProgress([]))
     }
-  }, [studentId, canShowProgress, school.code])
+  }, [username, canShowProgress, school.code])
 
   const entries = ENTRIES.filter((entry) => !entry.feature || school.features.includes(entry.feature))
   const completed = progress.reduce((sum, item) => sum + Number(item.total.actual || 0), 0)
@@ -59,8 +59,8 @@ export default function ProfilePage() {
       <View className='profile-header'>
         <Image className='profile-header__avatar' src={logo} mode='aspectFit' />
         <View className='grow'>
-          <Text className='profile-header__name'>{session?.displayName || '游客'}</Text>
-          <Text className='profile-header__meta'>{session ? `${school.name} · ${session.studentId}` : '登录后使用完整校园服务'}</Text>
+          <Text className='profile-header__name'>{session?.username || '未登录'}</Text>
+          <Text className='profile-header__meta'>{session ? `${school.name} 教务账号` : '游客'}</Text>
         </View>
         {!session ? <View className='profile-header__login pressable' onClick={() => Taro.navigateTo({ url: '/pages/login/index' })}>登录</View> : null}
       </View>
