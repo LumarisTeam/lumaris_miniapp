@@ -21,6 +21,7 @@ import {
   List,
   Notice,
   People,
+  Power,
   Refresh,
   Search,
   Service,
@@ -40,7 +41,7 @@ export type IconName =
   | 'add' | 'alarm' | 'back' | 'right' | 'bell' | 'book' | 'calendar'
   | 'category' | 'check' | 'clock' | 'close' | 'card' | 'delete' | 'edit'
   | 'error' | 'location' | 'home' | 'link' | 'list' | 'notice' | 'people'
-  | 'refresh' | 'search' | 'service' | 'settings' | 'success' | 'tips'
+  | 'power' | 'refresh' | 'search' | 'service' | 'settings' | 'success' | 'tips'
   | 'user' | 'warning'
 
 const ICONS: Record<IconName, ComponentType<{ size?: string | number; color?: string; className?: string }>> = {
@@ -65,6 +66,7 @@ const ICONS: Record<IconName, ComponentType<{ size?: string | number; color?: st
   list: List,
   notice: Notice,
   people: People,
+  power: Power,
   refresh: Refresh,
   search: Search,
   service: Service,

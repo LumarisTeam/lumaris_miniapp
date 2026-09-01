@@ -8,6 +8,7 @@ import { SectionHeader } from '@/components/common/SectionHeader'
 import { StateView } from '@/components/common/StateView'
 import { AppIcon } from '@/components/common/AppIcon'
 import { CourseCard } from '@/components/course/CourseCard'
+import { HomeServiceTile, type HomeServiceTileTone } from '@/components/home/HomeServiceTile'
 import { useAuthStore } from '@/stores/auth'
 import { useCourseStore } from '@/stores/course'
 import { useAppStore } from '@/stores/app'
@@ -18,10 +19,10 @@ import { getExamSnapshot, readExamSnapshot } from '@/services/examRepository'
 import '@/styles/pages.scss'
 import './index.scss'
 
-const SERVICE_ROUTES: Record<ServiceType, { label: string; hint: string; route: string; icon: 'notice' | 'service' | 'card'; feature: Feature }> = {
-  electricity: { label: '电费', hint: '余额与趋势', route: '/subpackages/services/electricity/index', icon: 'notice', feature: 'electricity' },
-  bus: { label: '校车', hint: '今日班次', route: '/subpackages/services/bus/index', icon: 'service', feature: 'bus_schedule' },
-  payment: { label: '校园卡', hint: '余额与流水', route: '/subpackages/services/payment/index', icon: 'card', feature: 'payment' },
+const SERVICE_ROUTES: Record<ServiceType, { label: string; value: string; route: string; icon: 'power' | 'service' | 'card'; tone: HomeServiceTileTone; feature: Feature }> = {
+  electricity: { label: '电费', value: '余额与趋势', route: '/subpackages/services/electricity/index', icon: 'power', tone: 'primary', feature: 'electricity' },
+  bus: { label: '校车', value: '今日班次', route: '/subpackages/services/bus/index', icon: 'service', tone: 'success', feature: 'bus_schedule' },
+  payment: { label: '校园卡', value: '余额与流水', route: '/subpackages/services/payment/index', icon: 'card', tone: 'warning', feature: 'payment' },
 }
 
 export default function HomePage() {
@@ -73,6 +74,7 @@ export default function HomePage() {
   const todayCourses = homeSchedule.courses
   const scheduleTitle = homeSchedule.isTomorrow ? '明日课程' : '今日课程'
   const upcomingExams = exams.slice(0, 3)
+  const homeServices = settings.visibleServices.filter((service) => school.features.includes(SERVICE_ROUTES[service].feature))
 
   const submitTodo = () => {
     if (!todoTitle.trim()) {
@@ -114,17 +116,21 @@ export default function HomePage() {
         )}
       </View>
 
-      {session && school.features.includes('exam_schedule') ? (
+      {session && homeServices.length > 0 ? (
         <View className='page-section'>
-          <SectionHeader title='校园服务' icon='service' />
-          <View className='service-grid'>
-            {settings.visibleServices.filter((service) => school.features.includes(SERVICE_ROUTES[service].feature)).map((service) => {
+          <SectionHeader title='快捷方式' icon='service' />
+          <View className='home-service-grid'>
+            {homeServices.map((service) => {
               const item = SERVICE_ROUTES[service]
               return (
-                <View className='service-tile pressable' key={service} onClick={() => Taro.navigateTo({ url: item.route })}>
-                  <View className='service-tile__icon'><AppIcon name={item.icon} size={23} /></View>
-                  <View><Text className='service-tile__label'>{item.label}</Text><Text className='service-tile__hint'>{item.hint}</Text></View>
-                </View>
+                <HomeServiceTile
+                  key={service}
+                  label={item.label}
+                  value={item.value}
+                  icon={item.icon}
+                  tone={item.tone}
+                  onClick={() => Taro.navigateTo({ url: item.route })}
+                />
               )
             })}
           </View>
