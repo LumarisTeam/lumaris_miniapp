@@ -1,4 +1,8 @@
 .app-page {
+  --app-status-bar-height: env(safe-area-inset-top);
+  --app-navbar-content-height: 88rpx;
+  --app-navbar-height: calc(var(--app-status-bar-height) + var(--app-navbar-content-height));
+  --app-navbar-system-right-inset: 0px;
   min-height: 100vh;
   color: var(--label);
   background: var(--grouped-bg);
@@ -12,8 +16,8 @@
   position: sticky;
   top: 0;
   z-index: 30;
-  height: calc(88rpx + env(safe-area-inset-top));
-  padding: env(safe-area-inset-top) 24rpx 0;
+  height: var(--app-navbar-height);
+  padding: var(--app-status-bar-height) 24rpx 0;
   display: grid;
   grid-template-columns: 96rpx minmax(0, 1fr) 96rpx;
   align-items: center;
@@ -28,6 +32,11 @@
 }
 
 .app-navbar__side--right {
+  position: absolute;
+  top: var(--app-status-bar-height);
+  right: var(--app-navbar-system-right-inset);
+  width: 96rpx;
+  height: var(--app-navbar-content-height);
   justify-content: flex-end;
 }
 

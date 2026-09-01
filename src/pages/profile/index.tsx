@@ -28,7 +28,6 @@ const ENTRIES: ProfileEntry[] = [
   { title: '培养计划', icon: 'book', route: '/subpackages/services/program/index', feature: 'program' },
   { title: '校园卡', icon: 'card', route: '/subpackages/services/payment/index', feature: 'payment' },
   { title: '校园地图', icon: 'location', route: '/subpackages/services/map/index', feature: 'map' },
-  { title: '校园网', icon: 'service', route: '/subpackages/services/network/index' },
   { title: '帮助', icon: 'tips', route: '/subpackages/content/document/index?kind=help' },
   { title: '设置与关于', icon: 'settings', route: '/subpackages/settings/index/index' },
 ]

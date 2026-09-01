@@ -15,7 +15,6 @@ export default defineAppConfig({
         'payment/index',
         'program/index',
         'links/index',
-        'network/index',
         'map/index',
       ],
     },
