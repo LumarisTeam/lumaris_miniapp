@@ -29,7 +29,12 @@ import {
   Tips,
   User,
   Warning,
+  configure,
 } from '@nutui/icons-react-taro'
+
+// The SVG mask renderer is not reliable in all mini-program runtimes.
+// The bundled iconfont has the same glyphs and renders consistently there.
+configure({ useSvg: false })
 
 export type IconName =
   | 'add' | 'alarm' | 'back' | 'right' | 'bell' | 'book' | 'calendar'

@@ -13,13 +13,18 @@
 .schedule-weekbar__center { min-width: 0; text-align: center; }
 .schedule-weekbar__title { display: block; font-size: 30rpx; font-weight: 700; }
 .schedule-weekbar__subtitle { display: block; margin-top: 4rpx; color: var(--secondary-label); font-size: 20rpx; }
-.schedule-scroll { width: 100%; height: calc(100vh - 200rpx - env(safe-area-inset-top)); }
+.schedule-scroll {
+  width: 100%;
+  max-width: 100%;
+  height: calc(100vh - 200rpx - env(safe-area-inset-top));
+}
 
 .schedule-grid {
-  width: 1280rpx;
+  width: 100%;
+  max-width: 100%;
   padding: 16rpx;
   display: grid;
-  grid-template-columns: 72rpx repeat(7, 168rpx);
+  grid-template-columns: 56rpx repeat(7, minmax(0, 1fr));
   grid-template-rows: 68rpx repeat(13, 92rpx);
   gap: 4rpx;
   position: relative;
