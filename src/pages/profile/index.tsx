@@ -82,7 +82,7 @@ export default function ProfilePage() {
       {session ? (
         <View className='page-section'><ClubCard padding='none'><ListRow title='退出登录' subtitle='本机不会保存教务密码' icon='user' danger onClick={() => Taro.showModal({ title: '退出登录', content: '将清除本机登录会话，是否继续？', success: ({ confirm }) => { if (confirm) logout() } })} /></ClubCard></View>
       ) : (
-        <StateView state='login' compact title='当前为游客模式' description='自定义课程与待办仍会保存在本机' actionLabel='登录教务系统' onAction={() => Taro.navigateTo({ url: '/pages/login/index' })} />
+        <StateView state='login' compact title='当前为游客模式' description='自定义课程仍会保存在本机' actionLabel='登录教务系统' onAction={() => Taro.navigateTo({ url: '/pages/login/index' })} />
       )}
     </PageShell>
   )

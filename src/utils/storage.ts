@@ -11,7 +11,6 @@ export const STORAGE_KEYS = {
   CUSTOM_COURSES: 'custom-courses',
   IGNORED_COURSES: 'ignored-courses',
   TIME_INFO: 'time-info',
-  TODOS: 'todos',
   EXAMS: 'exams',
   SEMESTERS: 'semesters',
   SCORES: 'scores',
@@ -128,6 +127,14 @@ function discardInvalidCurrentSession(): void {
   if (session && !validSession(session)) removeStorage(STORAGE_KEYS.SESSION)
 }
 
+function removeDeprecatedStorage(): void {
+  try {
+    Taro.removeStorageSync(`${PREFIX}todos`)
+  } catch {
+    // Deprecated data must not prevent the current storage schema from loading.
+  }
+}
+
 const LEGACY_MAPPINGS: Array<[string, StorageKey]> = [
   ['lm_courseData', STORAGE_KEYS.COURSES],
   ['lm_guestCourseData', STORAGE_KEYS.COURSES],
@@ -171,4 +178,5 @@ export function migrateLegacyStorage(): void {
 export function initializeStorage(): void {
   migrateLegacyStorage()
   discardInvalidCurrentSession()
+  removeDeprecatedStorage()
 }

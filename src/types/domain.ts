@@ -185,15 +185,6 @@ export interface MapPoi {
   sortOrder: string
 }
 
-export interface TodoItem {
-  id: string
-  title: string
-  deadline: string
-  isCompleted: boolean
-  description?: string
-  key?: string
-}
-
 export type ThemeMode = 'system' | 'light' | 'dark'
 export type StartPage = 'home' | 'schedule' | 'score' | 'profile'
 export type ServiceType = 'electricity' | 'bus' | 'payment'

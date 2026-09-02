@@ -64,16 +64,24 @@ describe('versioned storage', () => {
     expect(mockStorage['lumaris:v1:scores']).toBeUndefined()
   })
 
-  test('clears remote education data but preserves custom courses and todos', () => {
+  test('clears remote education data but preserves custom courses', () => {
     writeStorage(STORAGE_KEYS.COURSES, ['remote'])
     writeStorage(STORAGE_KEYS.SCORES, ['remote'])
     writeStorage(STORAGE_KEYS.CUSTOM_COURSES, ['custom'])
-    writeStorage(STORAGE_KEYS.TODOS, ['todo'])
     clearEducationCache()
 
     expect(readStorage(STORAGE_KEYS.COURSES, [])).toEqual([])
     expect(readStorage(STORAGE_KEYS.SCORES, [])).toEqual([])
     expect(readStorage(STORAGE_KEYS.CUSTOM_COURSES, [])).toEqual(['custom'])
-    expect(readStorage(STORAGE_KEYS.TODOS, [])).toEqual(['todo'])
+  })
+
+  test('removes data left by the retired todo feature', () => {
+    mockStorage['lumaris:v1:legacy-migrated'] = true
+    mockStorage['lumaris:v1:todos'] = [{ id: 'old-todo' }]
+
+    const { initializeStorage } = require('@/utils/storage') as typeof import('@/utils/storage')
+    initializeStorage()
+
+    expect(mockStorage['lumaris:v1:todos']).toBeUndefined()
   })
 })

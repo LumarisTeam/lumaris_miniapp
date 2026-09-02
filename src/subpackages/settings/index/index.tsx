@@ -6,7 +6,6 @@ import { ListRow } from '@/components/common/ListRow'
 import { useAppStore } from '@/stores/app'
 import { useCourseStore } from '@/stores/course'
 import { useScoreStore } from '@/stores/score'
-import { reminderProvider } from '@/services/reminders'
 import type { StartPage, ThemeMode } from '@/types/domain'
 import { checkForUpdate, haptic } from '@/utils/platform'
 import { clearEducationCache } from '@/utils/storage'
@@ -39,7 +38,7 @@ export default function SettingsPage() {
   const clearCache = () => {
     Taro.showModal({
       title: '确认清除缓存',
-      content: '将清除课程、成绩和校园服务缓存，不会删除自定义课程与待办。',
+      content: '将清除课程、成绩和校园服务缓存，不会删除自定义课程。',
       confirmText: '清除缓存',
       confirmColor: '#ff3b30',
       success: ({ confirm }) => {
@@ -71,14 +70,7 @@ export default function SettingsPage() {
           </Picker>
           <ListRow title='触感反馈' subtitle='在支持的真机上提供轻触反馈' icon='alarm' trailing={<Switch checked={settings.hapticFeedback} color='#007aff' onChange={(event) => { setSettings({ hapticFeedback: event.detail.value }); if (event.detail.value) haptic() }} />} />
           <ListRow title='课表设置' subtitle='显示方式、忽略课程与自定义课程' icon='calendar' onClick={() => Taro.navigateTo({ url: '/subpackages/settings/schedule/index' })} />
-          <ListRow title='清除缓存' subtitle='保留自定义课程与待办' icon='delete' danger onClick={clearCache} />
-        </ClubCard>
-      </View>
-
-      <View className='page-section'>
-        <Text className='form-label'>提醒</Text>
-        <ClubCard>
-          <View className='page-note'>微信小程序无法像原生应用一样在本机安排任意时间通知。{reminderProvider.description}</View>
+          <ListRow title='清除缓存' subtitle='保留自定义课程' icon='delete' danger onClick={clearCache} />
         </ClubCard>
       </View>
 
