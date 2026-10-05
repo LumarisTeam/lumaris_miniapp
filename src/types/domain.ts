@@ -237,6 +237,11 @@ export interface AppSettings {
   showTomorrow: boolean
   showCourseGrid: boolean
   /**
+   * 课表格子高度（逻辑像素），对应 Flutter 的 course_size：
+   * 50 紧凑 / 55 标准 / 60 宽松。
+   */
+  courseSize: number
+  /**
    * @deprecated 首页快捷方式改由磁贴配置管理（见 @/stores/tile）。
    * 保留此字段只为首次启动时迁移用户已有的显示/隐藏偏好，不再写入。
    */

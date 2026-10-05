@@ -1,20 +1,32 @@
-import { useMemo } from 'react'
-import { ScrollView, Text, View } from '@tarojs/components'
+import { useMemo, useRef, useState } from 'react'
+import { ScrollView, Text, View, type ITouchEvent } from '@tarojs/components'
 import Taro, { useDidShow, usePullDownRefresh } from '@tarojs/taro'
-import { PageShell } from '@/components/common/PageShell'
+import { Popup } from '@nutui/nutui-react-taro'
 import { AppIcon } from '@/components/common/AppIcon'
+import { ListRow } from '@/components/common/ListRow'
+import { PageShell } from '@/components/common/PageShell'
 import { StateView } from '@/components/common/StateView'
-import { CourseCard } from '@/components/course/CourseCard'
+import { CourseDetailSheet } from '@/components/schedule/CourseDetailSheet'
+import { ScheduleGrid } from '@/components/schedule/ScheduleGrid'
+import { WeekdayHeader } from '@/components/schedule/WeekdayHeader'
+import { COURSE_CARD_STYLES, courseCardStyleForSize } from '@/components/schedule/ScheduleCourseCard'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 import { useCourseStore } from '@/stores/course'
-import { coursesForWeek, getCourseTime, orderedWeekdays } from '@/utils/education'
+import { useTranslation } from '@/i18n'
+import { coursesForPage, weekStartForPage } from '@/utils/education'
+import { CAOTANG_CAMPUS, resolveCampusName } from '@/utils/scheduleTime'
+import type { Course } from '@/types/domain'
 import '@/styles/pages.scss'
 import './index.scss'
 
-const DAY_NAMES = ['一', '二', '三', '四', '五', '六', '日']
+/** 横滑切周的触发距离（设备像素）与方向判定比例。 */
+const SWIPE_MIN_DISTANCE = 60
+const SWIPE_DIRECTION_RATIO = 1.5
 
+/** 课表页：周次导航 + 星期栏 + 网格，支持横滑切周。 */
 export default function SchedulePage() {
+  const t = useTranslation()
   const session = useAuthStore((state) => state.session)
   const courses = useCourseStore((state) => state.courses)
   const customCourses = useCourseStore((state) => state.customCourses)
@@ -25,14 +37,25 @@ export default function SchedulePage() {
   const setWeek = useCourseStore((state) => state.setCurrentWeek)
   const refresh = useCourseStore((state) => state.refresh)
   const isStale = useCourseStore((state) => state.isStale)
-  const showCourseGrid = useAppStore((state) => state.settings.showCourseGrid)
-  const weekStartDay = useAppStore((state) => state.school.weekStartDay)
-  const supportsTimetable = useAppStore((state) => state.school.features.includes('timetable'))
-  const weekdays = orderedWeekdays(weekStartDay)
 
-  useDidShow(() => { if (session && supportsTimetable && courses.length === 0) void refresh(session.educationId, 'local-first') })
+  const settings = useAppStore((state) => state.settings)
+  const setSettings = useAppStore((state) => state.setSettings)
+  const school = useAppStore((state) => state.school)
+  const supportsTimetable = school.features.includes('timetable')
+
+  const [detailCourse, setDetailCourse] = useState<Course | null>(null)
+  const [conflicts, setConflicts] = useState<Course[] | null>(null)
+  const [stylePickerVisible, setStylePickerVisible] = useState(false)
+  const [weekMenuVisible, setWeekMenuVisible] = useState(false)
+
+  useDidShow(() => {
+    if (session && supportsTimetable && courses.length === 0) void refresh(session.educationId, 'local-first')
+  })
   usePullDownRefresh(() => {
-    if (!session || !supportsTimetable) return Taro.stopPullDownRefresh()
+    if (!session || !supportsTimetable) {
+      Taro.stopPullDownRefresh()
+      return
+    }
     void refresh(session.educationId).finally(() => Taro.stopPullDownRefresh())
   })
 
@@ -40,10 +63,46 @@ export default function SchedulePage() {
     const ignoredNames = new Set(ignored)
     return [...courses.filter((course) => !ignoredNames.has(course.courseName)), ...customCourses]
   }, [courses, customCourses, ignored])
+
+  // 页号沿用课程约定：0 是全部课表，1..maxWeek 是第 N 周。
   const weekCourses = useMemo(
-    () => coursesForWeek(visibleCourses, week).sort((left, right) => left.weekday - right.weekday || left.startUnit - right.startUnit),
+    () =>
+      coursesForPage(visibleCourses, week).sort(
+        (left, right) => left.weekday - right.weekday || left.startUnit - right.startUnit,
+      ),
     [visibleCourses, week],
   )
+
+  const campus = visibleCourses.length > 0 ? resolveCampusName(visibleCourses[0]) : CAOTANG_CAMPUS
+  const cellHeight = settings.courseSize * 2
+  const activeStyle = courseCardStyleForSize(settings.courseSize)
+  const weekStartDate = weekStartForPage(new Date(), week, weekNow, school.weekStartDay)
+
+  const weekSubtitle = weekNow <= 0 ? t('weeksUntilStart', { n: -weekNow + 1 }) : t('currentWeek', { n: weekNow })
+
+  const swipeStart = useRef<{ x: number; y: number } | null>(null)
+  const handleTouchStart = (event: ITouchEvent) => {
+    const touch = event.touches[0]
+    swipeStart.current = touch ? { x: touch.clientX, y: touch.clientY } : null
+  }
+  const handleTouchEnd = (event: ITouchEvent) => {
+    const start = swipeStart.current
+    swipeStart.current = null
+    const touch = event.changedTouches[0]
+    if (!start || !touch) return
+
+    const deltaX = touch.clientX - start.x
+    const deltaY = touch.clientY - start.y
+    // 竖向位移明显更大时当成页面滚动，不切周。
+    if (Math.abs(deltaX) < SWIPE_MIN_DISTANCE) return
+    if (Math.abs(deltaX) < Math.abs(deltaY) * SWIPE_DIRECTION_RATIO) return
+
+    setWeek(deltaX < 0 ? week + 1 : week - 1)
+  }
+
+  if (!supportsTimetable) {
+    return <PageShell title={t('schedule')}><StateView state='empty' title={t('schoolNotSupported')} /></PageShell>
+  }
 
   const action = (
     <View className='icon-action pressable' onClick={() => Taro.navigateTo({ url: '/subpackages/settings/schedule/index' })}>
@@ -51,74 +110,142 @@ export default function SchedulePage() {
     </View>
   )
 
-  if (!supportsTimetable) {
-    return <PageShell title='课表'><StateView state='empty' title='当前学校暂不支持课表' /></PageShell>
-  }
-
   return (
-    <PageShell title='课表' action={action}>
-      <View className='schedule-weekbar'>
-        <View className='schedule-weekbar__button pressable' onClick={() => setWeek(week - 1)}><AppIcon name='back' size={18} /></View>
-        <View className='schedule-weekbar__center' onClick={() => setWeek(weekNow)}><Text className='schedule-weekbar__title'>{week === 0 ? '全部课程' : `第 ${week} 周`}</Text><Text className='schedule-weekbar__subtitle'>{maxWeek > 0 ? `共 ${maxWeek} 周 · 点击回到当前周` : '学期时间未同步'}</Text></View>
-        <View className='schedule-weekbar__button pressable' onClick={() => setWeek(week + 1)}><AppIcon name='right' size={18} /></View>
+    <PageShell title={t('schedule')} action={action} className='schedule-page'>
+      <View className='schedule-topbar'>
+        <View
+          className='schedule-topbar__info pressable'
+          onClick={() => setWeek(weekNow)}
+          onLongClick={() => setWeekMenuVisible(true)}
+        >
+          <Text className='schedule-topbar__title'>
+            {week <= 0 ? t('allSchedules') : t('weekUnit', { n: week })}
+          </Text>
+          <Text className='schedule-topbar__subtitle'>{weekSubtitle}</Text>
+        </View>
+
+        <View className='schedule-topbar__actions'>
+          <View
+            className={`icon-action pressable ${stylePickerVisible ? 'icon-action--active' : ''}`}
+            onClick={() => setStylePickerVisible((value) => !value)}
+          >
+            <AppIcon name='category' size={20} />
+          </View>
+          <View className='icon-action pressable' onClick={() => void refresh(session?.educationId ?? '')}>
+            <AppIcon name='refresh' size={20} />
+          </View>
+        </View>
       </View>
 
-      {!session && visibleCourses.length === 0 ? (
-        <StateView state='login' title='登录后自动同步课表' description='也可以在课表设置中手工添加课程' actionLabel='去登录' onAction={() => Taro.navigateTo({ url: '/pages/login/index' })} />
-      ) : weekCourses.length === 0 ? (
-        <StateView state='empty' title={`第 ${week} 周没有课程`} actionLabel='添加自定义课程' onAction={() => Taro.navigateTo({ url: '/subpackages/settings/custom-course/index' })} />
-      ) : !showCourseGrid ? (
-        <View className='schedule-list'>
-          {isStale ? <View className='page-note'>刷新失败，当前显示本地课表缓存</View> : null}
-          {weekdays.map((weekday) => {
-            const day = DAY_NAMES[weekday - 1]
-            const dayCourses = weekCourses.filter((course) => course.weekday === weekday)
-            return dayCourses.length ? (
-              <View key={day}>
-                <Text className='schedule-list__day'>周{day}</Text>
-                {dayCourses.map((course) => <CourseCard course={course} key={course.id} />)}
-              </View>
-            ) : null
-          })}
+      {stylePickerVisible ? (
+        <View className='schedule-style'>
+          {COURSE_CARD_STYLES.map((item) => (
+            <View
+              className={`schedule-style__item pressable ${activeStyle.value === item.value ? 'schedule-style__item--active' : ''}`}
+              key={item.value}
+              onClick={() => setSettings({ courseSize: item.size })}
+            >
+              {t(item.labelKey)}
+            </View>
+          ))}
         </View>
+      ) : null}
+
+      {!session && visibleCourses.length === 0 ? (
+        <StateView
+          state='login'
+          title={t('loginEduSystem')}
+          description={t('customCourseManage')}
+          actionLabel={t('goToLogin')}
+          onAction={() => Taro.navigateTo({ url: '/pages/login/index' })}
+        />
       ) : (
-        <ScrollView scrollX className='schedule-scroll' enhanced showScrollbar={false}>
-          <View className='schedule-grid'>
-            <View className='schedule-grid__corner'>节次</View>
-            {weekdays.map((weekday) => <View className='schedule-grid__day' key={weekday}>周{DAY_NAMES[weekday - 1]}</View>)}
-            {Array.from({ length: 13 }, (_, index) => (
-              <View className='schedule-grid__slot' style={{ gridColumn: 1, gridRow: index + 2 }} key={`slot-${index + 1}`}>
-                <Text>{index + 1}</Text>
-              </View>
-            ))}
-            {Array.from({ length: 91 }, (_, index) => (
-              <View
-                className='schedule-grid__cell'
-                style={{ gridColumn: (index % 7) + 2, gridRow: Math.floor(index / 7) + 2 }}
-                key={`cell-${index}`}
-              />
-            ))}
-            {weekCourses.map((course) => {
-              const time = getCourseTime(course)
+        <>
+          <View className='schedule-header'>
+            {isStale ? <View className='page-note'>刷新失败，当前显示本地课表缓存</View> : null}
+            <WeekdayHeader
+              weekStartDate={weekStartDate}
+              showDate={week > 0}
+              showGrid={settings.showCourseGrid}
+              highlightToday={weekNow !== 0}
+            />
+          </View>
+
+          <ScrollView
+            scrollY
+            enhanced
+            showScrollbar={false}
+            className='schedule-scroll'
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {/* 空周也保留网格：节次、日期和时间轴本身就是信息，与 Flutter 一致。 */}
+            <ScheduleGrid
+              courses={weekCourses}
+              cellHeight={cellHeight}
+              weekStartDay={school.weekStartDay}
+              campus={campus}
+              cardStyle={activeStyle.value}
+              showGrid={settings.showCourseGrid}
+              onCourseTap={setDetailCourse}
+              onConflictTap={setConflicts}
+            />
+          </ScrollView>
+        </>
+      )}
+
+      <Popup visible={weekMenuVisible} position='bottom' round onClose={() => setWeekMenuVisible(false)}>
+        <View className='schedule-menu'>
+          <Text className='schedule-menu__title'>{t('schedule')}</Text>
+          <ScrollView scrollY className='schedule-menu__list'>
+            {Array.from({ length: maxWeek + 1 }, (_, index) => {
+              const isCurrentWeek = index === weekNow && index > 0
+              const label = index === 0 ? t('allSchedules') : t('weekUnit', { n: index })
               return (
-                <View
-                  className='schedule-grid__course pressable'
-                  style={{
-                    gridColumn: weekdays.indexOf(course.weekday) + 2,
-                    gridRow: `${course.startUnit + 1} / span ${Math.max(1, course.endUnit - course.startUnit + 1)}`,
-                    backgroundColor: course.color,
+                <ListRow
+                  key={index}
+                  title={`${label}${isCurrentWeek ? ` (${t('currentWeekLabel')})` : ''}`}
+                  icon={index === week ? 'check' : undefined}
+                  onClick={() => {
+                    setWeek(index)
+                    setWeekMenuVisible(false)
                   }}
-                  key={course.id}
-                  onClick={() => Taro.showModal({ title: course.courseName, content: `${course.room}\n${course.teachers.join('、')}\n${time.start}-${time.end}\n第 ${course.startUnit}-${course.endUnit} 节`, showCancel: false })}
-                >
-                  <Text className='schedule-grid__course-name'>{course.courseName}</Text>
-                  <Text className='schedule-grid__course-meta'>{course.room}</Text>
-                </View>
+                />
               )
             })}
-          </View>
-        </ScrollView>
-      )}
+          </ScrollView>
+        </View>
+      </Popup>
+
+      <Popup visible={conflicts !== null} position='bottom' round onClose={() => setConflicts(null)}>
+        <View className='schedule-menu'>
+          <Text className='schedule-menu__title'>{t('courseConflict')}</Text>
+          <ListRow
+            title={t('cancel')}
+            icon='close'
+            onClick={() => setConflicts(null)}
+          />
+          {(conflicts ?? []).map((course) => (
+            <ListRow
+              key={course.id}
+              title={course.courseName}
+              subtitle={[course.room, course.teachers.join('、')].filter(Boolean).join(' · ')}
+              iconColor={course.color}
+              icon='calendar'
+              onClick={() => {
+                setConflicts(null)
+                setDetailCourse(course)
+              }}
+            />
+          ))}
+        </View>
+      </Popup>
+
+      <CourseDetailSheet
+        course={detailCourse}
+        visible={detailCourse !== null}
+        onClose={() => setDetailCourse(null)}
+      />
     </PageShell>
   )
 }

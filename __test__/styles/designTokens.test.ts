@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 
 const SRC = resolve(__dirname, '../../src')
 
@@ -9,12 +9,16 @@ function readTokens(): Set<string> {
   return new Set([...pageBlock.matchAll(/^\s*(--[\w-]+):/gm)].map((match) => match[1]))
 }
 
-function walkScss(dir: string): string[] {
+function walkFiles(dir: string, extensions: string[]): string[] {
   return readdirSync(dir).flatMap((entry) => {
     const full = join(dir, entry)
-    if (statSync(full).isDirectory()) return walkScss(full)
-    return full.endsWith('.scss') ? [full] : []
+    if (statSync(full).isDirectory()) return walkFiles(full, extensions)
+    return extensions.some((extension) => full.endsWith(extension)) ? [full] : []
   })
+}
+
+function walkScss(dir: string): string[] {
+  return walkFiles(dir, ['.scss'])
 }
 
 /** Flutter ClubColors / ClubRadii 里跨端通用的那部分 token。 */
@@ -69,6 +73,37 @@ describe('design tokens', () => {
     }
 
     expect([...undefinedTokens]).toEqual([])
+  })
+
+  test('every stylesheet is imported, so its rules actually reach the bundle', () => {
+    // 未被任何模块 import 的 .scss 不会被打包，页面会「像 CSS 没生效」一样地
+    // 裸奔——scheduleGrid.scss 就这么漏过一次。
+    const imported = new Set<string>()
+
+    const record = (fromFile: string, specifier: string) => {
+      // `@/x` 是 tsconfig 里的别名，映射到 src/ 根。
+      const target = specifier.startsWith('@/')
+        ? resolve(SRC, specifier.slice(2))
+        : resolve(dirname(fromFile), specifier)
+      imported.add(target)
+    }
+
+    for (const file of walkFiles(SRC, ['.ts', '.tsx'])) {
+      const source = readFileSync(file, 'utf8')
+      for (const match of source.matchAll(/import\s+['"]([^'"]+\.scss)['"]/g)) {
+        record(file, match[1])
+      }
+    }
+    // 样式文件之间也能互相 @import。
+    for (const file of walkScss(SRC)) {
+      const source = readFileSync(file, 'utf8')
+      for (const match of source.matchAll(/@import\s+['"]([^'"]+\.scss)['"]/g)) {
+        record(file, match[1])
+      }
+    }
+
+    const orphans = walkScss(SRC).filter((file) => !imported.has(file))
+    expect(orphans.map((file) => file.slice(SRC.length + 1))).toEqual([])
   })
 
   test('uses rpx rather than px for lengths so layouts scale per device', () => {

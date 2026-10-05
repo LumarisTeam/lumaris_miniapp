@@ -10,6 +10,7 @@ import { AppIcon } from '@/components/common/AppIcon'
 import { useCourseStore } from '@/stores/course'
 import type { Course } from '@/types/domain'
 import '@/styles/pages.scss'
+import './index.scss'
 
 const DAYS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
 const SLOTS = Array.from({ length: 13 }, (_, index) => `第 ${index + 1} 节`)

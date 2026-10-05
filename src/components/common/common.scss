@@ -175,6 +175,10 @@
 
 .page-section { padding: 28rpx 32rpx 0; }
 
+.icon-action--active {
+  background: var(--primary-soft);
+}
+
 .icon-action {
   width: 64rpx;
   height: 64rpx;

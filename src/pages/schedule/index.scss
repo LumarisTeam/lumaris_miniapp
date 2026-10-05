@@ -1,44 +1,101 @@
-.schedule-weekbar {
-  height: 112rpx;
+/* 课表页占满视口，顶部栏与星期栏固定，只有网格区域滚动。 */
+.app-page.schedule-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.schedule-page .app-page__content {
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.schedule-topbar {
   padding: 16rpx 32rpx;
-  display: grid;
-  grid-template-columns: 72rpx 1fr 72rpx;
+  display: flex;
   align-items: center;
-  gap: 20rpx;
-  background: var(--app-bg);
-  border-bottom: 1rpx solid var(--separator);
+  justify-content: space-between;
+  gap: 24rpx;
 }
 
-.schedule-weekbar__button { width: 64rpx; height: 64rpx; display: flex; align-items: center; justify-content: center; color: var(--primary); background: var(--primary-soft); border-radius: 50%; }
-.schedule-weekbar__center { min-width: 0; text-align: center; }
-.schedule-weekbar__title { display: block; font-size: 30rpx; font-weight: 700; }
-.schedule-weekbar__subtitle { display: block; margin-top: 4rpx; color: var(--secondary-label); font-size: 20rpx; }
+.schedule-topbar__info {
+  min-width: 0;
+}
+
+.schedule-topbar__title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.schedule-topbar__subtitle {
+  display: block;
+  margin-top: 4rpx;
+  color: var(--primary);
+  font-size: 26rpx;
+  font-weight: 500;
+}
+
+.schedule-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.schedule-style {
+  margin: 0 32rpx 16rpx;
+  padding: 6rpx;
+  display: flex;
+  gap: 6rpx;
+  background: var(--surface);
+  border-radius: var(--radius-navigation);
+}
+
+.schedule-style__item {
+  flex: 1;
+  padding: 14rpx 0;
+  text-align: center;
+  color: var(--secondary-label);
+  border-radius: var(--radius-control);
+  font-size: 26rpx;
+}
+
+.schedule-style__item--active {
+  color: var(--label);
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+}
+
 .schedule-scroll {
-  width: 100%;
-  max-width: 100%;
-  height: calc(100vh - var(--app-navbar-height) - 112rpx);
+  flex: 1;
+  min-height: 0;
 }
 
-.schedule-grid {
-  width: 100%;
-  max-width: 100%;
-  padding: 16rpx;
-  display: grid;
-  grid-template-columns: 56rpx repeat(7, minmax(0, 1fr));
-  grid-template-rows: 68rpx repeat(13, 92rpx);
-  gap: 4rpx;
-  position: relative;
+/* 星期栏与网格共用同一份左右留白，保证时间轴和日期列对齐。 */
+.schedule-header,
+.schedule-scroll {
+  padding-left: 24rpx;
+  padding-right: 24rpx;
 }
 
-.schedule-grid__corner, .schedule-grid__day, .schedule-grid__slot { display: flex; align-items: center; justify-content: center; color: var(--secondary-label); font-size: 21rpx; }
-.schedule-grid__corner { grid-column: 1; grid-row: 1; }
-.schedule-grid__day { background: var(--surface); border-radius: 8rpx; }
-.schedule-grid__day:nth-of-type(2) { grid-column: 2; }
-.schedule-grid__cell { min-width: 0; min-height: 0; background: var(--surface); border-radius: 5rpx; }
-.schedule-grid__course { z-index: 2; min-width: 0; margin: 2rpx; padding: 10rpx; overflow: hidden; display: flex; flex-direction: column; gap: 4rpx; color: #fff; border-radius: 9rpx; box-shadow: 0 3rpx 10rpx rgba(0, 0, 0, 0.15); }
-.schedule-grid__course-name { overflow-wrap: anywhere; font-size: 21rpx; line-height: 1.25; font-weight: 700; }
-.schedule-grid__course-meta { overflow-wrap: anywhere; font-size: 17rpx; line-height: 1.25; opacity: 0.9; }
+.schedule-menu {
+  padding: 40rpx 32rpx calc(40rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  background: var(--card-bg);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
 
-.schedule-list { padding: 24rpx 32rpx 40rpx; }
-.schedule-list__day { display: block; margin: 24rpx 0 12rpx; color: var(--secondary-label); font-size: 24rpx; font-weight: 600; }
-.schedule-list__day:first-child { margin-top: 0; }
+.schedule-menu__title {
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.schedule-menu__list {
+  max-height: 60vh;
+}

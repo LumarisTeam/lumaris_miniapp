@@ -30,6 +30,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   hapticFeedback: true,
   showTomorrow: false,
   showCourseGrid: true,
+  courseSize: 55,
   visibleServices: ['electricity', 'bus', 'payment'],
 }
 

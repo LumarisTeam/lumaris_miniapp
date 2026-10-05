@@ -99,12 +99,15 @@ export const useCourseStore = create<CourseState>((set, get) => ({
     return { currentWeek: weekInfo.week <= 0 ? 0 : weekInfo.week, weekNow: weekInfo.week, maxWeek: weekInfo.maxWeek }
   }),
   clearRemote: () => set({ courses: [], timeInfo: null, currentWeek: 0, weekNow: 0, maxWeek: 0, isFromLocal: false, isStale: false, error: '' }),
+  /**
+   * 切到某一页课表。页号 0 是全部课表，1..maxWeek 是第 N 周。
+   *
+   * 越界时夹在两端而不是首尾环绕——环绕会让「全部课表」按上一周直接跳到最后一
+   * 周，Flutter 的 PageView 也是线性的（到端点就不动了）。
+   */
   setCurrentWeek: (week) => set((state) => {
     if (state.maxWeek <= 0) return { currentWeek: 0 }
-    let next = week
-    if (next < 0) next = state.maxWeek
-    if (next > state.maxWeek) next = 0
-    return { currentWeek: next }
+    return { currentWeek: Math.min(state.maxWeek, Math.max(0, week)) }
   }),
   toggleIgnored: (name) => {
     const current = get().ignoredCourseNames

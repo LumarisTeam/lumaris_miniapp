@@ -52,7 +52,8 @@ export function normalizeCourse(raw: Record<string, unknown>, index = 0): Course
     credits: String(raw.credits ?? ''),
     lessonId: String(raw.lessonId ?? raw.id ?? ''),
     campus: String(raw.campus ?? ''),
-    color: typeof raw.color === 'string' ? raw.color : COURSE_COLORS[index % COURSE_COLORS.length],
+    // 兜底色按名字散列而不是按到达顺序，否则课程列表顺序一变，同一门课就换色。
+    color: typeof raw.color === 'string' && raw.color ? raw.color : colorForName(courseName),
     isCustom: Boolean(raw.isCustom),
   }
 }
@@ -157,8 +158,110 @@ export function orderedWeekdays(weekStartDay: number): number[] {
   return normalizeWeekStartDay(weekStartDay) === 1 ? [1, 2, 3, 4, 5, 6, 7] : [7, 1, 2, 3, 4, 5, 6]
 }
 
+/** 课表展示的节次数，与 Flutter ScheduleGrid 的 periodCount 一致。 */
+export const PERIOD_COUNT = 12
+
+/**
+ * 合并同名同节次的课程，把教师并到一起。
+ *
+ * 对应 Flutter ScheduleGrid._mergeSameNameCourses：同一门课由多位老师分头上的
+ * 情况在教务数据里是两条记录，直接叠着画会互相盖住。
+ */
+export function mergeSameNameCourses(courses: Course[]): Course[] {
+  const merged: Course[] = []
+  const used = courses.map(() => false)
+
+  for (let index = 0; index < courses.length; index += 1) {
+    if (used[index]) continue
+
+    const current = courses[index]
+    const teachers = [...current.teachers]
+    used[index] = true
+
+    for (let other = index + 1; other < courses.length; other += 1) {
+      if (used[other]) continue
+      const candidate = courses[other]
+      const sameSlot =
+        current.courseName === candidate.courseName &&
+        current.startUnit === candidate.startUnit &&
+        current.endUnit === candidate.endUnit
+      if (!sameSlot) continue
+
+      for (const teacher of candidate.teachers) {
+        if (!teachers.includes(teacher)) teachers.push(teacher)
+      }
+      used[other] = true
+    }
+
+    merged.push({ ...current, teachers })
+  }
+
+  return merged
+}
+
+function hasTimeConflict(a: Course, b: Course): boolean {
+  return a.startUnit <= b.endUnit && a.endUnit >= b.startUnit
+}
+
+/**
+ * 把一天里的课程按时间冲突分组：单元素组直接画，多元素组画成「冲突」提示。
+ *
+ * 对应 Flutter ScheduleGrid._groupConflictingCourses。
+ */
+export function groupConflictingCourses(courses: Course[]): Course[][] {
+  const merged = mergeSameNameCourses(courses)
+  const groups: Course[][] = []
+  const used = merged.map(() => false)
+
+  for (let index = 0; index < merged.length; index += 1) {
+    if (used[index]) continue
+
+    const group = [merged[index]]
+    used[index] = true
+
+    for (let other = index + 1; other < merged.length; other += 1) {
+      if (used[other]) continue
+      if (hasTimeConflict(merged[index], merged[other])) {
+        group.push(merged[other])
+        used[other] = true
+      }
+    }
+
+    groups.push(group)
+  }
+
+  return groups
+}
+
+/**
+ * 课表某一页对应的那一周的起始日。
+ *
+ * 页号沿用课程的约定：0 是「全部课表」，1..maxWeek 是第 N 周。全部课表按当前周
+ * 取日期，与 Flutter `_buildSchedulePage` 的算法一致。
+ */
+export function weekStartForPage(
+  now: Date,
+  page: number,
+  currentWeek: number,
+  weekStartDay: number,
+): Date {
+  const base = getWeekStart(now, weekStartDay)
+  if (page <= 0) return base
+  return new Date(base.getFullYear(), base.getMonth(), base.getDate() + (page - currentWeek) * 7)
+}
+
 export function coursesForWeek(courses: Course[], week: number): Course[] {
   return courses.filter((course) => course.weekIndexes.includes(week))
+}
+
+/**
+ * 取某一「页」要显示的课程。
+ *
+ * 页号 0 是「全部课表」，展示所有课程而不是第 0 周的课程——直接复用
+ * [coursesForWeek] 会因为周次从 1 开始而永远得到空列表。
+ */
+export function coursesForPage(courses: Course[], page: number): Course[] {
+  return page === 0 ? courses : coursesForWeek(courses, page)
 }
 
 export function coursesForDay(courses: Course[], week: number, day: number): Course[] {
