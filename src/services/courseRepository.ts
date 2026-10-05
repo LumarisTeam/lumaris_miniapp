@@ -1,10 +1,12 @@
 import { fetchCourses, fetchTimeInfo } from '@/api/education'
 import type { Course, FetchPolicy, FetchSnapshot, TimeInfo } from '@/types/domain'
 import { assignCourseColors, normalizeCourse, normalizeTimeInfo } from '@/utils/education'
+import { fetchScheduleTimeFromRemote } from '@/services/scheduleTimeRepository'
+import { CacheTtl } from '@/utils/cachePolicy'
 import { readCache, STORAGE_KEYS, writeCache } from '@/utils/storage'
 
-const COURSE_TTL = 60 * 60 * 1000
-const TIME_TTL = 60 * 60 * 1000
+const COURSE_TTL = CacheTtl.mediumTerm
+const TIME_TTL = CacheTtl.shortTerm
 
 export interface CourseBundle {
   courses: Course[]
@@ -41,7 +43,12 @@ export function readCourseBundle(studentId: string, schoolCode: string): CourseB
 
 async function refreshCourseBundle(studentId: string, schoolCode: string): Promise<CourseBundleSnapshot> {
   const fallback = readCourseBundle(studentId, schoolCode)
-  const [coursesResult, timeResult] = await Promise.allSettled([fetchCourses(studentId), fetchTimeInfo()])
+  const [coursesResult, timeResult] = await Promise.allSettled([
+    fetchCourses(studentId),
+    fetchTimeInfo(),
+    // 作息表是学校级数据，刷新课表时顺手更新；带 24h 缓存，命中时不发请求。
+    fetchScheduleTimeFromRemote(schoolCode),
+  ])
   let courses = fallback.data.courses
   let timeInfo = fallback.data.timeInfo
   let fetchedAny = false

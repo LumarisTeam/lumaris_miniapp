@@ -2,6 +2,7 @@ import { Picker, Switch, Text, View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { PageShell } from '@/components/common/PageShell'
 import { ClubCard } from '@/components/common/ClubCard'
+import { LanguageSetting } from '@/components/common/LanguageSetting'
 import { ListRow } from '@/components/common/ListRow'
 import { useAppStore } from '@/stores/app'
 import { useCourseStore } from '@/stores/course'
@@ -59,6 +60,12 @@ export default function SettingsPage() {
               <View className={`segmented__item pressable ${settings.theme === theme.value ? 'segmented__item--active' : ''}`} key={theme.value} onClick={() => setSettings({ theme: theme.value })}>{theme.label}</View>
             ))}
           </View>
+        </ClubCard>
+      </View>
+
+      <View className='page-section'>
+        <ClubCard padding='none'>
+          <LanguageSetting />
         </ClubCard>
       </View>
 

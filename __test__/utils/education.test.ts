@@ -104,7 +104,7 @@ describe('education domain helpers', () => {
 
   test('uses campus-specific course times', () => {
     const caotang = normalizeCourse({ name: '课程', campus: '草堂校区', startSlot: 1, endSlot: 2 })
-    expect(getCourseTime(caotang, new Date('2026-01-01'))).toEqual({ start: '08:30', end: '10:05' })
+    expect(getCourseTime(caotang, new Date('2026-01-01'))).toEqual({ start: '8:30', end: '10:05' })
   })
 
   test('calculates weighted GPA, credits and numeric average', () => {

@@ -60,6 +60,21 @@ export interface Course {
   isCustom: boolean
 }
 
+/**
+ * 一张作息表：某个校区在某个季节的节次起止时间。
+ * 与服务端 `GET /v1/course/ScheduleTime` 返回的一项一一对应。
+ */
+export interface ScheduleTable {
+  /** 校区名称，例如「草堂校区」「雁塔校区」 */
+  campusName: string
+  /** 适用区间，例如 `05/01~09/30`；不分季节的校区为空串 */
+  timeRange: string
+  /** 各节次的开始时间，下标即节次（0 是早自习，空串表示该节次没课） */
+  start: string[]
+  /** 各节次的结束时间，下标含义同 start */
+  end: string[]
+}
+
 export interface TimeInfo {
   startTime: string
   endTime: string
@@ -186,11 +201,14 @@ export interface MapPoi {
 }
 
 export type ThemeMode = 'system' | 'light' | 'dark'
+export type LocaleCode = 'system' | 'zh-CN' | 'zh-Hant' | 'en' | 'ja' | 'ko' | 'fr' | 'de' | 'ru'
 export type StartPage = 'home' | 'schedule' | 'score' | 'profile'
 export type ServiceType = 'electricity' | 'bus' | 'payment'
 
 export interface AppSettings {
   theme: ThemeMode
+  /** 界面语言，system 表示跟随系统 */
+  locale: LocaleCode
   startPage: StartPage
   hapticFeedback: boolean
   showTomorrow: boolean

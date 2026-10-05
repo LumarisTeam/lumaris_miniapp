@@ -1,15 +1,38 @@
 @import '@nutui/icons-react-taro/dist/style_iconfont.css';
 
+/**
+ * 设计 token，对齐 Flutter 的 ClubColors / ClubRadii。
+ *
+ * 长度单位统一用 rpx：750rpx = 屏幕宽度，1dp ≈ 2rpx（以 375pt 宽的机型为基准），
+ * 所以 Flutter 里的 18dp 圆角在这里写作 36rpx。全站只有这一个地方管这些值，
+ * 组件里不要再写死颜色和圆角。
+ */
+
 page {
+  /* 背景 */
   --app-bg: #ffffff;
   --grouped-bg: #f8f8f8;
   --card-bg: #ffffff;
+  --card-overlay: rgba(255, 255, 255, 0.7);
   --surface: #f2f2f7;
   --surface-muted: #efeff4;
+  --surface-sunken: #e5e5ea;
+
+  /* 描边 */
   --separator: rgba(60, 60, 67, 0.2);
+  --border-strong: #d1d1d6;
+  /* 卡片描边：Flutter ClubCard 用 separator 的 10% 透明度 */
+  --card-border: rgba(60, 60, 67, 0.02);
+
+  /* 文字 */
   --label: #000000;
   --secondary-label: rgba(60, 60, 67, 0.65);
   --tertiary-label: rgba(60, 60, 67, 0.35);
+  --quaternary-label: rgba(60, 60, 67, 0.18);
+  --inverse-label: #ffffff;
+  --on-accent: #ffffff;
+
+  /* 语义色 */
   --primary: #007aff;
   --primary-soft: rgba(0, 122, 255, 0.12);
   --success: #34c759;
@@ -18,10 +41,39 @@ page {
   --warning-soft: rgba(255, 149, 0, 0.12);
   --danger: #ff3b30;
   --danger-soft: rgba(255, 59, 48, 0.12);
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  --radius-control: 8px;
-  --radius-card: 18px;
-  --radius-panel: 16px;
+  --indigo: #5856d6;
+  --indigo-soft: rgba(88, 86, 214, 0.12);
+  --purple: #af52de;
+  --purple-soft: rgba(175, 82, 222, 0.12);
+  --pink: #ff2d55;
+  --pink-soft: rgba(255, 45, 85, 0.12);
+  --cyan: #5ac8fa;
+  --cyan-soft: rgba(90, 200, 250, 0.12);
+  --yellow: #ffcc00;
+  --yellow-soft: rgba(255, 204, 0, 0.12);
+
+  /* 其它 */
+  --selection-fill: rgba(120, 120, 128, 0.12);
+  --shadow: 0 8rpx 40rpx -4rpx rgba(0, 0, 0, 0.1);
+  --skeleton-base: #ebebf4;
+  --skeleton-highlight: #f4f4f4;
+
+  /* 圆角刻度（对应 ClubRadii 的 xs…xxl） */
+  --radius-xs: 8rpx;
+  --radius-sm: 16rpx;
+  --radius-md: 24rpx;
+  --radius-lg: 32rpx;
+  --radius-xl: 40rpx;
+  --radius-xxl: 48rpx;
+
+  /* 圆角语义别名（对应 ClubRadii 的 control/navigation/panel/card/tile） */
+  --radius-control: var(--radius-sm);
+  --radius-navigation: var(--radius-md);
+  --radius-panel: var(--radius-lg);
+  --radius-card: 36rpx;
+  --radius-tile: 44rpx;
+  --radius-pill: 999rpx;
+
   color: var(--label);
   background: var(--grouped-bg);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -33,21 +85,45 @@ page {
   --app-bg: #000000;
   --grouped-bg: #000000;
   --card-bg: #1c1c1e;
+  --card-overlay: rgba(235, 235, 245, 0.12);
   --surface: #2c2c2e;
   --surface-muted: #242426;
+  --surface-sunken: #3a3a3c;
+
   --separator: rgba(84, 84, 88, 0.65);
+  --border-strong: #545458;
+  --card-border: rgba(84, 84, 88, 0.02);
+
   --label: #ffffff;
   --secondary-label: rgba(235, 235, 245, 0.65);
   --tertiary-label: rgba(235, 235, 245, 0.35);
+  --quaternary-label: rgba(235, 235, 245, 0.18);
+  --inverse-label: #000000;
+  --on-accent: #ffffff;
+
   --primary: #0a84ff;
-  --primary-soft: rgba(10, 132, 255, 0.18);
+  --primary-soft: rgba(10, 132, 255, 0.15);
   --success: #30d158;
-  --success-soft: rgba(48, 209, 88, 0.18);
+  --success-soft: rgba(48, 209, 88, 0.15);
   --warning: #ff9f0a;
-  --warning-soft: rgba(255, 159, 10, 0.18);
+  --warning-soft: rgba(255, 159, 10, 0.15);
   --danger: #ff453a;
-  --danger-soft: rgba(255, 69, 58, 0.18);
+  --danger-soft: rgba(255, 69, 58, 0.15);
+  --indigo: #5e5ce6;
+  --indigo-soft: rgba(94, 92, 230, 0.15);
+  --purple: #bf5af2;
+  --purple-soft: rgba(191, 90, 242, 0.15);
+  --pink: #ff375f;
+  --pink-soft: rgba(255, 55, 95, 0.15);
+  --cyan: #64d2ff;
+  --cyan-soft: rgba(100, 210, 255, 0.15);
+  --yellow: #ffd60a;
+  --yellow-soft: rgba(255, 214, 10, 0.15);
+
+  --selection-fill: rgba(120, 120, 128, 0.2);
   --shadow: none;
+  --skeleton-base: #2c2c2e;
+  --skeleton-highlight: #3a3a3c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -55,15 +131,44 @@ page {
     --app-bg: #000000;
     --grouped-bg: #000000;
     --card-bg: #1c1c1e;
+    --card-overlay: rgba(235, 235, 245, 0.12);
     --surface: #2c2c2e;
     --surface-muted: #242426;
+    --surface-sunken: #3a3a3c;
+
     --separator: rgba(84, 84, 88, 0.65);
+    --border-strong: #545458;
+    --card-border: rgba(84, 84, 88, 0.02);
+
     --label: #ffffff;
     --secondary-label: rgba(235, 235, 245, 0.65);
     --tertiary-label: rgba(235, 235, 245, 0.35);
+    --quaternary-label: rgba(235, 235, 245, 0.18);
+    --inverse-label: #000000;
+
     --primary: #0a84ff;
-    --primary-soft: rgba(10, 132, 255, 0.18);
+    --primary-soft: rgba(10, 132, 255, 0.15);
+    --success: #30d158;
+    --success-soft: rgba(48, 209, 88, 0.15);
+    --warning: #ff9f0a;
+    --warning-soft: rgba(255, 159, 10, 0.15);
+    --danger: #ff453a;
+    --danger-soft: rgba(255, 69, 58, 0.15);
+    --indigo: #5e5ce6;
+    --indigo-soft: rgba(94, 92, 230, 0.15);
+    --purple: #bf5af2;
+    --purple-soft: rgba(191, 90, 242, 0.15);
+    --pink: #ff375f;
+    --pink-soft: rgba(255, 55, 95, 0.15);
+    --cyan: #64d2ff;
+    --cyan-soft: rgba(100, 210, 255, 0.15);
+    --yellow: #ffd60a;
+    --yellow-soft: rgba(255, 214, 10, 0.15);
+
+    --selection-fill: rgba(120, 120, 128, 0.2);
     --shadow: none;
+    --skeleton-base: #2c2c2e;
+    --skeleton-highlight: #3a3a3c;
   }
 }
 

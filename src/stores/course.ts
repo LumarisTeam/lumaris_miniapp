@@ -4,8 +4,10 @@ import { assignCourseColors, calculateWeekInfo, normalizeCourse } from '@/utils/
 import { useAppStore } from '@/stores/app'
 import { initializeStorage, readStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage'
 import { getCourseBundle, readCourseBundle } from '@/services/courseRepository'
+import { ensureScheduleTimeLoaded } from '@/services/scheduleTimeRepository'
 
 initializeStorage()
+ensureScheduleTimeLoaded(useAppStore.getState().school.code)
 
 function readCourseArray(key: typeof STORAGE_KEYS.COURSES | typeof STORAGE_KEYS.CUSTOM_COURSES): Course[] {
   const value = readStorage<unknown>(key, [])
@@ -133,6 +135,11 @@ export function selectVisibleCourses(state: CourseState): Course[] {
 }
 
 useAppStore.subscribe((state, previous) => {
-  if (state.school.code !== previous.school.code) useCourseStore.getState().clearRemote()
-  else if (state.school.weekStartDay !== previous.school.weekStartDay) useCourseStore.getState().recalculateWeek()
+  if (state.school.code !== previous.school.code) {
+    useCourseStore.getState().clearRemote()
+    // 作息表按 schoolCode 分 scope，换学校后要重新装载（缓存未命中则退回内置表）。
+    ensureScheduleTimeLoaded(state.school.code)
+  } else if (state.school.weekStartDay !== previous.school.weekStartDay) {
+    useCourseStore.getState().recalculateWeek()
+  }
 })

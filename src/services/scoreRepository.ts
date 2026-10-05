@@ -1,9 +1,10 @@
 import { fetchScores, fetchSemesters } from '@/api/education'
 import type { FetchPolicy, FetchSnapshot, ScoreList, Semester } from '@/types/domain'
 import { normalizeScore, normalizeSemester } from '@/utils/education'
+import { CacheTtl } from '@/utils/cachePolicy'
 import { readCache, STORAGE_KEYS, writeCache } from '@/utils/storage'
 
-const SCORE_TTL = 60 * 60 * 1000
+const SCORE_TTL = CacheTtl.longTerm
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value))

@@ -11,6 +11,7 @@ export const STORAGE_KEYS = {
   CUSTOM_COURSES: 'custom-courses',
   IGNORED_COURSES: 'ignored-courses',
   TIME_INFO: 'time-info',
+  SCHEDULE_TIME: 'schedule-time',
   EXAMS: 'exams',
   SEMESTERS: 'semesters',
   SCORES: 'scores',
@@ -88,6 +89,9 @@ export function readCache<T>(key: StorageKey, scope: string, validate: (value: u
   return entry as CacheEntry<T>
 }
 
+/// 注意：SCHEDULE_TIME 不在清理列表内。作息表是学校级数据（按 schoolCode 分
+/// scope），登出或清除缓存后仍要用它显示课表时间，与 Flutter 的
+/// EducationCacheService.clearEduCache 行为一致。
 const EDUCATION_CACHE_KEYS: StorageKey[] = [
   STORAGE_KEYS.COURSES,
   STORAGE_KEYS.TIME_INFO,

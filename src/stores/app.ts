@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { listSchools } from '@/api/education'
+import { applyLocaleToShell } from '@/i18n/applyLocale'
 import type { AppSettings, Feature, School, ServiceType } from '@/types/domain'
 import { clearEducationCache, initializeStorage, readStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage'
 
@@ -20,6 +21,7 @@ export const DEFAULT_SCHOOL: School = {
 
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'system',
+  locale: 'system',
   startPage: 'home',
   hapticFeedback: true,
   showTomorrow: false,
@@ -56,6 +58,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     const settings = { ...get().settings, ...patch }
     writeStorage(STORAGE_KEYS.SETTINGS, settings)
     set({ settings })
+    if (patch.locale !== undefined) applyLocaleToShell()
   },
   setSchool: (school) => {
     if (get().school.code.toUpperCase() !== school.code.toUpperCase()) clearEducationCache()

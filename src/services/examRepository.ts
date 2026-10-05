@@ -1,10 +1,12 @@
 import { fetchExams } from '@/api/education'
 import type { Exam, FetchPolicy, FetchSnapshot } from '@/types/domain'
 import { isUpcomingExam, normalizeExam, parseExamEndTime } from '@/utils/education'
+import { CacheTtl } from '@/utils/cachePolicy'
 import { readCache, removeStorage, STORAGE_KEYS, writeCache } from '@/utils/storage'
 
+/** 有未考考试时短缓存，考完的场次留一天，与 Flutter ExamService 一致。 */
 const UPCOMING_TTL = 2 * 60 * 60 * 1000
-const EMPTY_TTL = 24 * 60 * 60 * 1000
+const EMPTY_TTL = CacheTtl.veryLongTerm
 
 function isRecordArray(value: unknown): value is Record<string, unknown>[] {
   return Array.isArray(value) && value.every((item) => Boolean(item && typeof item === 'object' && !Array.isArray(item)))

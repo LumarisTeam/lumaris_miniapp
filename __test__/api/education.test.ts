@@ -9,7 +9,7 @@ jest.mock('@/api/client', () => ({
   },
 }))
 
-import { fetchCourses, fetchElectricityWeekly, fetchLinks, fetchMapPois, fetchProgram, fetchScores } from '@/api/education'
+import { fetchCourses, fetchElectricityWeekly, fetchLinks, fetchMapPois, fetchProgram, fetchScheduleTime, fetchScores } from '@/api/education'
 
 describe('Flutter education API fixtures', () => {
   beforeEach(() => mockRequest.mockReset())
@@ -40,6 +40,19 @@ describe('Flutter education API fixtures', () => {
       { id: '1', name: '图书馆', category: '学习', latitude: '34.3', longitude: '108.8', is_active: true, sort_order: '2' },
     ])
     await expect(fetchMapPois()).resolves.toEqual([expect.objectContaining({ id: '1', name: '图书馆', sortOrder: '2' })])
+  })
+
+  test('requests the schedule time table and folds PascalCase fields', async () => {
+    mockRequest.mockResolvedValue([
+      { CampusName: '草堂校区', Time: '', Start: ['08:00', '08:30'], End: ['08:20', '09:15'] },
+      { CampusName: '雁塔校区', Time: '05/01~09/30', Start: ['09:00'], End: ['09:45'] },
+    ])
+
+    await expect(fetchScheduleTime()).resolves.toEqual([
+      { campusName: '草堂校区', timeRange: '', start: ['08:00', '08:30'], end: ['08:20', '09:15'] },
+      { campusName: '雁塔校区', timeRange: '05/01~09/30', start: ['09:00'], end: ['09:45'] },
+    ])
+    expect(mockRequest).toHaveBeenCalledWith('/course/ScheduleTime')
   })
 
   test('accepts API casing variants preserved by Flutter models', async () => {

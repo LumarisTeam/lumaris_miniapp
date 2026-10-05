@@ -2,7 +2,7 @@
   --app-status-bar-height: env(safe-area-inset-top);
   --app-navbar-content-height: 88rpx;
   --app-navbar-height: calc(var(--app-status-bar-height) + var(--app-navbar-content-height));
-  --app-navbar-system-right-inset: 0px;
+  --app-navbar-system-right-inset: 0;
   min-height: 100vh;
   color: var(--label);
   background: var(--grouped-bg);

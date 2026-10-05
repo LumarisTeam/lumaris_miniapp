@@ -10,6 +10,7 @@ import type {
   MapPoi,
   PaymentRecord,
   PlanCourse,
+  ScheduleTable,
   School,
   Score,
   Semester,
@@ -26,6 +27,7 @@ import {
   normalizeTimeInfo,
   toNumber,
 } from '@/utils/education'
+import { normalizeScheduleTables } from '@/utils/scheduleTime'
 
 function asRecords(value: unknown): Record<string, unknown>[] {
   return Array.isArray(value) ? value.filter((item): item is Record<string, unknown> => Boolean(item && typeof item === 'object')) : []
@@ -60,6 +62,16 @@ export async function fetchCourses(studentId: string): Promise<Course[]> {
 export async function fetchTimeInfo(): Promise<TimeInfo> {
   const raw = await request<Record<string, unknown>>('/Info/Time')
   return normalizeTimeInfo(raw ?? {})
+}
+
+/**
+ * 获取各校区、各季节的作息时间表（草堂一份，雁塔冬季/夏季各一份）。
+ * 服务端返回裸数组，也兼容带 data 包装的响应；服务端不做校区判断，
+ * 由调用方按课程校区字段和当前日期自行选择。
+ */
+export async function fetchScheduleTime(): Promise<ScheduleTable[]> {
+  const raw = await request<unknown>('/course/ScheduleTime')
+  return normalizeScheduleTables(raw)
 }
 
 export async function fetchExams(studentId: string): Promise<Exam[]> {

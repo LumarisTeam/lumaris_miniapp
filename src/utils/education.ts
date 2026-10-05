@@ -1,3 +1,4 @@
+import { getStartAndEnd } from '@/utils/scheduleTime'
 import type {
   BusTrip,
   Course,
@@ -14,13 +15,6 @@ const COURSE_COLORS = [
   '#007aff', '#34c759', '#ff9500', '#ff3b30', '#5856d6', '#af52de',
   '#ff2d55', '#5ac8fa', '#ffcc00', '#0a84ff', '#30d158', '#bf5af2',
 ]
-
-const CAOTANG_START = ['08:00', '08:30', '09:20', '10:25', '11:15', '12:10', '13:00', '14:00', '14:50', '15:45', '16:35', '19:30', '20:20']
-const CAOTANG_END = ['08:20', '09:15', '10:05', '11:10', '12:00', '12:55', '13:45', '14:45', '15:35', '16:30', '17:20', '20:15', '21:05']
-const YANTA_WINTER_START = ['', '08:00', '09:00', '10:10', '11:10', '', '', '14:00', '15:00', '16:00', '17:00', '19:30', '20:30']
-const YANTA_WINTER_END = ['', '08:50', '09:50', '11:00', '12:00', '', '', '14:50', '15:50', '16:50', '17:50', '20:20', '21:20']
-const YANTA_SUMMER_START = ['', '08:00', '09:00', '10:10', '11:10', '', '', '14:30', '15:30', '16:30', '17:30', '20:00', '21:00']
-const YANTA_SUMMER_END = ['', '08:50', '09:50', '11:00', '12:00', '', '', '15:20', '16:20', '17:30', '18:20', '20:50', '21:50']
 
 export function toNumber(value: unknown, fallback = 0): number {
   if (typeof value === 'number' && Number.isFinite(value)) return value
@@ -190,12 +184,15 @@ export function buildSemesterLabels(count: number): string[] {
   })
 }
 
+/**
+ * 取课程对应的起止时间。
+ *
+ * 时间来自当前生效的作息表（服务端 `GET /v1/course/ScheduleTime`，见
+ * `@/services/scheduleTimeRepository`），未装载时用内置兜底表——不再是
+ * 硬编码的季节判断。
+ */
 export function getCourseTime(course: Pick<Course, 'campus' | 'room' | 'startUnit' | 'endUnit'>, now = new Date()): { start: string; end: string } {
-  const caotang = course.campus === '草堂校区' || course.room.startsWith('草堂')
-  const summer = now.getMonth() + 1 >= 5 && now.getMonth() + 1 < 10
-  const starts = caotang ? CAOTANG_START : summer ? YANTA_SUMMER_START : YANTA_WINTER_START
-  const ends = caotang ? CAOTANG_END : summer ? YANTA_SUMMER_END : YANTA_WINTER_END
-  return { start: starts[course.startUnit] ?? '', end: ends[course.endUnit] ?? '' }
+  return getStartAndEnd(course, now)
 }
 
 export function normalizeExam(raw: Record<string, unknown>, index = 0): Exam {
