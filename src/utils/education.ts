@@ -1,4 +1,5 @@
 import { getStartAndEnd } from '@/utils/scheduleTime'
+import type { MessageKey } from '@/i18n'
 import type {
   BusTrip,
   Course,
@@ -288,16 +289,32 @@ export function formatWeekRanges(weeks: number[]): string {
   return ranges.join(',')
 }
 
-const ACADEMIC_YEAR_LABELS = ['大一', '大二', '大三', '大四', '大五', '大六', '大七', '大八', '大九', '大十']
+/** 年级标签的文案键，index 0 = 大一。 */
+const ACADEMIC_YEAR_KEYS: MessageKey[] = [
+  'year1', 'year2', 'year3', 'year4', 'year5',
+  'year6', 'year7', 'year8', 'year9', 'year10',
+]
 
-export function academicYearLabel(index: number): string {
-  return ACADEMIC_YEAR_LABELS[index] ?? String(index + 1)
+/** 年级标签（大一…），越界时退到最后一个。 */
+export function academicYearKey(index: number): MessageKey {
+  return ACADEMIC_YEAR_KEYS[Math.min(Math.max(index, 0), ACADEMIC_YEAR_KEYS.length - 1)]
 }
 
-export function buildSemesterLabels(count: number): string[] {
+/**
+ * 学期选择器的标签，例如「大二下」。
+ *
+ * 从最后一个学期往前推，与 Flutter `_buildSelectorList` 一致。文案由调用方
+ * 传入的 translate 提供，这里不写死中文。
+ */
+export function buildSemesterLabels(
+  count: number,
+  translate: (key: MessageKey) => string,
+): string[] {
   return Array.from({ length: count }, (_, index) => {
     const semesterIndex = count - index + 1
-    return `${academicYearLabel(Math.floor(semesterIndex / 2) - 1)}${semesterIndex % 2 === 1 ? '下' : '上'}`
+    const year = translate(academicYearKey(Math.floor(semesterIndex / 2) - 1))
+    const term = translate(semesterIndex % 2 === 1 ? 'semesterSpringShort' : 'semesterAutumnShort')
+    return `${year}${term}`
   })
 }
 
@@ -391,7 +408,14 @@ function calculateFlutterGpa(scores: Score[]): number {
   return credits > 0 ? weightedPoints / credits : 0
 }
 
-export function calculateScoreSummary(scores: Score[]): { credits: number; weightedGpa: number; courses: number } {
+/** 成绩汇总：总学分、加权 GPA、通过课程数。 */
+export interface ScoreSummary {
+  credits: number
+  weightedGpa: number
+  courses: number
+}
+
+export function calculateScoreSummary(scores: Score[]): ScoreSummary {
   let credits = 0
   let courses = 0
   for (const score of scores) {
@@ -404,13 +428,46 @@ export function calculateScoreSummary(scores: Score[]): { credits: number; weigh
   return { credits, weightedGpa: calculateFlutterGpa(scores), courses }
 }
 
-export function calculateScoreListsSummary(scoreLists: ScoreList[]): { credits: number; weightedGpa: number; courses: number } {
+export function calculateScoreListsSummary(scoreLists: ScoreList[]): ScoreSummary {
   const allScores = scoreLists.flatMap((scoreList) => scoreList.list)
   return {
     credits: scoreLists.reduce((total, scoreList) => total + calculateScoreSummary(scoreList.list).credits, 0),
     weightedGpa: calculateFlutterGpa(allScores),
     courses: scoreLists.reduce((total, scoreList) => total + calculateScoreSummary(scoreList.list).courses, 0),
   }
+}
+
+/**
+ * 把学期按学年两两合并（从最后一个学期往前数）。
+ *
+ * 与 Flutter `score_page.dart` 的 `_changeScoreList` 合并逻辑一致：最新的两个
+ * 学期合成一个学年。
+ */
+export function groupByAcademicYear(scoreLists: ScoreList[]): ScoreList[] {
+  const years: ScoreList[] = []
+  for (let index = scoreLists.length - 1; index >= 0; index -= 1) {
+    const offset = scoreLists.length - 1 - index
+    const scoreList = scoreLists[index]
+    if (offset % 2 === 0) {
+      years.push({ semester: scoreList.semester, list: [...scoreList.list] })
+    } else {
+      years[years.length - 1]?.list.push(...scoreList.list)
+    }
+  }
+  return years
+}
+
+/**
+ * 愚人模式：把展示用的成绩统一改满。
+ *
+ * 不改原数组——Flutter 是原地改模型，这里返回新对象，调用方拿它同时喂列表和
+ * 统计卡，两处口径才一致。
+ */
+export function applyFoolishMode(scoreLists: ScoreList[]): ScoreList[] {
+  return scoreLists.map((scoreList) => ({
+    semester: scoreList.semester,
+    list: scoreList.list.map((score) => ({ ...score, grade: '100', gpa: '5', gradeDetail: '666' })),
+  }))
 }
 
 export function normalizeBusTrip(raw: Record<string, unknown>, index = 0): BusTrip {

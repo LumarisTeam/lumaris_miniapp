@@ -106,6 +106,45 @@ describe('design tokens', () => {
     expect(orphans.map((file) => file.slice(SRC.length + 1))).toEqual([])
   })
 
+  test('every class name used in JSX has a rule (or a matching family) in some stylesheet', () => {
+    // 另一类静默失效：JSX 里写了类名，样式表里根本没有这条规则。放行两种合法的
+    // 「查不到」情况：动态拼接的类名只校验静态前缀，以及第三方组件自带的类名。
+    const ALLOWED = new Set<string>()
+
+    const defined = new Set<string>()
+    for (const file of walkScss(SRC)) {
+      for (const match of readFileSync(file, 'utf8').matchAll(/\.([a-zA-Z][\w-]*)/g)) {
+        defined.add(match[1])
+      }
+    }
+
+    const DYNAMIC = '\u0000'
+    const unresolved: string[] = []
+
+    for (const file of walkFiles(SRC, ['.ts', '.tsx'])) {
+      const source = readFileSync(file, 'utf8')
+      for (const match of source.matchAll(/className=(?:'([^']*)'|"([^"]*)"|\{`([^`]*)`\})/g)) {
+        const raw = match[1] ?? match[2] ?? match[3] ?? ''
+        const withSentinels = raw.replace(/\$\{[^}]*\}/g, DYNAMIC)
+
+        for (const token of withSentinels.split(/\s+/).filter(Boolean)) {
+          if (ALLOWED.has(token)) continue
+          if (!token.includes(DYNAMIC)) {
+            if (!defined.has(token)) unresolved.push(`${token} (${file.slice(SRC.length + 1)})`)
+            continue
+          }
+          // 动态拼接：至少要有一个已定义的类名以静态前缀开头。
+          const prefix = token.slice(0, token.indexOf(DYNAMIC))
+          if (prefix && ![...defined].some((name) => name.startsWith(prefix))) {
+            unresolved.push(`${token.replace(DYNAMIC, '…')} (${file.slice(SRC.length + 1)})`)
+          }
+        }
+      }
+    }
+
+    expect(unresolved).toEqual([])
+  })
+
   test('uses rpx rather than px for lengths so layouts scale per device', () => {
     const pxLengths: string[] = []
 

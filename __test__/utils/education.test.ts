@@ -15,6 +15,7 @@ import {
   getHomeCourses,
   orderedWeekdays,
   formatWeekRanges,
+  academicYearKey,
   buildSemesterLabels,
   filterUpcomingBusTrips,
   summarizeElectricity,
@@ -134,8 +135,22 @@ describe('education domain helpers', () => {
   })
 
   test('builds Flutter score selector labels from the semester count', () => {
-    expect(buildSemesterLabels(8)).toEqual(['大四下', '大四上', '大三下', '大三上', '大二下', '大二上', '大一下', '大一上'])
-    expect(buildSemesterLabels(1)).toEqual(['大一上'])
+    // 文案由调用方提供，这里用一个中文替身；实际页面传的是 i18n 的 t()。
+    const zh: Record<string, string> = {
+      year1: '大一', year2: '大二', year3: '大三', year4: '大四',
+      semesterSpringShort: '下', semesterAutumnShort: '上',
+    }
+    const translate = (key: string) => zh[key] ?? key
+
+    expect(buildSemesterLabels(8, translate)).toEqual(['大四下', '大四上', '大三下', '大三上', '大二下', '大二上', '大一下', '大一上'])
+    expect(buildSemesterLabels(1, translate)).toEqual(['大一上'])
+  })
+
+  test('maps academic year indexes to translation keys and clamps overflow', () => {
+    expect(academicYearKey(0)).toBe('year1')
+    expect(academicYearKey(3)).toBe('year4')
+    expect(academicYearKey(-1)).toBe('year1')
+    expect(academicYearKey(99)).toBe('year10')
   })
 
   test('normalizes bus and payment variants', () => {

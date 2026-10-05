@@ -1,0 +1,83 @@
+.score-stats {
+  padding: 32rpx;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.score-stat {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.score-stat__value {
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.score-stat__label-row {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.score-stat__label {
+  color: var(--secondary-label);
+  font-size: 18rpx;
+  font-weight: 700;
+}
+
+/* 行内容：与 Flutter _buildScoreItem 的 Padding(vertical: 8, horizontal: 16) 对齐。 */
+.score-row {
+  height: 144rpx;
+  padding: 0 32rpx;
+  display: flex;
+  align-items: center;
+  gap: 32rpx;
+}
+
+.score-row__bar {
+  flex: none;
+  width: 8rpx;
+  height: 80rpx;
+  border-radius: 4rpx;
+}
+
+.score-row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.score-row__name {
+  font-size: 32rpx;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score-row__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8rpx 32rpx;
+}
+
+.score-row__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.score-row__meta-text {
+  color: var(--secondary-label);
+  font-size: 28rpx;
+}
