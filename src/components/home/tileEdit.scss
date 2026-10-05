@@ -1,0 +1,167 @@
+.tile-edit-controls {
+  margin-bottom: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tile-edit-controls__title {
+  font-size: 44rpx;
+  font-weight: 700;
+  letter-spacing: -1rpx;
+}
+
+.tile-edit-controls__button {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 24rpx;
+  border-radius: var(--radius-control);
+}
+
+.tile-edit-controls__button-text {
+  color: var(--primary);
+  font-size: 28rpx;
+}
+
+.tile-edit-controls__button--done {
+  background: var(--primary);
+  box-shadow: var(--shadow);
+}
+
+.tile-edit-controls__button--done .tile-edit-controls__button-text {
+  color: var(--on-accent);
+}
+
+/* 编辑模式下磁贴左右轻晃，对应 Flutter 的 ±0.015rad 抖动。 */
+@keyframes tile-jiggle {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(0.86deg); }
+  75% { transform: rotate(-0.86deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.tile-slot {
+  position: relative;
+}
+
+.tile-slot--editing {
+  animation: tile-jiggle 250ms infinite;
+}
+
+/* 编辑模式下拦住机身点击，避免误跳转到服务页。 */
+.tile-slot__blocker {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.tile-empty {
+  margin-top: 16rpx;
+  padding: 48rpx 32rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+  background: var(--card-bg);
+  border: 1rpx solid var(--card-border);
+  border-radius: var(--radius-card);
+}
+
+.tile-empty__icon {
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--surface-muted);
+}
+
+.tile-empty__text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.tile-empty__title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.tile-empty__subtitle {
+  color: var(--secondary-label);
+  font-size: 26rpx;
+  text-align: center;
+}
+
+.tile-slot__remove {
+  position: absolute;
+  top: 16rpx;
+  left: 16rpx;
+  z-index: 2;
+  width: 44rpx;
+  height: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--secondary-label);
+}
+
+/* 用一根白条画减号，图标集里没有更贴切的字形。 */
+.tile-slot__remove-bar {
+  width: 22rpx;
+  height: 4rpx;
+  border-radius: 2rpx;
+  background: var(--on-accent);
+}
+
+.tile-slot__move {
+  position: absolute;
+  bottom: 16rpx;
+  right: 16rpx;
+  z-index: 2;
+  display: flex;
+  gap: 8rpx;
+}
+
+.tile-slot__move-button {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--selection-fill);
+}
+
+.tile-slot__move-button--disabled {
+  opacity: 0.3;
+}
+
+.tile-available {
+  margin-top: 16rpx;
+}
+
+.tile-available__title {
+  display: block;
+  padding: 32rpx 0 16rpx 16rpx;
+  font-size: 36rpx;
+  font-weight: 600;
+  letter-spacing: -1rpx;
+}
+
+.tile-available__add {
+  width: 44rpx;
+  height: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--success);
+}

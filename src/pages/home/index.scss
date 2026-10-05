@@ -1,19 +1,32 @@
-.home-service-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 32rpx;
-}
 
-.home-exam {
-  min-height: 112rpx;
-  padding: 22rpx 24rpx;
+
+.home-schedule-actions {
   display: flex;
   align-items: center;
-  gap: 18rpx;
-  border-bottom: 1rpx solid var(--separator);
+  gap: 16rpx;
 }
 
-.home-exam:last-child { border-bottom: 0; }
-.home-exam__date { width: 56rpx; height: 56rpx; display: flex; align-items: center; justify-content: center; background: var(--warning-soft); border-radius: 14rpx; }
-.home-exam__name { display: block; overflow-wrap: anywhere; font-size: 27rpx; font-weight: 650; }
-.home-exam__meta { display: block; margin-top: 5rpx; color: var(--secondary-label); font-size: 22rpx; }
+.home-settings-sheet {
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 32rpx;
+  background: var(--card-bg);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+.home-settings-sheet__title {
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.home-settings-sheet__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+}
+
+.home-settings-sheet__label {
+  font-size: 32rpx;
+}

@@ -4,10 +4,12 @@ import Taro from '@tarojs/taro'
 import { PageShell } from '@/components/common/PageShell'
 import { ClubCard } from '@/components/common/ClubCard'
 import { ListRow } from '@/components/common/ListRow'
+import { StudyCreditCard } from '@/components/profile/StudyCreditCard'
 import { StateView } from '@/components/common/StateView'
 import { getStudyProgressSnapshot } from '@/services/domainRepository'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
+import { useTranslation } from '@/i18n'
 import type { Feature, StudyModule } from '@/types/domain'
 import logo from '@/static/logo.png'
 import '@/styles/pages.scss'
@@ -33,25 +35,50 @@ const ENTRIES: ProfileEntry[] = [
 ]
 
 export default function ProfilePage() {
+  const t = useTranslation()
   const session = useAuthStore((state) => state.session)
   const logout = useAuthStore((state) => state.logout)
   const school = useAppStore((state) => state.school)
   const [progress, setProgress] = useState<StudyModule[]>([])
+  const [progressLoading, setProgressLoading] = useState(false)
+  const [progressError, setProgressError] = useState('')
   const username = session?.username
   const canShowProgress = school.features.includes('study_progress')
 
   useEffect(() => {
-    if (username && canShowProgress) {
-      void getStudyProgressSnapshot(username, school.code, 'local-first').then(async (snapshot) => {
-        setProgress(snapshot.data)
-        if (snapshot.isFromLocal) setProgress((await getStudyProgressSnapshot(username, school.code, 'refresh')).data)
-      }).catch(() => setProgress([]))
+    if (!username || !canShowProgress) {
+      setProgress([])
+      return
     }
+
+    let cancelled = false
+    const load = async () => {
+      setProgressLoading(true)
+      setProgressError('')
+      try {
+        // 先渲染本地缓存，再后台拉一次，和 Flutter ProfilePage 的行为一致。
+        const snapshot = await getStudyProgressSnapshot(username, school.code, 'local-first')
+        if (cancelled) return
+        setProgress(snapshot.data)
+        setProgressLoading(false)
+
+        if (snapshot.isFromLocal) {
+          const refreshed = await getStudyProgressSnapshot(username, school.code, 'refresh')
+          if (!cancelled) setProgress(refreshed.data)
+        }
+      } catch (error) {
+        if (cancelled) return
+        setProgressError(error instanceof Error ? error.message : String(error))
+      } finally {
+        if (!cancelled) setProgressLoading(false)
+      }
+    }
+
+    void load()
+    return () => { cancelled = true }
   }, [username, canShowProgress, school.code])
 
   const entries = ENTRIES.filter((entry) => !entry.feature || school.features.includes(entry.feature))
-  const completed = progress.reduce((sum, item) => sum + Number(item.total.actual || 0), 0)
-  const required = progress.reduce((sum, item) => sum + Number(item.total.full || 0), 0)
 
   return (
     <PageShell title='我的'>
@@ -64,12 +91,15 @@ export default function ProfilePage() {
         {!session ? <View className='profile-header__login pressable' onClick={() => Taro.navigateTo({ url: '/pages/login/index' })}>登录</View> : null}
       </View>
 
-      {session && required > 0 ? (
+      {session && canShowProgress ? (
         <View className='page-section'>
-          <ClubCard>
-            <View className='row row--between'><Text className='profile-progress__title'>学习进度</Text><Text className='profile-progress__value'>{completed.toFixed(1)} / {required.toFixed(1)} 学分</Text></View>
-            <View className='profile-progress__track'><View className='profile-progress__fill' style={{ width: `${Math.min(100, completed / required * 100)}%` }} /></View>
-          </ClubCard>
+          {progressLoading && progress.length === 0 ? (
+            <StateView state='loading' compact title={t('syncingAcademic')} description={t('syncingAcademicSubtitle')} />
+          ) : progressError && progress.length === 0 ? (
+            <StateView state='error' compact title={t('loadFailed')} description={progressError} />
+          ) : (
+            progress.map((module) => <StudyCreditCard key={module.type} data={module} />)
+          )}
         </View>
       ) : null}
 

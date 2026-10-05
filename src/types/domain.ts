@@ -22,10 +22,33 @@ export type Feature =
 export interface School {
   code: string
   name: string
+  /** 后端 API 基址，可能已经带 /v1 */
   website: string
+  /**
+   * 学生登录教务系统的地址，用于指引与 HTML 课表导入。
+   * 与 website（后端 API 基址）不同，可以为空。
+   */
+  eduSystemUrl: string
   features: Feature[]
   enabled: boolean
   weekStartDay: 1 | 7
+  createdAt: string
+  updatedAt: string
+}
+
+/** 应用发布信息（GET /api/v1/app），对应 Flutter 的 ReleaseInfo。 */
+export interface ReleaseAsset {
+  name: string
+  browserDownloadUrl: string
+}
+
+export interface ReleaseInfo {
+  id: number
+  tagName: string
+  name: string
+  body: string
+  createdAt: string
+  assets: ReleaseAsset[]
 }
 
 export interface AuthSession {
@@ -213,5 +236,9 @@ export interface AppSettings {
   hapticFeedback: boolean
   showTomorrow: boolean
   showCourseGrid: boolean
+  /**
+   * @deprecated 首页快捷方式改由磁贴配置管理（见 @/stores/tile）。
+   * 保留此字段只为首次启动时迁移用户已有的显示/隐藏偏好，不再写入。
+   */
   visibleServices: ServiceType[]
 }

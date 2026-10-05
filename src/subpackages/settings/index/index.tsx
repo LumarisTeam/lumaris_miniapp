@@ -23,16 +23,9 @@ const START_PAGES: Array<{ value: StartPage; label: string }> = [
   { value: 'score', label: '成绩' },
   { value: 'profile', label: '我的' },
 ]
-const HOME_SERVICES = [
-  { value: 'electricity' as const, label: '电费' },
-  { value: 'bus' as const, label: '校车' },
-  { value: 'payment' as const, label: '校园卡' },
-]
-
 export default function SettingsPage() {
   const settings = useAppStore((state) => state.settings)
   const setSettings = useAppStore((state) => state.setSettings)
-  const toggleService = useAppStore((state) => state.toggleService)
   const clearCourses = useCourseStore((state) => state.clearRemote)
   const clearScores = useScoreStore((state) => state.clear)
   const startIndex = Math.max(0, START_PAGES.findIndex((item) => item.value === settings.startPage))
@@ -78,15 +71,6 @@ export default function SettingsPage() {
           <ListRow title='触感反馈' subtitle='在支持的真机上提供轻触反馈' icon='alarm' trailing={<Switch checked={settings.hapticFeedback} color='#007aff' onChange={(event) => { setSettings({ hapticFeedback: event.detail.value }); if (event.detail.value) haptic() }} />} />
           <ListRow title='课表设置' subtitle='显示方式、忽略课程与自定义课程' icon='calendar' onClick={() => Taro.navigateTo({ url: '/subpackages/settings/schedule/index' })} />
           <ListRow title='清除缓存' subtitle='保留自定义课程' icon='delete' danger onClick={clearCache} />
-        </ClubCard>
-      </View>
-
-      <View className='page-section'>
-        <Text className='form-label'>首页服务</Text>
-        <ClubCard padding='none'>
-          {HOME_SERVICES.map((service) => (
-            <ListRow key={service.value} title={service.label} subtitle='在首页快捷入口中显示' icon='service' trailing={<Switch checked={settings.visibleServices.includes(service.value)} color='#007aff' onChange={() => toggleService(service.value)} />} />
-          ))}
         </ClubCard>
       </View>
 

@@ -1,0 +1,93 @@
+.tile {
+  --tile-accent: var(--primary);
+
+  position: relative;
+  height: 100%;
+  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--card-bg);
+  border: 1rpx solid var(--card-border);
+  border-radius: var(--radius-tile);
+  box-shadow: var(--shadow);
+}
+
+.theme-dark .tile {
+  box-shadow: none;
+}
+
+.tile--primary { --tile-accent: var(--primary); }
+.tile--success { --tile-accent: var(--success); }
+.tile--warning { --tile-accent: var(--warning); }
+.tile--danger { --tile-accent: var(--danger); }
+.tile--muted { --tile-accent: var(--secondary-label); }
+
+.tile__icon {
+  width: 76rpx;
+  height: 76rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* 各语义色对应的 soft 变体（小程序内核普遍不支持 color-mix）。 */
+.tile--primary .tile__icon { background: var(--primary-soft); }
+.tile--success .tile__icon { background: var(--success-soft); }
+.tile--warning .tile__icon { background: var(--warning-soft); }
+.tile--danger .tile__icon { background: var(--danger-soft); }
+.tile--muted .tile__icon { background: var(--surface-muted); }
+
+.tile__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.tile__label {
+  color: var(--secondary-label);
+  font-size: 26rpx;
+  font-weight: 500;
+}
+
+.tile__value {
+  color: var(--label);
+  font-size: 48rpx;
+  font-weight: 700;
+  letter-spacing: -1rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tile__value--compact {
+  font-size: 36rpx;
+}
+
+/* 数值允许折两行时用行数裁剪，小程序里没有 numberOfLines 属性。 */
+.tile__value--clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+}
+
+.tile--danger .tile__value {
+  color: var(--danger);
+}
+
+.tile--muted .tile__value {
+  color: var(--secondary-label);
+}
+
+.tile--loading {
+  align-items: center;
+  justify-content: center;
+}
+
+.tile__loading-text {
+  color: var(--secondary-label);
+  font-size: 24rpx;
+  text-align: center;
+}

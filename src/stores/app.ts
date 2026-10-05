@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import { listSchools } from '@/api/education'
+import { fetchSchoolDetail, listSchools } from '@/api/basic'
 import { applyLocaleToShell } from '@/i18n/applyLocale'
-import type { AppSettings, Feature, School, ServiceType } from '@/types/domain'
+import type { AppSettings, Feature, School } from '@/types/domain'
 import { clearEducationCache, initializeStorage, readStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage'
 
 initializeStorage()
@@ -17,6 +17,10 @@ export const DEFAULT_SCHOOL: School = {
   ],
   enabled: true,
   weekStartDay: 7,
+  // 兜底学校与 Flutter 的 School.fallbackList 保持一致：未登记教务系统地址。
+  eduSystemUrl: '',
+  createdAt: '2024-01-01T00:00:00.000Z',
+  updatedAt: '2024-01-01T00:00:00.000Z',
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -36,8 +40,9 @@ interface AppState {
   schoolsLoading: boolean
   setSettings: (patch: Partial<AppSettings>) => void
   setSchool: (school: School) => void
+  /** 拉取当前学校的最新配置（功能开关可能被服务端改过）。 */
+  refreshSchoolDetail: (code: string) => Promise<void>
   loadSchools: () => Promise<void>
-  toggleService: (service: ServiceType) => void
 }
 
 const savedSettings = readStorage<Partial<AppSettings>>(STORAGE_KEYS.SETTINGS, {})
@@ -64,6 +69,19 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (get().school.code.toUpperCase() !== school.code.toUpperCase()) clearEducationCache()
     writeStorage(STORAGE_KEYS.SCHOOL, school)
     set({ school })
+    void get().refreshSchoolDetail(school.code)
+  },
+  refreshSchoolDetail: async (code) => {
+    const target = code.trim().toUpperCase()
+    try {
+      const detail = await fetchSchoolDetail(target)
+      // 请求期间又切了学校就丢弃结果，避免把旧学校的功能开关盖上去。
+      if (get().school.code.toUpperCase() !== target) return
+      writeStorage(STORAGE_KEYS.SCHOOL, detail)
+      set({ school: detail })
+    } catch {
+      // 拿不到远端配置就继续用缓存里的那份，不阻断任何流程。
+    }
   },
   loadSchools: async () => {
     set({ schoolsLoading: true })
@@ -75,13 +93,6 @@ export const useAppStore = create<AppState>((set, get) => ({
     } finally {
       set({ schoolsLoading: false })
     }
-  },
-  toggleService: (service) => {
-    const current = get().settings.visibleServices
-    const visibleServices = current.includes(service)
-      ? current.filter((item) => item !== service)
-      : [...current, service]
-    get().setSettings({ visibleServices })
   },
 }))
 

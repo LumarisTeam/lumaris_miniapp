@@ -57,6 +57,20 @@ export function normalizeCourse(raw: Record<string, unknown>, index = 0): Course
   }
 }
 
+/**
+ * 由名称推导一个稳定的展示色：同名同色，与到达顺序无关。
+ *
+ * 课程用的是 [assignCourseColors]（优先保留服务端/用户已有的颜色）；考试没有
+ * 颜色字段，用这个按名字散列，对应 Flutter 的 `CourseColorManager.generateSoftColor`。
+ */
+export function colorForName(name: string): string {
+  let hash = 0
+  for (let index = 0; index < name.length; index += 1) {
+    hash = (hash * 31 + name.charCodeAt(index)) >>> 0
+  }
+  return COURSE_COLORS[hash % COURSE_COLORS.length]
+}
+
 export function assignCourseColors(courses: Course[]): Course[] {
   const byName = new Map<string, string>()
   return courses.map((course) => {

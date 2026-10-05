@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Text, View } from '@tarojs/components'
 import type { IconName } from '@/components/common/AppIcon'
 import { AppIcon } from '@/components/common/AppIcon'
@@ -6,7 +7,8 @@ import './common.scss'
 interface SectionHeaderProps {
   title: string
   icon?: IconName
-  trailing?: string
+  /** 右侧内容：传字符串会按次要文字样式渲染，也可以传按钮等自定义节点。 */
+  trailing?: ReactNode
   compact?: boolean
 }
 
@@ -17,7 +19,9 @@ export function SectionHeader({ title, icon, trailing, compact = false }: Sectio
         {icon ? <AppIcon name={icon} size={20} color='var(--primary)' /> : null}
         <Text className='section-header__title'>{title}</Text>
       </View>
-      {trailing ? <Text className='section-header__trailing'>{trailing}</Text> : null}
+      {typeof trailing === 'string'
+        ? <Text className='section-header__trailing'>{trailing}</Text>
+        : trailing}
     </View>
   )
 }

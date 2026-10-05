@@ -4,6 +4,7 @@ import {
   calculateScoreSummary,
   assignCourseColors,
   coursesForDay,
+  colorForName,
   getCourseTime,
   normalizeBusTrip,
   normalizeCourse,
@@ -105,6 +106,13 @@ describe('education domain helpers', () => {
   test('uses campus-specific course times', () => {
     const caotang = normalizeCourse({ name: '课程', campus: '草堂校区', startSlot: 1, endSlot: 2 })
     expect(getCourseTime(caotang, new Date('2026-01-01'))).toEqual({ start: '8:30', end: '10:05' })
+  })
+
+  test('derives a stable color from a name regardless of order', () => {
+    expect(colorForName('高等数学')).toBe(colorForName('高等数学'))
+    expect(colorForName('高等数学')).not.toBe(colorForName('大学物理'))
+    expect(colorForName('高等数学')).toMatch(/^#[0-9a-f]{6}$/)
+    expect(colorForName('')).toMatch(/^#[0-9a-f]{6}$/)
   })
 
   test('calculates weighted GPA, credits and numeric average', () => {

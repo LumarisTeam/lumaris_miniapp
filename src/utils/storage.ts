@@ -25,6 +25,7 @@ export const STORAGE_KEYS = {
   PROGRAM_CACHE: 'program-cache',
   LINKS_CACHE: 'links-cache',
   MAP_CACHE: 'map-cache',
+  TILE_CONFIGURATIONS: 'tile-configurations',
   MIGRATED: 'legacy-migrated',
 } as const
 

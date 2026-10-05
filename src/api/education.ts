@@ -11,7 +11,6 @@ import type {
   PaymentRecord,
   PlanCourse,
   ScheduleTable,
-  School,
   Score,
   Semester,
   StudyModule,
@@ -39,19 +38,6 @@ export async function login(username: string, password: string): Promise<LoginRe
     data: { username, password },
     authenticated: false,
   })
-}
-
-export async function listSchools(): Promise<School[]> {
-  const response = await request<{ items?: Record<string, unknown>[] } | Record<string, unknown>[]>('/api/v1/schools', { basic: true, authenticated: false })
-  const items = Array.isArray(response) ? response : response.items ?? []
-  return items.map((raw) => ({
-    code: String(raw.code ?? 'XAUAT'),
-    name: String(raw.name ?? '西安建筑科技大学'),
-    website: String(raw.website ?? 'https://xauatapi.xauat.site'),
-    features: Array.isArray(raw.features) ? (raw.features as School['features']) : [],
-    enabled: raw.enabled !== false,
-    weekStartDay: raw.week_start_day === 1 ? 1 : 7,
-  }))
 }
 
 export async function fetchCourses(studentId: string): Promise<Course[]> {

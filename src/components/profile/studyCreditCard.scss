@@ -1,0 +1,141 @@
+.credit-card {
+  margin: 24rpx 0;
+}
+
+.credit-card__header {
+  display: flex;
+  align-items: center;
+  gap: 32rpx;
+}
+
+.credit-card__badge {
+  flex: none;
+  width: 96rpx;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-navigation);
+  background: var(--primary-soft);
+}
+
+.credit-card__title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.credit-card__subtitle {
+  display: block;
+  margin-top: 8rpx;
+  color: var(--secondary-label);
+  font-size: 26rpx;
+}
+
+.credit-card__total {
+  margin-top: 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.credit-card__total-head {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.credit-card__indicator {
+  flex: none;
+  width: 8rpx;
+  height: 40rpx;
+  border-radius: 4rpx;
+  background: var(--primary);
+}
+
+.credit-card__total-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.credit-card__total-value {
+  font-weight: 700;
+  font-size: 32rpx;
+}
+
+.credit-card__rate {
+  color: var(--secondary-label);
+  font-size: 24rpx;
+}
+
+.credit-card__items {
+  margin-top: 32rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.credit-card__items-head {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.credit-card__items-title {
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.credit-item {
+  padding: 32rpx 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.credit-item__head {
+  display: flex;
+  align-items: center;
+  gap: 32rpx;
+}
+
+.credit-item__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 30rpx;
+  font-weight: 500;
+}
+
+.credit-item__value {
+  flex: none;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.credit-item__value--success { color: var(--success); }
+.credit-item__value--primary { color: var(--primary); }
+.credit-item__value--warning { color: var(--warning); }
+.credit-item__value--danger { color: var(--danger); }
+
+.credit-bar {
+  height: 12rpx;
+  border-radius: var(--radius-xs);
+  background: var(--selection-fill);
+  overflow: hidden;
+}
+
+.credit-bar__fill {
+  height: 100%;
+  border-radius: var(--radius-xs);
+  transition: width 600ms ease-out;
+}
+
+.credit-bar__fill--success { background: var(--success); }
+.credit-bar__fill--primary { background: var(--primary); }
+.credit-bar__fill--warning { background: var(--warning); }
+.credit-bar__fill--danger { background: var(--danger); }

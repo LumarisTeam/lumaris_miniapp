@@ -4,7 +4,9 @@ import { readStorage, STORAGE_KEYS } from '@/utils/storage'
 import { defaultRetryPolicy, sleep, type RetryPolicy } from '@/api/retryPolicy'
 
 const API_BASE_URL = process.env.TARO_APP_API_BASE_URL || 'https://xauatapi.xauat.site/v1'
-const BASIC_API_BASE_URL = process.env.TARO_APP_BASIC_API_BASE_URL || 'https://xauatapi.xauat.site'
+// 学校目录/应用信息走独立的基础服务，与 Flutter BasicHttpClient 的 baseUrl 一致。
+// 注意不是教务 API 的 xauatapi.xauat.site——写成那个会让 /api/v1/schools 一直 404。
+const BASIC_API_BASE_URL = process.env.TARO_APP_BASIC_API_BASE_URL || 'https://luminous.xauat.site'
 const REQUEST_TIMEOUT = 15000
 
 function educationApiBaseUrl(): string {

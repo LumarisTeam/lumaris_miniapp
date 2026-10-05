@@ -1,0 +1,68 @@
+.course-sheet {
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+.course-sheet__title {
+  font-size: 44rpx;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.course-sheet__rows {
+  margin-top: 40rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 28rpx;
+}
+
+.course-sheet__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 28rpx;
+}
+
+.course-sheet__badge {
+  --sheet-accent-primary: var(--primary);
+  --sheet-accent-danger: var(--danger);
+  --sheet-accent-success: var(--success);
+  --sheet-accent-warning: var(--warning);
+  --sheet-accent-yellow: var(--yellow);
+
+  flex: none;
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-control);
+}
+
+.course-sheet__badge--primary { background: var(--primary-soft); }
+.course-sheet__badge--danger { background: var(--danger-soft); }
+.course-sheet__badge--success { background: var(--success-soft); }
+.course-sheet__badge--warning { background: var(--warning-soft); }
+.course-sheet__badge--yellow { background: var(--yellow-soft); }
+
+.course-sheet__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.course-sheet__label {
+  color: var(--secondary-label);
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+.course-sheet__content {
+  font-size: 32rpx;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}

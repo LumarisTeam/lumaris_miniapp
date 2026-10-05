@@ -1,0 +1,17 @@
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32rpx;
+}
+
+/* 宽屏（平板）一排放三个，对应 Flutter 的 crossAxisCount = 3。 */
+@media (min-width: 600px) {
+  .tile-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* 方块比例；个别内核不支持 aspect-ratio 时退化成内容高度，仍可正常使用。 */
+.tile-grid > .tile-slot {
+  aspect-ratio: 1;
+}

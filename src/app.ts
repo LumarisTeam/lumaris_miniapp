@@ -7,6 +7,8 @@ import './app.scss'
 function App({ children }: PropsWithChildren) {
   useLaunch(() => {
     applyLocaleToShell()
+    // 功能开关决定整个页面是否可用，启动时后台刷一次，失败就用缓存。
+    void useAppStore.getState().refreshSchoolDetail(useAppStore.getState().school.code)
     const startPage = useAppStore.getState().settings.startPage
     if (startPage !== 'home') {
       setTimeout(() => {

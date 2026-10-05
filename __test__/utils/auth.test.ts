@@ -8,6 +8,9 @@ const school: School = {
   features: ['login'],
   enabled: true,
   weekStartDay: 1,
+  eduSystemUrl: '',
+  createdAt: '2024-01-01T00:00:00.000Z',
+  updatedAt: '2024-01-01T00:00:00.000Z',
 }
 
 describe('Flutter-compatible authentication identity', () => {

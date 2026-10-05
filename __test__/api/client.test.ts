@@ -34,6 +34,18 @@ describe('API client', () => {
     delete mockStorage['lumaris:v1:school']
   })
 
+  test('routes basic requests to the standalone basic service', async () => {
+    // 回归：basic 基址曾经错写成教务 API 的 xauatapi.xauat.site，
+    // 导致 /api/v1/schools 一直 404、学校列表永远只有兜底那一项。
+    mockRequest.mockResolvedValue({ statusCode: 200, data: { code: 200, message: 'ok', data: [] } })
+
+    await request('/api/v1/schools', { basic: true, authenticated: false })
+
+    expect(mockRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ url: 'https://luminous.xauat.site/api/v1/schools', header: { 'Content-Type': 'application/json' } }),
+    )
+  })
+
   test('invokes unauthorized handler on 401', async () => {
     const handler = jest.fn()
     setUnauthorizedHandler(handler)

@@ -77,7 +77,10 @@ describe('design tokens', () => {
     for (const file of walkScss(SRC)) {
       const relative = file.slice(SRC.length + 1)
       if (relative === 'app.scss') continue
-      for (const match of readFileSync(file, 'utf8').matchAll(/[\d.]+px/g)) {
+
+      // 媒体查询断点是设备宽度阈值，本来就该用 px——用 rpx 会随屏宽换算，反而错。
+      const scss = readFileSync(file, 'utf8').replace(/@media[^{]*\{/g, '@media {')
+      for (const match of scss.matchAll(/[\d.]+px/g)) {
         pxLengths.push(`${match[0]} (${relative})`)
       }
     }
