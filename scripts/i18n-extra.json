@@ -1,0 +1,458 @@
+{
+  "$comment": [
+    "小程序独有文案。Flutter 的 lib/l10n/app_*.arb 仍是共享文案的唯一事实来源，",
+    "这里只放 Flutter 侧不存在的说法（微信业务域名、webview 回退一类的平台限制）。",
+    "每个 key 必须给全部 8 种语言，generateI18n.mjs 会校验；生成时会被合并进",
+    "src/i18n/locales/*.ts，所以 MessageKey 里能直接 t() 到。"
+  ],
+  "webviewTitle": {
+    "zh-CN": "网页无法打开",
+    "zh-Hant": "網頁無法開啟",
+    "en": "Cannot open page",
+    "ja": "ページを開けません",
+    "ko": "페이지를 열 수 없습니다",
+    "fr": "Impossible d'ouvrir la page",
+    "de": "Seite kann nicht geöffnet werden",
+    "ru": "Не удалось открыть страницу"
+  },
+  "webviewDomainBlocked": {
+    "zh-CN": "此网页不在微信业务域名中，无法在小程序内打开。",
+    "zh-Hant": "此網頁不在微信業務域名中，無法在小程式內開啟。",
+    "en": "This page is not on the WeChat business domain list, so it cannot be opened inside the mini program.",
+    "ja": "このページは WeChat の業務ドメインに登録されていないため、ミニプログラム内では開けません。",
+    "ko": "이 페이지는 WeChat 비즈니스 도메인에 등록되어 있지 않아 미니프로그램 안에서 열 수 없습니다.",
+    "fr": "Cette page n'est pas dans la liste des domaines professionnels WeChat et ne peut pas être ouverte dans le mini-programme.",
+    "de": "Diese Seite steht nicht auf der WeChat-Geschäftsdomain-Liste und kann nicht im Mini-Programm geöffnet werden.",
+    "ru": "Эта страница не входит в список бизнес-доменов WeChat, поэтому её нельзя открыть внутри мини-программы."
+  },
+  "webviewCopyLink": {
+    "zh-CN": "复制链接",
+    "zh-Hant": "複製連結",
+    "en": "Copy link",
+    "ja": "リンクをコピー",
+    "ko": "링크 복사",
+    "fr": "Copier le lien",
+    "de": "Link kopieren",
+    "ru": "Скопировать ссылку"
+  },
+  "webviewCopySuccess": {
+    "zh-CN": "链接已复制，请在浏览器中打开",
+    "zh-Hant": "連結已複製，請在瀏覽器中開啟",
+    "en": "Link copied — open it in your browser",
+    "ja": "リンクをコピーしました。ブラウザで開いてください",
+    "ko": "링크를 복사했습니다. 브라우저에서 열어 주세요",
+    "fr": "Lien copié — ouvrez-le dans votre navigateur",
+    "de": "Link kopiert – im Browser öffnen",
+    "ru": "Ссылка скопирована — откройте её в браузере"
+  },
+  "webviewCopyFailed": {
+    "zh-CN": "无法复制此链接",
+    "zh-Hant": "無法複製此連結",
+    "en": "Could not copy this link",
+    "ja": "リンクをコピーできませんでした",
+    "ko": "링크를 복사할 수 없습니다",
+    "fr": "Impossible de copier ce lien",
+    "de": "Link konnte nicht kopiert werden",
+    "ru": "Не удалось скопировать ссылку"
+  },
+  "webviewLimitHint": {
+    "zh-CN": "网页受微信业务域名限制。若页面无法载入，可在错误页复制链接后用系统浏览器打开。",
+    "zh-Hant": "網頁受微信業務域名限制。若頁面無法載入，可在錯誤頁複製連結後用系統瀏覽器開啟。",
+    "en": "External pages are limited by the WeChat business domain list. If one fails to load, copy the link from the error page and open it in your browser.",
+    "ja": "外部ページは WeChat の業務ドメイン制限を受けます。読み込めない場合は、エラーページでリンクをコピーしブラウザで開いてください。",
+    "ko": "외부 페이지는 WeChat 비즈니스 도메인 제한을 받습니다. 열리지 않으면 오류 페이지에서 링크를 복사해 브라우저에서 여세요.",
+    "fr": "Les pages externes sont limitées par la liste des domaines professionnels WeChat. En cas d'échec, copiez le lien depuis la page d'erreur et ouvrez-le dans votre navigateur.",
+    "de": "Externe Seiten unterliegen der WeChat-Geschäftsdomain-Liste. Falls eine nicht lädt, kopiere den Link von der Fehlerseite und öffne ihn im Browser.",
+    "ru": "Внешние страницы ограничены списком бизнес-доменов WeChat. Если страница не загружается, скопируйте ссылку со страницы ошибки и откройте её в браузере."
+  },
+  "pageReading": {
+    "zh-CN": "正在读取",
+    "zh-Hant": "正在讀取",
+    "en": "Loading",
+    "ja": "読み込み中",
+    "ko": "불러오는 중",
+    "fr": "Chargement",
+    "de": "Wird geladen",
+    "ru": "Загрузка"
+  },
+  "mapLoading": {
+    "zh-CN": "正在加载校园地图",
+    "zh-Hant": "正在載入校園地圖",
+    "en": "Loading campus map",
+    "ja": "キャンパスマップを読み込み中",
+    "ko": "캠퍼스 지도를 불러오는 중",
+    "fr": "Chargement du plan du campus",
+    "de": "Campus-Karte wird geladen",
+    "ru": "Загрузка карты кампуса"
+  },
+  "mapLoadFailed": {
+    "zh-CN": "地图数据加载失败",
+    "zh-Hant": "地圖資料載入失敗",
+    "en": "Failed to load map data",
+    "ja": "マップデータの読み込みに失敗しました",
+    "ko": "지도 데이터를 불러오지 못했습니다",
+    "fr": "Échec du chargement des données de la carte",
+    "de": "Kartendaten konnten nicht geladen werden",
+    "ru": "Не удалось загрузить данные карты"
+  },
+  "mapNoResults": {
+    "zh-CN": "没有匹配地点",
+    "zh-Hant": "沒有符合的地點",
+    "en": "No matching places",
+    "ja": "該当する場所がありません",
+    "ko": "일치하는 장소가 없습니다",
+    "fr": "Aucun lieu correspondant",
+    "de": "Keine passenden Orte",
+    "ru": "Подходящих мест не найдено"
+  },
+  "mapLocationDenied": {
+    "zh-CN": "未获得定位权限，当前显示默认校区。点击右上角定位按钮可重试。",
+    "zh-Hant": "未取得定位權限，目前顯示預設校區。點擊右上角定位按鈕可重試。",
+    "en": "Location permission was not granted, so the default campus is shown. Tap the locate button in the top-right corner to retry.",
+    "ja": "位置情報の権限がないため、既定のキャンパスを表示しています。右上の位置情報ボタンで再試行できます。",
+    "ko": "위치 권한이 없어 기본 캠퍼스를 표시합니다. 오른쪽 위 위치 버튼으로 다시 시도할 수 있습니다.",
+    "fr": "L'autorisation de localisation n'a pas été accordée : le campus par défaut est affiché. Touchez le bouton de localisation en haut à droite pour réessayer.",
+    "de": "Der Standortzugriff wurde nicht erlaubt, daher wird der Standardcampus angezeigt. Tippe oben rechts auf die Standortschaltfläche, um es erneut zu versuchen.",
+    "ru": "Доступ к геолокации не предоставлен, показан кампус по умолчанию. Нажмите кнопку геолокации справа сверху, чтобы повторить."
+  },
+  "mapLocationDeniedRetry": {
+    "zh-CN": "未获得定位权限，请在微信设置中授权后重试。",
+    "zh-Hant": "未取得定位權限，請在微信設定中授權後重試。",
+    "en": "Location permission was not granted. Allow it in WeChat settings and try again.",
+    "ja": "位置情報の権限がありません。WeChat の設定で許可してから再試行してください。",
+    "ko": "위치 권한이 없습니다. WeChat 설정에서 허용한 뒤 다시 시도해 주세요.",
+    "fr": "L'autorisation de localisation n'a pas été accordée. Activez-la dans les réglages WeChat puis réessayez.",
+    "de": "Der Standortzugriff wurde nicht erlaubt. Erlaube ihn in den WeChat-Einstellungen und versuche es erneut.",
+    "ru": "Доступ к геолокации не предоставлен. Разрешите его в настройках WeChat и повторите."
+  },
+  "mapLocateFailed": {
+    "zh-CN": "无法获取定位，请检查权限",
+    "zh-Hant": "無法取得定位，請檢查權限",
+    "en": "Could not get your location — check permissions",
+    "ja": "位置情報を取得できません。権限を確認してください",
+    "ko": "위치를 가져올 수 없습니다. 권한을 확인해 주세요",
+    "fr": "Impossible d'obtenir votre position : vérifiez les autorisations",
+    "de": "Standort konnte nicht ermittelt werden – Berechtigungen prüfen",
+    "ru": "Не удалось определить местоположение — проверьте разрешения"
+  },
+  "allCategories": {
+    "zh-CN": "全部",
+    "zh-Hant": "全部",
+    "en": "All",
+    "ja": "すべて",
+    "ko": "전체",
+    "fr": "Tout",
+    "de": "Alle",
+    "ru": "Все"
+  },
+  "guestCourseHint": {
+    "zh-CN": "自定义课程仍会保存在本机",
+    "zh-Hant": "自訂課程仍會保存在本機",
+    "en": "Custom courses are still kept on this device",
+    "ja": "カスタム授業は引き続き端末に保存されます",
+    "ko": "사용자 지정 수업은 계속 기기에 저장됩니다",
+    "fr": "Les cours personnalisés restent enregistrés sur cet appareil",
+    "de": "Eigene Kurse bleiben weiterhin auf diesem Gerät gespeichert",
+    "ru": "Пользовательские курсы по-прежнему сохраняются на этом устройстве"
+  },
+  "helpLoginTitle": {
+    "zh-CN": "登录与数据",
+    "zh-Hant": "登入與資料",
+    "en": "Sign-in and data",
+    "ja": "ログインとデータ",
+    "ko": "로그인 및 데이터",
+    "fr": "Connexion et données",
+    "de": "Anmeldung und Daten",
+    "ru": "Вход и данные"
+  },
+  "helpLoginBody": {
+    "zh-CN": "请选择学校后使用教务系统账号登录。为保护账号安全，小程序不会保存密码，会话过期时需要重新登录。",
+    "zh-Hant": "請選擇學校後使用教務系統帳號登入。為保護帳號安全，小程式不會儲存密碼，工作階段過期時需要重新登入。",
+    "en": "Pick your school and sign in with your academic-system account. The mini program never stores your password, so you will need to sign in again once the session expires.",
+    "ja": "学校を選び、教務システムのアカウントでログインしてください。パスワードは保存されないため、セッションが切れると再ログインが必要です。",
+    "ko": "학교를 선택한 뒤 학사 시스템 계정으로 로그인하세요. 비밀번호는 저장되지 않으므로 세션이 만료되면 다시 로그인해야 합니다.",
+    "fr": "Choisissez votre établissement et connectez-vous avec votre compte du système scolaire. Le mini-programme ne conserve jamais votre mot de passe : vous devrez vous reconnecter à l'expiration de la session.",
+    "de": "Wähle deine Hochschule und melde dich mit deinem Hochschulkonto an. Das Mini-Programm speichert kein Passwort – nach Ablauf der Sitzung ist eine erneute Anmeldung nötig.",
+    "ru": "Выберите вуз и войдите под учётной записью учебного портала. Мини-программа не сохраняет пароль, поэтому после истечения сеанса потребуется войти снова."
+  },
+  "helpScheduleTitle": {
+    "zh-CN": "课表",
+    "zh-Hant": "課表",
+    "en": "Timetable",
+    "ja": "時間割",
+    "ko": "시간표",
+    "fr": "Emploi du temps",
+    "de": "Stundenplan",
+    "ru": "Расписание"
+  },
+  "helpScheduleBody": {
+    "zh-CN": "登录后会自动同步课程和学期周次。游客可以在课表设置里添加自定义课程；小程序版不支持 Flutter 版的 HTML 课表导入。",
+    "zh-Hant": "登入後會自動同步課程和學期週次。訪客可以在課表設定裡新增自訂課程；小程式版不支援 Flutter 版的 HTML 課表匯入。",
+    "en": "Courses and week ranges sync automatically after sign-in. Guests can add custom courses in the timetable settings. The mini program does not support the HTML timetable import available in the Flutter app.",
+    "ja": "ログイン後に授業と学期の週数が自動で同期されます。ゲストは時間割設定でカスタム授業を追加できます。Flutter 版の HTML 時間割インポートには対応していません。",
+    "ko": "로그인하면 수업과 학기 주차가 자동으로 동기화됩니다. 게스트는 시간표 설정에서 사용자 지정 수업을 추가할 수 있습니다. Flutter 버전의 HTML 시간표 가져오기는 지원하지 않습니다.",
+    "fr": "Les cours et les semaines se synchronisent automatiquement après la connexion. Les visiteurs peuvent ajouter des cours personnalisés dans les réglages de l'emploi du temps. L'import HTML de la version Flutter n'est pas disponible.",
+    "de": "Nach der Anmeldung werden Kurse und Semesterwochen automatisch synchronisiert. Gäste können im Stundenplan eigene Kurse anlegen. Der HTML-Import der Flutter-Version wird nicht unterstützt.",
+    "ru": "После входа курсы и недели семестра синхронизируются автоматически. Гости могут добавить свои занятия в настройках расписания. Импорт HTML из версии на Flutter не поддерживается."
+  },
+  "helpWebTitle": {
+    "zh-CN": "网页与外部链接",
+    "zh-Hant": "網頁與外部連結",
+    "en": "Web pages and external links",
+    "ja": "ウェブページと外部リンク",
+    "ko": "웹 페이지 및 외부 링크",
+    "fr": "Pages web et liens externes",
+    "de": "Webseiten und externe Links",
+    "ru": "Веб-страницы и внешние ссылки"
+  },
+  "helpWebBody": {
+    "zh-CN": "校园工具箱里的网页受微信业务域名限制，无法在小程序内打开时，可以在错误页复制链接，改用系统浏览器访问。",
+    "zh-Hant": "校園工具箱裡的網頁受微信業務域名限制，無法在小程式內開啟時，可以在錯誤頁複製連結，改用系統瀏覽器存取。",
+    "en": "Pages in the campus toolbox are limited by the WeChat business domain list. If one cannot open inside the mini program, copy the link from the error page and open it in your browser.",
+    "ja": "キャンパスツールボックスのページは WeChat の業務ドメイン制限を受けます。ミニプログラム内で開けない場合は、エラーページでリンクをコピーしブラウザで開いてください。",
+    "ko": "캠퍼스 도구함의 페이지는 WeChat 비즈니스 도메인 제한을 받습니다. 미니프로그램 안에서 열 수 없다면 오류 페이지에서 링크를 복사해 브라우저에서 여세요.",
+    "fr": "Les pages de la boîte à outils du campus sont limitées par la liste des domaines professionnels WeChat. Si l'une d'elles ne s'ouvre pas dans le mini-programme, copiez le lien depuis la page d'erreur et ouvrez-le dans votre navigateur.",
+    "de": "Seiten im Campus-Werkzeugkasten unterliegen der WeChat-Geschäftsdomain-Liste. Lässt sich eine nicht im Mini-Programm öffnen, kopiere den Link von der Fehlerseite und öffne ihn im Browser.",
+    "ru": "Страницы в наборе инструментов кампуса ограничены списком бизнес-доменов WeChat. Если страница не открывается в мини-программе, скопируйте ссылку со страницы ошибки и откройте её в браузере."
+  },
+  "helpRefreshTitle": {
+    "zh-CN": "刷新与离线",
+    "zh-Hant": "重新整理與離線",
+    "en": "Refresh and offline",
+    "ja": "更新とオフライン",
+    "ko": "새로 고침 및 오프라인",
+    "fr": "Actualisation et hors ligne",
+    "de": "Aktualisieren und offline",
+    "ru": "Обновление и офлайн"
+  },
+  "helpRefreshBody": {
+    "zh-CN": "页面下拉即可刷新数据。网络不可用时，已缓存的内容仍可查看，界面会标出这些数据可能不是最新的。",
+    "zh-Hant": "頁面下拉即可重新整理資料。網路不可用時，已快取的內容仍可查看，介面會標示這些資料可能不是最新的。",
+    "en": "Pull down on a page to refresh. When the network is unavailable, cached content stays readable and the interface marks it as possibly out of date.",
+    "ja": "画面を下に引っ張ると更新できます。ネットワークがない場合でもキャッシュされた内容は閲覧でき、最新でない可能性がある旨が表示されます。",
+    "ko": "화면을 아래로 당기면 새로 고침됩니다. 네트워크가 없어도 캐시된 내용은 볼 수 있으며, 최신이 아닐 수 있다는 표시가 나타납니다.",
+    "fr": "Tirez une page vers le bas pour actualiser. Sans réseau, le contenu en cache reste consultable et est signalé comme potentiellement obsolète.",
+    "de": "Ziehe eine Seite nach unten, um zu aktualisieren. Ohne Netzwerk bleiben zwischengespeicherte Inhalte lesbar und werden als möglicherweise veraltet markiert.",
+    "ru": "Потяните страницу вниз, чтобы обновить данные. Без сети кэшированное содержимое остаётся доступным и помечается как возможно устаревшее."
+  },
+  "loginPasswordNote": {
+    "zh-CN": "为保护账号安全，小程序不会保存教务密码，会话过期后需要重新登录。",
+    "zh-Hant": "為保護帳號安全，小程式不會儲存教務密碼，工作階段過期後需要重新登入。",
+    "en": "For your security the mini program does not store your academic-system password, so you will need to sign in again when the session expires.",
+    "ja": "セキュリティのため、ミニプログラムは教務システムのパスワードを保存しません。セッションが切れたら再ログインしてください。",
+    "ko": "보안을 위해 미니프로그램은 학사 시스템 비밀번호를 저장하지 않습니다. 세션이 만료되면 다시 로그인해 주세요.",
+    "fr": "Pour votre sécurité, le mini-programme ne conserve pas votre mot de passe : vous devrez vous reconnecter à l'expiration de la session.",
+    "de": "Aus Sicherheitsgründen speichert das Mini-Programm dein Passwort nicht – nach Ablauf der Sitzung ist eine erneute Anmeldung nötig.",
+    "ru": "В целях безопасности мини-программа не сохраняет пароль, поэтому после истечения сеанса потребуется войти снова."
+  },
+  "updateUnsupported": {
+    "zh-CN": "当前环境不支持更新检查",
+    "zh-Hant": "目前環境不支援更新檢查",
+    "en": "Update checks are not available here",
+    "ja": "この環境では更新を確認できません",
+    "ko": "이 환경에서는 업데이트 확인을 지원하지 않습니다",
+    "fr": "La vérification des mises à jour n'est pas disponible ici",
+    "de": "Update-Prüfung ist hier nicht verfügbar",
+    "ru": "Проверка обновлений здесь недоступна"
+  },
+  "updateLatest": {
+    "zh-CN": "当前已是最新版本",
+    "zh-Hant": "目前已是最新版本",
+    "en": "You are on the latest version",
+    "ja": "すでに最新バージョンです",
+    "ko": "이미 최신 버전입니다",
+    "fr": "Vous êtes déjà à jour",
+    "de": "Du bist bereits auf dem neuesten Stand",
+    "ru": "У вас уже последняя версия"
+  },
+  "updateReadyTitle": {
+    "zh-CN": "更新已就绪",
+    "zh-Hant": "更新已就緒",
+    "en": "Update ready",
+    "ja": "更新の準備ができました",
+    "ko": "업데이트 준비 완료",
+    "fr": "Mise à jour prête",
+    "de": "Update bereit",
+    "ru": "Обновление готово"
+  },
+  "updateReadyContent": {
+    "zh-CN": "新版本已下载，是否立即重启？",
+    "zh-Hant": "新版本已下載，是否立即重新啟動？",
+    "en": "The new version has been downloaded. Restart now?",
+    "ja": "新しいバージョンをダウンロードしました。今すぐ再起動しますか？",
+    "ko": "새 버전을 내려받았습니다. 지금 다시 시작할까요?",
+    "fr": "La nouvelle version a été téléchargée. Redémarrer maintenant ?",
+    "de": "Die neue Version wurde heruntergeladen. Jetzt neu starten?",
+    "ru": "Новая версия загружена. Перезапустить сейчас?"
+  },
+  "updateDownloadFailed": {
+    "zh-CN": "更新下载失败",
+    "zh-Hant": "更新下載失敗",
+    "en": "Update download failed",
+    "ja": "更新のダウンロードに失敗しました",
+    "ko": "업데이트 다운로드 실패",
+    "fr": "Échec du téléchargement de la mise à jour",
+    "de": "Update-Download fehlgeschlagen",
+    "ru": "Не удалось загрузить обновление"
+  },
+  "logoutHint": {
+    "zh-CN": "退出后需要重新登录才能访问教务数据",
+    "zh-Hant": "登出後需要重新登入才能存取教務資料",
+    "en": "You will need to sign in again to access academic data",
+    "ja": "ログアウト後は教務データを見るのに再ログインが必要です",
+    "ko": "로그아웃하면 학사 데이터를 보려면 다시 로그인해야 합니다",
+    "fr": "Vous devrez vous reconnecter pour accéder aux données scolaires",
+    "de": "Nach dem Abmelden ist eine erneute Anmeldung nötig, um auf Hochschuldaten zuzugreifen",
+    "ru": "После выхода потребуется снова войти для доступа к учебным данным"
+  },
+  "scheduleSettingsSubtitle": {
+    "zh-CN": "显示方式、忽略课程与自定义课程",
+    "zh-Hant": "顯示方式、忽略課程與自訂課程",
+    "en": "Display style, ignored courses and custom courses",
+    "ja": "表示方法・除外する授業・カスタム授業",
+    "ko": "표시 방식, 제외할 수업, 사용자 지정 수업",
+    "fr": "Affichage, cours ignorés et cours personnalisés",
+    "de": "Darstellung, ignorierte und eigene Kurse",
+    "ru": "Отображение, игнорируемые и свои курсы"
+  },
+  "studentIdLabel": {
+    "zh-CN": "学号",
+    "zh-Hant": "學號",
+    "en": "Student ID",
+    "ja": "学籍番号",
+    "ko": "학번",
+    "fr": "Numéro d'étudiant",
+    "de": "Matrikelnummer",
+    "ru": "Номер студенческого"
+  },
+  "studentIdPlaceholder": {
+    "zh-CN": "请输入学号",
+    "zh-Hant": "請輸入學號",
+    "en": "Enter your student ID",
+    "ja": "学籍番号を入力",
+    "ko": "학번을 입력하세요",
+    "fr": "Saisissez votre numéro d'étudiant",
+    "de": "Matrikelnummer eingeben",
+    "ru": "Введите номер студенческого"
+  },
+  "passwordPlaceholder": {
+    "zh-CN": "请输入教务系统密码",
+    "zh-Hant": "請輸入教務系統密碼",
+    "en": "Enter your academic-system password",
+    "ja": "教務システムのパスワードを入力",
+    "ko": "학사 시스템 비밀번호를 입력하세요",
+    "fr": "Saisissez votre mot de passe du système scolaire",
+    "de": "Passwort des Hochschulsystems eingeben",
+    "ru": "Введите пароль учебного портала"
+  },
+  "currencyUnit": {
+    "zh-CN": "元",
+    "zh-Hant": "元",
+    "en": "CNY",
+    "ja": "元",
+    "ko": "위안",
+    "fr": "CNY",
+    "de": "CNY",
+    "ru": "юаней"
+  },
+  "startSectionLabel": {
+    "zh-CN": "开始节次",
+    "zh-Hant": "開始節次",
+    "en": "First period",
+    "ja": "開始時限",
+    "ko": "시작 교시",
+    "fr": "Début",
+    "de": "Erste Stunde",
+    "ru": "Начало"
+  },
+  "endSectionLabel": {
+    "zh-CN": "结束节次",
+    "zh-Hant": "結束節次",
+    "en": "Last period",
+    "ja": "終了時限",
+    "ko": "종료 교시",
+    "fr": "Fin",
+    "de": "Letzte Stunde",
+    "ru": "Конец"
+  },
+  "weekdayLabel": {
+    "zh-CN": "星期",
+    "zh-Hant": "星期",
+    "en": "Weekday",
+    "ja": "曜日",
+    "ko": "요일",
+    "fr": "Jour",
+    "de": "Wochentag",
+    "ru": "День недели"
+  },
+  "weeksInputLabel": {
+    "zh-CN": "周次（如 1-8,10,12）",
+    "zh-Hant": "週次（如 1-8,10,12）",
+    "en": "Weeks (e.g. 1-8,10,12)",
+    "ja": "週（例 1-8,10,12）",
+    "ko": "주차 (예: 1-8,10,12)",
+    "fr": "Semaines (ex. 1-8,10,12)",
+    "de": "Wochen (z. B. 1-8,10,12)",
+    "ru": "Недели (например 1-8,10,12)"
+  },
+  "customCourseEmptyDescription": {
+    "zh-CN": "适合游客课表或教务系统外的课程",
+    "zh-Hant": "適合訪客課表或教務系統外的課程",
+    "en": "Useful for guest timetables or courses outside the academic system",
+    "ja": "ゲストの時間割や教務システム外の授業に",
+    "ko": "게스트 시간표나 학사 시스템 외 수업에 적합합니다",
+    "fr": "Utile pour un emploi du temps visiteur ou des cours hors système scolaire",
+    "de": "Für Gast-Stundenpläne oder Kurse außerhalb des Hochschulsystems",
+    "ru": "Подходит для гостевого расписания или занятий вне учебного портала"
+  },
+  "invalidCourseInput": {
+    "zh-CN": "请填写课程名、有效周次和节次",
+    "zh-Hant": "請填寫課程名、有效週次和節次",
+    "en": "Fill in the course name, valid weeks and periods",
+    "ja": "授業名・有効な週・時限を入力してください",
+    "ko": "수업명, 유효한 주차와 교시를 입력하세요",
+    "fr": "Renseignez le nom du cours, des semaines et des périodes valides",
+    "de": "Bitte Kursname, gültige Wochen und Stunden angeben",
+    "ru": "Укажите название курса, корректные недели и пары"
+  },
+  "courseSaved": {
+    "zh-CN": "课程已保存",
+    "zh-Hant": "課程已儲存",
+    "en": "Course saved",
+    "ja": "授業を保存しました",
+    "ko": "수업을 저장했습니다",
+    "fr": "Cours enregistré",
+    "de": "Kurs gespeichert",
+    "ru": "Курс сохранён"
+  },
+  "credentialsRequired": {
+    "zh-CN": "请输入学号和密码",
+    "zh-Hant": "請輸入學號和密碼",
+    "en": "Enter your student ID and password",
+    "ja": "学籍番号とパスワードを入力してください",
+    "ko": "학번과 비밀번호를 입력하세요",
+    "fr": "Saisissez votre numéro d'étudiant et votre mot de passe",
+    "de": "Matrikelnummer und Passwort eingeben",
+    "ru": "Введите номер студенческого и пароль"
+  },
+  "loginSuccess": {
+    "zh-CN": "登录成功",
+    "zh-Hant": "登入成功",
+    "en": "Signed in",
+    "ja": "ログインしました",
+    "ko": "로그인되었습니다",
+    "fr": "Connexion réussie",
+    "de": "Angemeldet",
+    "ru": "Вход выполнен"
+  },
+  "requestFailed": {
+    "zh-CN": "请求失败（{status}）",
+    "zh-Hant": "請求失敗（{status}）",
+    "en": "Request failed ({status})",
+    "ja": "リクエストに失敗しました（{status}）",
+    "ko": "요청 실패({status})",
+    "fr": "Échec de la requête ({status})",
+    "de": "Anfrage fehlgeschlagen ({status})",
+    "ru": "Запрос не выполнен ({status})"
+  }
+}

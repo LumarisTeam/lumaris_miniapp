@@ -35,9 +35,12 @@
   position: absolute;
   top: var(--app-status-bar-height);
   right: var(--app-navbar-system-right-inset);
-  width: 96rpx;
+  /* 宽度随内容走：单图标时仍在 96rpx 的栅格列内，多图标时向右溢出一点点。 */
+  width: auto;
+  min-width: 96rpx;
   height: var(--app-navbar-content-height);
   justify-content: flex-end;
+  gap: 12rpx;
 }
 
 .app-navbar__icon {
@@ -57,6 +60,17 @@
   white-space: nowrap;
   font-size: 34rpx;
   font-weight: 700;
+}
+
+/* 自定义导航内容（分段控件等）：去掉标题的省略号约束，交给内部控件自己排。 */
+.app-navbar__title--custom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  white-space: normal;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .club-card {

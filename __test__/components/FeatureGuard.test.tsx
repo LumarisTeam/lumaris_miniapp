@@ -29,7 +29,9 @@ describe('FeatureGuard', () => {
 
     act(() => root.render(<FeatureGuard feature='payment' title='校园卡'><ProtectedContent /></FeatureGuard>))
     expect(childMounted).not.toHaveBeenCalled()
-    expect(container.textContent).toContain('当前学校暂不支持校园卡')
+    // 文案来自语言包（schoolNotSupported），页面标题仍然用调用方给的名称。
+    expect(container.textContent).toContain('当前学校不支持此功能')
+    expect(container.textContent).toContain('校园卡')
 
     act(() => root.unmount())
     useAppStore.setState({ school: originalSchool })

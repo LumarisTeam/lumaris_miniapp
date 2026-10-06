@@ -15,9 +15,12 @@ export type { LocaleCode }
 /**
  * 多语言入口。
  *
- * 语言包由 `scripts/generateI18n.mjs` 从 Flutter 的 ARB 生成，文案的唯一事实
+ * 语言包由 `scripts/generateI18n.mjs` 从 Flutter 的 ARB 生成，共享文案的唯一事实
  * 来源是 Flutter 仓库，这里不手工维护第二份。键名与 Flutter 的
  * `AppLocalizations` 完全一致，方便两端对照。
+ *
+ * 小程序独有的说法（微信业务域名、webview 回退一类 Flutter 侧没有的概念）来自
+ * `scripts/i18n-extra.json`，生成时合并进同一份语言包，所以 t() 的用法完全一样。
  */
 
 /** 具体语言（不含 system）。 */

@@ -7,6 +7,7 @@ import { SectionHeader } from '@/components/common/SectionHeader'
 import { StateView } from '@/components/common/StateView'
 import { useExamStore } from '@/stores/exam'
 import { useTranslation } from '@/i18n'
+import { describeError } from '@/utils/errorText'
 import { colorForName } from '@/utils/education'
 import type { Exam } from '@/types/domain'
 import './examCard.scss'
@@ -45,7 +46,7 @@ export function ExamCard() {
             state='error'
             compact
             title={t('loadFailed')}
-            description={error}
+            description={describeError(error, t)}
             actionLabel={t('retry')}
             onAction={() => void load('refresh')}
           />

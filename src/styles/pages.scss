@@ -78,3 +78,17 @@
   font-size: 23rpx;
   line-height: 1.5;
 }
+
+/* 搜索框：校园导航与校园地图共用的工具条输入。 */
+.search-field {
+  height: 76rpx;
+  padding: 0 22rpx;
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  color: var(--label);
+  background: var(--surface);
+  border-radius: var(--radius-navigation);
+}
+
+.search-field input { min-width: 0; flex: 1; font-size: 25rpx; }

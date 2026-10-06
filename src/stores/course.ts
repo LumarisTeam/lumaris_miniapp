@@ -5,6 +5,7 @@ import { useAppStore } from '@/stores/app'
 import { initializeStorage, readStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage'
 import { getCourseBundle, readCourseBundle } from '@/services/courseRepository'
 import { ensureScheduleTimeLoaded } from '@/services/scheduleTimeRepository'
+import { t } from '@/i18n'
 
 initializeStorage()
 ensureScheduleTimeLoaded(useAppStore.getState().school.code)
@@ -89,7 +90,7 @@ export const useCourseStore = create<CourseState>((set, get) => ({
         set({ courses: refreshed.data.courses, timeInfo: refreshed.data.timeInfo, currentWeek: refreshedWeek.week <= 0 ? 0 : refreshedWeek.week, weekNow: refreshedWeek.week, maxWeek: refreshedWeek.maxWeek, isFromLocal: refreshed.isFromLocal, isStale: refreshed.isStale, ...(refreshed.coursesRefreshed ? { ignoredCourseNames: [] } : {}) })
       }
     } catch (error) {
-      set({ error: error instanceof Error ? error.message : '课表刷新失败', isStale: hasLocal })
+      set({ error: error instanceof Error ? error.message : t('refreshDataFailed'), isStale: hasLocal })
     } finally {
       set({ loading: false, refreshing: false })
     }

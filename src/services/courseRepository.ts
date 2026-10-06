@@ -4,6 +4,7 @@ import { assignCourseColors, normalizeCourse, normalizeTimeInfo } from '@/utils/
 import { fetchScheduleTimeFromRemote } from '@/services/scheduleTimeRepository'
 import { CacheTtl } from '@/utils/cachePolicy'
 import { readCache, STORAGE_KEYS, writeCache } from '@/utils/storage'
+import { t } from '@/i18n'
 
 const COURSE_TTL = CacheTtl.mediumTerm
 const TIME_TTL = CacheTtl.shortTerm
@@ -66,7 +67,7 @@ async function refreshCourseBundle(studentId: string, schoolCode: string): Promi
 
   if (!fetchedAny && courses.length === 0 && !timeInfo) {
     const reason = coursesResult.status === 'rejected' ? coursesResult.reason : timeResult.status === 'rejected' ? timeResult.reason : null
-    throw reason instanceof Error ? reason : new Error('课表加载失败')
+    throw reason instanceof Error ? reason : new Error(t('loadFailed'))
   }
   return {
     data: { courses, timeInfo },

@@ -1,5 +1,6 @@
 import { DetailSheet, type DetailRow } from '@/components/common/DetailSheet'
-import { useTranslation, type MessageKey } from '@/i18n'
+import { useTranslation } from '@/i18n'
+import { weekdayKey } from '@/utils/dates'
 import { formatWeekRanges } from '@/utils/education'
 import type { Course } from '@/types/domain'
 
@@ -8,13 +9,6 @@ import type { Course } from '@/types/domain'
  *
  * 对应 Flutter 的 `lib/ui/components/schedule/course_detail_sheet.dart`。
  */
-
-/** Course.weekday 是 1(周一)~7(周日)。 */
-const WEEKDAY_KEYS: MessageKey[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-
-function weekdayKey(weekday: number): MessageKey {
-  return WEEKDAY_KEYS[Math.min(6, Math.max(0, weekday - 1))]
-}
 
 export function CourseDetailSheet({
   course,

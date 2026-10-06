@@ -8,12 +8,14 @@ import { ListRow } from '@/components/common/ListRow'
 import { StateView } from '@/components/common/StateView'
 import { AppIcon } from '@/components/common/AppIcon'
 import { useCourseStore } from '@/stores/course'
+import { useTranslation, type Translator } from '@/i18n'
+import { WEEKDAY_KEYS } from '@/utils/dates'
 import type { Course } from '@/types/domain'
 import '@/styles/pages.scss'
 import './index.scss'
 
-const DAYS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-const SLOTS = Array.from({ length: 13 }, (_, index) => `第 ${index + 1} 节`)
+/** 星期下拉：下标 0 是周一，与课程的 weekday 字段一致。 */
+const SLOT_COUNT = 13
 const COLORS = ['#007aff', '#34c759', '#ff9500', '#ff3b30', '#5856d6', '#af52de', '#ff2d55']
 
 interface CourseForm {
@@ -46,7 +48,18 @@ function parseWeeks(value: string): number[] {
   return [...weeks].sort((left, right) => left - right)
 }
 
+/** 下拉里的星期文案，顺序按课程的 weekday（1 = 周一）。 */
+function weekdayLabels(t: Translator): string[] {
+  return WEEKDAY_KEYS.map((key) => t(key))
+}
+
+/** 下拉里的节次文案。 */
+function slotLabels(t: Translator): string[] {
+  return Array.from({ length: SLOT_COUNT }, (_, index) => t('periodUnit', { n: index + 1 }))
+}
+
 export default function CustomCoursePage() {
+  const t = useTranslation()
   const courses = useCourseStore((state) => state.customCourses)
   const save = useCourseStore((state) => state.saveCustomCourse)
   const remove = useCourseStore((state) => state.removeCustomCourse)
@@ -68,16 +81,19 @@ export default function CustomCoursePage() {
     setVisible(true)
   }
 
+  const days = weekdayLabels(t)
+  const slots = slotLabels(t)
+
   const submit = () => {
     const weeks = parseWeeks(form.weeksText)
     if (!form.name.trim() || weeks.length === 0 || form.end < form.start) {
-      Taro.showToast({ title: '请填写课程名、有效周次和节次', icon: 'none' })
+      Taro.showToast({ title: t('invalidCourseInput'), icon: 'none' })
       return
     }
     save({
       id: form.id,
       weekIndexes: weeks,
-      teachers: form.teacher.split(/[、,，]/).map((item) => item.trim()).filter(Boolean),
+      teachers: form.teacher.split(/[、,，;；]/).map((item) => item.trim()).filter(Boolean),
       room: form.location.trim(),
       courseName: form.name.trim(),
       courseCode: '',
@@ -91,33 +107,33 @@ export default function CustomCoursePage() {
       isCustom: true,
     })
     setVisible(false)
-    Taro.showToast({ title: '课程已保存', icon: 'success' })
+    Taro.showToast({ title: t('courseSaved'), icon: 'success' })
   }
 
   const action = <View className='icon-action pressable' onClick={() => openForm()}><AppIcon name='add' size={21} /></View>
 
   return (
-    <PageShell title='自定义课程' showBack action={action}>
+    <PageShell title={t('customCourseManage')} showBack action={action}>
       <View className='page-section'>
         <ClubCard padding='none'>
-          {courses.length === 0 ? <StateView state='empty' title='还没有自定义课程' description='适合游客课表或教务系统外的课程' actionLabel='添加课程' onAction={() => openForm()} /> : courses.map((course) => <ListRow key={course.id} title={course.courseName} subtitle={`${DAYS[course.weekday - 1]} · 第 ${course.startUnit}-${course.endUnit} 节 · ${course.room || '未填写地点'}`} icon='calendar' iconColor={course.color} onClick={() => openForm(course)} />)}
+          {courses.length === 0 ? <StateView state='empty' title={t('noCustomCourses')} description={t('customCourseEmptyDescription')} actionLabel={t('addCourse')} onAction={() => openForm()} /> : courses.map((course) => <ListRow key={course.id} title={course.courseName} subtitle={`${days[course.weekday - 1]} · ${t('periodRange', { start: course.startUnit, end: course.endUnit })} · ${course.room || t('noLocation')}`} icon='calendar' iconColor={course.color} onClick={() => openForm(course)} />)}
         </ClubCard>
       </View>
 
-      <Dialog title={courses.some((course) => course.id === form.id) ? '编辑课程' : '添加课程'} visible={visible} footer={null} onClose={() => setVisible(false)}>
+      <Dialog title={t(courses.some((course) => course.id === form.id) ? 'editCourse' : 'addCourse')} visible={visible} footer={null} onClose={() => setVisible(false)}>
         <View className='dialog-form'>
-          <Text className='form-label'>课程名称</Text><Input className='form-input' value={form.name} maxlength={40} onInput={(event) => setForm((current) => ({ ...current, name: event.detail.value }))} />
-          <Text className='form-label'>教师</Text><Input className='form-input' value={form.teacher} maxlength={30} onInput={(event) => setForm((current) => ({ ...current, teacher: event.detail.value }))} />
-          <Text className='form-label'>地点</Text><Input className='form-input' value={form.location} maxlength={40} onInput={(event) => setForm((current) => ({ ...current, location: event.detail.value }))} />
-          <Text className='form-label'>周次（如 1-8,10,12）</Text><Input className='form-input' value={form.weeksText} maxlength={80} onInput={(event) => setForm((current) => ({ ...current, weeksText: event.detail.value }))} />
+          <Text className='form-label'>{t('courseName')}</Text><Input className='form-input' value={form.name} maxlength={40} onInput={(event) => setForm((current) => ({ ...current, name: event.detail.value }))} />
+          <Text className='form-label'>{t('courseTeacher')}</Text><Input className='form-input' value={form.teacher} maxlength={30} onInput={(event) => setForm((current) => ({ ...current, teacher: event.detail.value }))} />
+          <Text className='form-label'>{t('courseRoom')}</Text><Input className='form-input' value={form.location} maxlength={40} onInput={(event) => setForm((current) => ({ ...current, location: event.detail.value }))} />
+          <Text className='form-label'>{t('weeksInputLabel')}</Text><Input className='form-input' value={form.weeksText} maxlength={80} onInput={(event) => setForm((current) => ({ ...current, weeksText: event.detail.value }))} />
           <View className='custom-course__pickers'>
-            <Picker mode='selector' range={DAYS} value={form.day - 1} onChange={(event) => setForm((current) => ({ ...current, day: Number(event.detail.value) + 1 }))}><View><Text className='form-label'>星期</Text><View className='form-picker'>{DAYS[form.day - 1]}</View></View></Picker>
-            <Picker mode='selector' range={SLOTS} value={form.start - 1} onChange={(event) => setForm((current) => ({ ...current, start: Number(event.detail.value) + 1 }))}><View><Text className='form-label'>开始</Text><View className='form-picker'>{SLOTS[form.start - 1]}</View></View></Picker>
-            <Picker mode='selector' range={SLOTS} value={form.end - 1} onChange={(event) => setForm((current) => ({ ...current, end: Number(event.detail.value) + 1 }))}><View><Text className='form-label'>结束</Text><View className='form-picker'>{SLOTS[form.end - 1]}</View></View></Picker>
+            <Picker mode='selector' range={days} value={form.day - 1} onChange={(event) => setForm((current) => ({ ...current, day: Number(event.detail.value) + 1 }))}><View><Text className='form-label'>{t('weekdayLabel')}</Text><View className='form-picker'>{days[form.day - 1]}</View></View></Picker>
+            <Picker mode='selector' range={slots} value={form.start - 1} onChange={(event) => setForm((current) => ({ ...current, start: Number(event.detail.value) + 1 }))}><View><Text className='form-label'>{t('startSectionLabel')}</Text><View className='form-picker'>{slots[form.start - 1]}</View></View></Picker>
+            <Picker mode='selector' range={slots} value={form.end - 1} onChange={(event) => setForm((current) => ({ ...current, end: Number(event.detail.value) + 1 }))}><View><Text className='form-label'>{t('endSectionLabel')}</Text><View className='form-picker'>{slots[form.end - 1]}</View></View></Picker>
           </View>
           <View className='dialog-actions'>
-            {courses.some((course) => course.id === form.id) ? <Button className='danger-button' onClick={() => { remove(form.id); setVisible(false) }}>删除</Button> : <Button className='secondary-button' onClick={() => setVisible(false)}>取消</Button>}
-            <Button className='primary-button' onClick={submit}>保存</Button>
+            {courses.some((course) => course.id === form.id) ? <Button className='danger-button' onClick={() => { remove(form.id); setVisible(false) }}>{t('delete')}</Button> : <Button className='secondary-button' onClick={() => setVisible(false)}>{t('cancel')}</Button>}
+            <Button className='primary-button' onClick={submit}>{t('save')}</Button>
           </View>
         </View>
       </Dialog>

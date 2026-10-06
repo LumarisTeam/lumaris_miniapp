@@ -159,7 +159,7 @@ export default function ScorePage() {
 
   return (
     <PageShell title={t('scoresAndGpa')} action={action} className='score-page'>
-      {isStale ? <View className='page-note score-stale'>刷新失败，当前显示本地缓存</View> : null}
+      {isStale ? <View className='page-note score-stale'>{t('refreshFailedFallback')}</View> : null}
 
       {scoreLists.length === 0 ? (
         <StateView

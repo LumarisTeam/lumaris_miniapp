@@ -1,11 +1,37 @@
-.bus-date { display: grid; grid-template-columns: 56rpx 1fr 36rpx; align-items: center; gap: 16rpx; }
-.bus-date__label { display: block; color: var(--secondary-label); font-size: 22rpx; }
-.bus-date__value { display: block; margin-top: 4rpx; font-size: 29rpx; font-weight: 650; }
-.bus-trip { min-height: 116rpx; padding: 18rpx 24rpx; display: grid; grid-template-columns: 112rpx 32rpx 1fr; align-items: start; gap: 10rpx; border-bottom: 1rpx solid var(--separator); }
-.bus-trip:last-child { border-bottom: 0; }
-.bus-trip__time { padding-top: 4rpx; color: var(--primary); font-size: 31rpx; font-weight: 750; }
-.bus-trip__line { height: 96rpx; display: flex; flex-direction: column; align-items: center; }
-.bus-trip__dot { width: 18rpx; height: 18rpx; margin-top: 9rpx; border: 5rpx solid var(--primary-soft); border-radius: 50%; background: var(--primary); }
-.bus-trip__rail { width: 3rpx; flex: 1; background: var(--separator); }
-.bus-trip__route { display: block; overflow-wrap: anywhere; font-size: 27rpx; line-height: 1.35; font-weight: 650; }
-.bus-trip__campus { display: block; margin-top: 8rpx; color: var(--secondary-label); font-size: 22rpx; }
+/* 导航栏里的校区切换：一个校区直接显示名字，两个用分段控件，更多用下拉。 */
+.bus-campus__single { font-size: 34rpx; font-weight: 700; }
+.bus-campus__segmented { width: 100%; }
+.bus-campus__picker { display: flex; align-items: center; justify-content: center; gap: 6rpx; }
+.bus-campus__picker-label { font-size: 32rpx; font-weight: 700; }
+
+.bus-dates { width: 100%; padding: 20rpx 0 4rpx; white-space: nowrap; }
+.bus-dates__row { padding: 0 32rpx; display: inline-flex; gap: 14rpx; }
+
+.bus-day {
+  flex: none;
+  min-width: 92rpx;
+  padding: 14rpx 12rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+  color: var(--secondary-label);
+  background: var(--surface);
+  border-radius: var(--radius-navigation);
+}
+
+.bus-day--active { color: var(--on-accent); background: var(--primary); }
+.bus-day__weekday { font-size: 21rpx; font-weight: 500; }
+.bus-day__date { display: flex; align-items: baseline; gap: 2rpx; }
+.bus-day__month { font-size: 20rpx; }
+.bus-day__number { font-size: 30rpx; font-weight: 700; }
+
+.bus-trip__head { display: flex; align-items: center; gap: 16rpx; }
+.bus-trip__time { display: flex; flex-direction: column; gap: 2rpx; }
+.bus-trip__clock { font-size: 42rpx; font-weight: 800; letter-spacing: -1rpx; }
+.bus-trip__time-label { color: var(--tertiary-label); font-size: 20rpx; font-weight: 700; }
+.bus-trip__duration { margin-left: auto; font-weight: 700; }
+
+.bus-trip__body { margin-top: 24rpx; display: flex; align-items: center; gap: 16rpx; }
+.bus-trip__route { display: block; overflow-wrap: anywhere; font-size: 30rpx; font-weight: 600; }
+.bus-trip__note { display: block; margin-top: 6rpx; color: var(--secondary-label); font-size: 24rpx; }

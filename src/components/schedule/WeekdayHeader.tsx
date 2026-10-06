@@ -1,5 +1,6 @@
 import { Text, View } from '@tarojs/components'
-import { useTranslation, type MessageKey } from '@/i18n'
+import { useTranslation } from '@/i18n'
+import { MONTH_SHORT_KEYS, WEEKDAY_SHORT_KEYS, isSameDay } from '@/utils/dates'
 import './scheduleGrid.scss'
 
 /**
@@ -8,24 +9,6 @@ import './scheduleGrid.scss'
  * 对应 Flutter 的 `lib/ui/components/schedule/weekday_header.dart`。列顺序就是从
  * weekStartDate 起的连续 7 天，所以周起始日由调用方传入的日期决定。
  */
-
-const WEEKDAY_SHORT_KEYS: MessageKey[] = [
-  'sundayShort', 'mondayShort', 'tuesdayShort', 'wednesdayShort',
-  'thursdayShort', 'fridayShort', 'saturdayShort',
-]
-
-const MONTH_SHORT_KEYS: MessageKey[] = [
-  'janShort', 'febShort', 'marShort', 'aprShort', 'mayShort', 'junShort',
-  'julShort', 'augShort', 'sepShort', 'octShort', 'novShort', 'decShort',
-]
-
-function isSameDay(left: Date, right: Date): boolean {
-  return (
-    left.getFullYear() === right.getFullYear() &&
-    left.getMonth() === right.getMonth() &&
-    left.getDate() === right.getDate()
-  )
-}
 
 export function WeekdayHeader({
   weekStartDate,

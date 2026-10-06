@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { FetchPolicy, ScoreList } from '@/types/domain'
 import { getScoreSnapshot, readScoreLists } from '@/services/scoreRepository'
 import { useAppStore } from '@/stores/app'
+import { t } from '@/i18n'
 
 interface ScoreState {
   scoreLists: ScoreList[]
@@ -37,7 +38,7 @@ export const useScoreStore = create<ScoreState>((set) => ({
         set({ scoreLists: refreshed.data, isFromLocal: refreshed.isFromLocal, isStale: refreshed.isStale })
       }
     } catch (error) {
-      set({ error: error instanceof Error ? error.message : '成绩加载失败' })
+      set({ error: error instanceof Error ? error.message : t('loadFailed') })
     } finally {
       set({ loading: false, refreshing: false })
     }

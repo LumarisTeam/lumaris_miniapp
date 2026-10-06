@@ -1,25 +1,39 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Text, View } from '@tarojs/components'
+import { ScrollView, Text, View } from '@tarojs/components'
 import Taro, { usePullDownRefresh } from '@tarojs/taro'
 import { PageShell } from '@/components/common/PageShell'
 import { ClubCard } from '@/components/common/ClubCard'
 import { StateView } from '@/components/common/StateView'
-import { SectionHeader } from '@/components/common/SectionHeader'
+import { AppIcon } from '@/components/common/AppIcon'
 import { FeatureGuard } from '@/components/common/FeatureGuard'
 import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
 import { getProgramSnapshot } from '@/services/domainRepository'
 import type { PlanCourse } from '@/types/domain'
+import { colorForName } from '@/utils/education'
+import { describeError } from '@/utils/errorText'
+import { groupProgramTerms, programTermLabel } from '@/utils/program'
+import { useTranslation } from '@/i18n'
 import '@/styles/pages.scss'
 import './index.scss'
 
-function ProgramContent() {
+/**
+ * 培养方案。
+ *
+ * 对应 Flutter 的 `lib/ui/pages/program_page/program_page.dart`：按学期分页，
+ * 每门课显示类别色点、课程名、课程类别与学分。学期标签与分组的规则见
+ * `@/utils/program`。
+ */
+
+export function ProgramContent() {
+  const t = useTranslation()
   const session = useAuthStore((state) => state.session)
   const schoolCode = useAppStore((state) => state.school.code)
   const [courses, setCourses] = useState<PlanCourse[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [isStale, setIsStale] = useState(false)
+  const [activeTerm, setActiveTerm] = useState('')
 
   const load = useCallback(async (force = false) => {
     if (!session) return
@@ -27,40 +41,109 @@ function ProgramContent() {
     setError('')
     try {
       const snapshot = await getProgramSnapshot(session.educationId, schoolCode, force ? 'refresh' : 'local-first')
-      setCourses(snapshot.data); setIsStale(snapshot.isStale)
+      setCourses(snapshot.data)
+      setIsStale(snapshot.isStale)
       if (!force && snapshot.isFromLocal) {
         const refreshed = await getProgramSnapshot(session.educationId, schoolCode, 'refresh')
-        setCourses(refreshed.data); setIsStale(refreshed.isStale)
+        setCourses(refreshed.data)
+        setIsStale(refreshed.isStale)
       }
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : t('programLoadFailed'))
+    } finally {
+      setLoading(false)
     }
-    catch (loadError) { setError(loadError instanceof Error ? loadError.message : '培养计划加载失败') }
-    finally { setLoading(false) }
-  }, [session, schoolCode])
+  }, [schoolCode, session, t])
 
   useEffect(() => { void load() }, [load])
   usePullDownRefresh(() => { void load(true).finally(() => Taro.stopPullDownRefresh()) })
-  const grouped = useMemo(() => courses.reduce<Record<string, PlanCourse[]>>((result, course) => {
-    const key = course.term || '未分学期'
-    result[key] = [...(result[key] || []), course]
-    return result
-  }, {}), [courses])
-  const credits = courses.reduce((sum, course) => sum + course.credits, 0)
+
+  const groups = useMemo(() => groupProgramTerms(courses), [courses])
+  const active = groups.find((group) => group.term === activeTerm) ?? groups[0]
+
+  // 数据回来后默认停在第一个学期；切换学校/账号时旧的 term 会失效，这里兜底。
+  useEffect(() => {
+    if (groups.length > 0 && !groups.some((group) => group.term === activeTerm)) {
+      setActiveTerm(groups[0].term)
+    }
+  }, [groups, activeTerm])
 
   return (
-    <PageShell title='培养计划' showBack>
-      {!session ? <StateView state='login' title='登录后查看培养计划' actionLabel='去登录' onAction={() => Taro.navigateTo({ url: '/pages/login/index' })} /> : (
+    <PageShell
+      title={t('programLabel')}
+      showBack
+      action={
+        <View className='icon-action pressable' onClick={() => void load(true)}>
+          <AppIcon name='refresh' size={20} />
+        </View>
+      }
+    >
+      {!session ? (
+        <StateView
+          state='login'
+          title={t('guestMode')}
+          description={t('guestModeSubtitle')}
+          actionLabel={t('goToLogin')}
+          onAction={() => Taro.navigateTo({ url: '/pages/login/index' })}
+        />
+      ) : loading && courses.length === 0 ? (
+        <StateView state='loading' title={t('programLoading')} description={t('programLoadingSubtitle')} />
+      ) : error && courses.length === 0 ? (
+        <StateView
+          state='error'
+          title={t('programLoadFailed')}
+          description={describeError(error, t)}
+          actionLabel={t('retry')}
+          onAction={() => void load(true)}
+        />
+      ) : courses.length === 0 ? (
+        <StateView state='empty' title={t('programNoData')} />
+      ) : (
         <>
-          {isStale ? <View className='page-note'>刷新失败，当前显示本地培养计划缓存</View> : null}
-          <View className='page-section'><ClubCard><View className='metric-grid'><View className='metric'><Text className='metric__value'>{courses.length}</Text><Text className='metric__label'>课程</Text></View><View className='metric'><Text className='metric__value'>{credits.toFixed(1)}</Text><Text className='metric__label'>总学分</Text></View><View className='metric'><Text className='metric__value'>{Object.keys(grouped).length}</Text><Text className='metric__label'>学期</Text></View></View></ClubCard></View>
-          {loading && courses.length === 0 ? <StateView state='loading' title='正在读取培养计划' /> : error ? <StateView state='error' title='培养计划加载失败' description={error} actionLabel='重试' onAction={() => void load()} /> : courses.length === 0 ? <StateView state='empty' title='暂无培养计划数据' /> : Object.entries(grouped).map(([term, items]) => (
-            <View className='page-section' key={term}><SectionHeader title={term} icon='book' trailing={`${items.reduce((sum, item) => sum + item.credits, 0).toFixed(1)} 学分`} /><ClubCard padding='none'>{items.map((course) => <View className='program-row' key={course.id}><View className='grow'><Text className='program-row__name'>{course.name}</Text><Text className='program-row__meta'>{[course.courseTypeName, course.lessonType, course.examMode].filter(Boolean).join(' · ')}</Text></View><Text className='program-row__credit'>{course.credits.toFixed(1)}</Text></View>)}</ClubCard></View>
-          ))}
+          <ScrollView className='program-terms' scrollX enableFlex>
+            <View className='program-terms__row'>
+              {groups.map((group) => (
+                <View
+                  key={group.term}
+                  className={`program-term pressable ${group.term === active?.term ? 'program-term--active' : ''}`}
+                  onClick={() => setActiveTerm(group.term)}
+                >
+                  {programTermLabel(group.term, t)}
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+
+          <View className='page-section'>
+            {error || isStale ? <View className='page-note'>{t('programRefreshFailed')}</View> : null}
+
+            <ClubCard padding='none'>
+              {(active?.courses ?? []).map((course) => (
+                <ProgramRow key={course.id} course={course} creditsLabel={t('creditUnit', { credit: course.credits.toFixed(1) })} />
+              ))}
+            </ClubCard>
+          </View>
         </>
       )}
     </PageShell>
   )
 }
 
+function ProgramRow({ course, creditsLabel }: { course: PlanCourse; creditsLabel: string }) {
+  const color = colorForName(course.courseTypeName)
+  return (
+    <View className='program-row'>
+      <View className='program-row__dot' style={{ background: color }} />
+      <View className='grow'>
+        <Text className='program-row__name'>{course.name}</Text>
+        {course.courseTypeName ? <Text className='program-row__meta'>{course.courseTypeName}</Text> : null}
+      </View>
+      <Text className='program-row__credit' style={{ color, background: `${color}26` }}>{creditsLabel}</Text>
+    </View>
+  )
+}
+
 export default function ProgramPage() {
-  return <FeatureGuard feature='program' title='培养计划'><ProgramContent /></FeatureGuard>
+  const t = useTranslation()
+  return <FeatureGuard feature='program' title={t('programLabel')}><ProgramContent /></FeatureGuard>
 }

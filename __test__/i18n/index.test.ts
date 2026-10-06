@@ -1,4 +1,7 @@
 /* eslint-disable import/first */
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+
 const mockLocale = { value: 'system' as string }
 
 jest.mock('@/stores/app', () => ({
@@ -95,6 +98,22 @@ describe('translation', () => {
       expect({ locale, keys: Object.keys(bundle).sort() }).toEqual({ locale, keys: reference })
       const empty = Object.entries(bundle).filter(([, value]) => value.trim() === '')
       expect({ locale, empty }).toEqual({ locale, empty: [] })
+    }
+  })
+
+  test('folds the mini-program-only overlay into every bundle', () => {
+    // 这些 key 不在 Flutter 的 ARB 里，是 generateI18n.mjs 从 scripts/i18n-extra.json
+    // 合并进来的；漏跑生成或漏了某种语言时，页面会静默显示 key 本身。
+    const overlay = JSON.parse(
+      readFileSync(resolve(__dirname, '../../scripts/i18n-extra.json'), 'utf8'),
+    ) as Record<string, Record<string, string>>
+
+    for (const [key, values] of Object.entries(overlay)) {
+      if (key.startsWith('$')) continue
+      for (const [locale, bundle] of Object.entries(BUNDLES)) {
+        expect({ key, locale, value: bundle[key as keyof typeof bundle] })
+          .toEqual({ key, locale, value: values[locale] })
+      }
     }
   })
 

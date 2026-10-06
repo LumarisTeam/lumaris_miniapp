@@ -9,7 +9,18 @@ jest.mock('@/api/client', () => ({
   },
 }))
 
-import { fetchCourses, fetchElectricityWeekly, fetchLinks, fetchMapPois, fetchProgram, fetchScheduleTime, fetchScores } from '@/api/education'
+import {
+  fetchBusNewData,
+  fetchBusOldData,
+  fetchCourses,
+  fetchElectricityWeekly,
+  fetchLinks,
+  fetchMapPois,
+  fetchProgram,
+  fetchProgramList,
+  fetchScheduleTime,
+  fetchScores,
+} from '@/api/education'
 
 describe('Flutter education API fixtures', () => {
   beforeEach(() => mockRequest.mockReset())
@@ -53,6 +64,21 @@ describe('Flutter education API fixtures', () => {
       { campusName: '雁塔校区', timeRange: '05/01~09/30', start: ['09:00'], end: ['09:45'] },
     ])
     expect(mockRequest).toHaveBeenCalledWith('/course/ScheduleTime')
+  })
+
+  test('passes the Flutter bus new/old data query parameters', async () => {
+    mockRequest.mockResolvedValue([])
+    await fetchBusNewData('2026-09-01', '草堂校区')
+    await fetchBusOldData('2026-09-01', true)
+    expect(mockRequest).toHaveBeenNthCalledWith(1, '/Bus/NewData/2026-09-01?loc=草堂校区')
+    expect(mockRequest).toHaveBeenNthCalledWith(2, '/Bus/OldData/2026-09-01?isShow=true')
+  })
+
+  test('reads the flat program list with either field casing', async () => {
+    mockRequest.mockResolvedValue([{ Name: '高等数学', CourseTypeName: '公共课', Credits: '4' }])
+    await expect(fetchProgramList('84721')).resolves.toEqual([
+      expect.objectContaining({ name: '高等数学', courseTypeName: '公共课', credits: 4 }),
+    ])
   })
 
   test('accepts API casing variants preserved by Flutter models', async () => {

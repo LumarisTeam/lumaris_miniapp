@@ -17,6 +17,7 @@ import { useCourseStore } from '@/stores/course'
 import { useExamStore } from '@/stores/exam'
 import { useTranslation } from '@/i18n'
 import { getHomeCourses } from '@/utils/education'
+import { MONTH_SHORT_KEYS } from '@/utils/dates'
 import type { Course } from '@/types/domain'
 import '@/styles/pages.scss'
 import './index.scss'
@@ -66,7 +67,9 @@ export default function HomePage() {
           title={homeSchedule.isTomorrow ? t('tomorrowSchedule') : t('todayScheduleLabel')}
           trailing={
             <View className='home-schedule-actions'>
-              <Text className='section-header__trailing'>{`${now.getMonth() + 1}月${now.getDate()}日`}</Text>
+              <Text className='section-header__trailing'>
+                {`${t(MONTH_SHORT_KEYS[now.getMonth()])} ${now.getDate()}`}
+              </Text>
               <View className='icon-action pressable' onClick={() => setScheduleSettingsVisible(true)}>
                 <AppIcon name='settings' size={20} />
               </View>

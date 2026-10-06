@@ -495,6 +495,28 @@ export function normalizeBusTrip(raw: Record<string, unknown>, index = 0): BusTr
   }
 }
 
+/**
+ * 校区名的短写：去掉结尾的「校区」。
+ *
+ * 对应 Flutter `school_bus_page.dart` 的 `_displayCampusName`——班次数据里的出发
+ * 站是「草堂校区」这种全名，放在分段控件里太长。
+ */
+export function displayCampusName(campus: string): string {
+  return campus.endsWith('校区') ? campus.slice(0, -2) : campus
+}
+
+/**
+ * 班次耗时（`arrivalStationTime`，形如「1:30」）拆成时、分。
+ *
+ * 对应 Flutter `BusTimelineTile._arrivalStationTimeInL10n`：拆不出两段时返回
+ * null，由调用方决定退化成原样展示。
+ */
+export function splitArrivalDuration(duration: string): { hours: string; minutes: string } | null {
+  const parts = duration.split(':')
+  if (parts.length < 2) return null
+  return { hours: parts[0], minutes: parts[1] }
+}
+
 export function filterUpcomingBusTrips(trips: BusTrip[], date: string, now = new Date()): BusTrip[] {
   const pad = (value: number) => String(value).padStart(2, '0')
   const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`

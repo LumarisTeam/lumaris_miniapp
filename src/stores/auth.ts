@@ -6,6 +6,7 @@ import { initializeStorage, readStorage, removeStorage, STORAGE_KEYS, writeStora
 import { useCourseStore } from '@/stores/course'
 import { useScoreStore } from '@/stores/score'
 import { createAuthSession } from '@/utils/auth'
+import { t } from '@/i18n'
 
 initializeStorage()
 
@@ -15,6 +16,7 @@ interface AuthState {
   error: string
   login: (username: string, password: string, school: School) => Promise<boolean>
   logout: (reason?: string) => void
+  clearError: () => void
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -29,19 +31,20 @@ export const useAuthStore = create<AuthState>((set) => ({
       const result = await loginRequest(username.trim(), password)
       const session = createAuthSession(username, result, school)
       if (!session) {
-        set({ error: '账号或密码错误' })
+        set({ error: t('loginFailed') })
         return false
       }
       writeStorage(STORAGE_KEYS.SESSION, session)
       set({ session })
       return true
     } catch (error) {
-      set({ error: error instanceof Error ? error.message : '登录失败，请稍后重试' })
+      set({ error: error instanceof Error ? error.message : t('loadFailed') })
       return false
     } finally {
       set({ loading: false })
     }
   },
+  clearError: () => set({ error: '' }),
   logout: (reason = '') => {
     removeStorage(STORAGE_KEYS.SESSION)
     useCourseStore.getState().clearRemote()
@@ -51,5 +54,5 @@ export const useAuthStore = create<AuthState>((set) => ({
 }))
 
 setUnauthorizedHandler(() => {
-  useAuthStore.getState().logout('登录已过期，请重新登录')
+  useAuthStore.getState().logout(t('pleaseLoginEduAccount'))
 })

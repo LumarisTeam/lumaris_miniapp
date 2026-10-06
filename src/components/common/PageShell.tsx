@@ -4,10 +4,12 @@ import { View, Text } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { AppIcon } from '@/components/common/AppIcon'
 import { useAppStore } from '@/stores/app'
+import { useTranslation } from '@/i18n'
 import './common.scss'
 
 interface PageShellProps extends PropsWithChildren {
-  title: string
+  /** 传字符串时按标题样式渲染；传节点则用于放分段控件等自定义导航内容。 */
+  title: ReactNode
   showBack?: boolean
   action?: ReactNode
   className?: string
@@ -52,6 +54,7 @@ function getNavigationStyle(): NavigationStyle | undefined {
 }
 
 export function PageShell({ title, showBack = false, action, className = '', children }: PageShellProps) {
+  const t = useTranslation()
   const theme = useAppStore((state) => state.settings.theme)
   const [navigationStyle] = useState<NavigationStyle | undefined>(() => getNavigationStyle())
   return (
@@ -59,12 +62,14 @@ export function PageShell({ title, showBack = false, action, className = '', chi
       <View className='app-navbar'>
         <View className='app-navbar__side'>
           {showBack ? (
-            <View className='app-navbar__icon pressable' onClick={() => Taro.navigateBack()} aria-label='返回'>
+            <View className='app-navbar__icon pressable' onClick={() => Taro.navigateBack()} aria-label={t('back')}>
               <AppIcon name='back' size={22} />
             </View>
           ) : null}
         </View>
-        <Text className='app-navbar__title'>{title}</Text>
+        {typeof title === 'string'
+          ? <Text className='app-navbar__title'>{title}</Text>
+          : <View className='app-navbar__title app-navbar__title--custom'>{title}</View>}
         <View className='app-navbar__side app-navbar__side--right'>{action}</View>
       </View>
       <View className='app-page__content'>{children}</View>

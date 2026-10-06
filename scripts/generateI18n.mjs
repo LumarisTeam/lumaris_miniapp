@@ -2,10 +2,13 @@
 /**
  * 从 Flutter 版的 ARB 语言包生成小程序端的 TS 语言包。
  *
- * Flutter 的 `lib/l10n/app_*.arb` 是多语言的唯一事实来源，这里只做机械转换，
- * 不手工维护第二份文案。改完文案请在 Flutter 仓库跑一遍生成，再执行：
+ * Flutter 的 `lib/l10n/app_*.arb` 是共享文案的唯一事实来源，这里只做机械转换，
+ * 不手工维护第二份。改完文案请在 Flutter 仓库跑一遍生成，再执行：
  *
  *   node scripts/generateI18n.mjs
+ *
+ * 小程序独有的说法（微信业务域名、webview 回退一类 Flutter 侧没有的概念）放在
+ * `scripts/i18n-extra.json`，生成时合并进来；每个 key 必须给全部语言，少一个就报错。
  *
  * 默认从同级目录的 ios_club_app 读取，可用参数或环境变量覆盖：
  *
@@ -58,6 +61,21 @@ function resolveArbDir(argv) {
   process.exit(1)
 }
 
+/** 小程序独有文案，见 scripts/i18n-extra.json。 */
+function readExtraMessages() {
+  const raw = JSON.parse(readFileSync(join(ROOT, 'scripts/i18n-extra.json'), 'utf8'))
+  const extras = {}
+  for (const [key, value] of Object.entries(raw)) {
+    if (key.startsWith('$')) continue
+    const missing = LOCALES.filter(({ code }) => typeof value[code] !== 'string' || value[code] === '')
+    if (missing.length > 0) {
+      throw new Error(`i18n-extra.json 的 ${key} 缺少语言：${missing.map((item) => item.code).join(', ')}`)
+    }
+    extras[key] = value
+  }
+  return extras
+}
+
 function readMessages(arbDir, file) {
   const raw = JSON.parse(readFileSync(join(arbDir, file), 'utf8'))
   const messages = {}
@@ -92,6 +110,15 @@ function main() {
 
   const counts = new Map()
   let baseline = null
+  let extras
+  try {
+    extras = readExtraMessages()
+  } catch (error) {
+    console.error(error.message)
+    process.exitCode = 1
+    return
+  }
+  const extraKeys = Object.keys(extras)
 
   for (const { code, file } of LOCALES) {
     let messages
@@ -101,6 +128,15 @@ function main() {
       console.error(`读取失败 ${join(arbDir, file)}: ${error.message}`)
       process.exitCode = 1
       return
+    }
+
+    for (const key of extraKeys) {
+      if (key in messages) {
+        console.error(`i18n-extra.json 的 ${key} 与 ARB 里的同名 key 冲突，请改名或删掉 ARB 里的那份`)
+        process.exitCode = 1
+        return
+      }
+      messages[key] = extras[key][code]
     }
 
     const keys = Object.keys(messages)
@@ -120,7 +156,7 @@ function main() {
   }
 
   const total = counts.get(SOURCE_LOCALE)
-  console.log(`已生成 ${LOCALES.length} 个语言包，每个 ${total} 个 key → src/i18n/locales/`)
+  console.log(`已生成 ${LOCALES.length} 个语言包，每个 ${total} 个 key（含小程序独有 ${extraKeys.length} 个）→ src/i18n/locales/`)
   for (const [code, count] of counts) {
     console.log(`  ${code.padEnd(8)} ${count}`)
   }

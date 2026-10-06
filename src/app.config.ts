@@ -24,7 +24,16 @@ export default defineAppConfig({
     },
     {
       root: 'subpackages/content',
-      pages: ['about/index', 'document/index', 'webview/index'],
+      pages: [
+        'help/index',
+        'feedback/index',
+        'privacy/index',
+        'agreement/index',
+        'license/index',
+        'author/index',
+        'egg/index',
+        'webview/index',
+      ],
     },
   ],
   window: {

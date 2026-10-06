@@ -162,7 +162,7 @@ export default function SchedulePage() {
       ) : (
         <>
           <View className='schedule-header'>
-            {isStale ? <View className='page-note'>刷新失败，当前显示本地课表缓存</View> : null}
+            {isStale ? <View className='page-note'>{t('refreshFailedFallback')}</View> : null}
             <WeekdayHeader
               weekStartDate={weekStartDate}
               showDate={week > 0}

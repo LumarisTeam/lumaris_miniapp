@@ -1,6 +1,59 @@
-.electricity-balance__label { display: block; color: var(--secondary-label); font-size: 24rpx; }
-.electricity-balance__value { margin-top: 14rpx; font-size: 60rpx; line-height: 1.15; font-weight: 750; }
-.electricity-balance__danger { color: var(--danger); background: var(--danger-soft); }
-.electricity-error { display: block; margin-top: 18rpx; color: var(--danger); font-size: 22rpx; }
-.electricity-chart { width: 100%; height: 420rpx; margin-top: 24rpx; }
-.electricity-chart canvas { width: 100%; height: 100%; }
+.electricity-balance {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  text-align: center;
+}
+
+.electricity-balance__label { color: var(--secondary-label); font-size: 26rpx; font-weight: 500; }
+
+.electricity-balance__amount { display: flex; align-items: flex-start; gap: 6rpx; }
+.electricity-balance__symbol { padding-top: 12rpx; font-size: 40rpx; font-weight: 600; }
+.electricity-balance__value { font-size: 96rpx; line-height: 1.1; font-weight: 750; letter-spacing: -2rpx; }
+.electricity-balance__empty { font-size: 60rpx; font-weight: 750; }
+.electricity-balance__status--low { color: var(--danger); background: var(--danger-soft); }
+.electricity-balance__error { margin-top: 8rpx; color: var(--danger); font-size: 23rpx; }
+
+.electricity-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  row-gap: 32rpx;
+}
+
+.electricity-metric { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 8rpx; }
+.electricity-metric__label { color: var(--secondary-label); font-size: 24rpx; font-weight: 500; }
+.electricity-metric__value { overflow-wrap: anywhere; text-align: center; font-size: 34rpx; font-weight: 650; letter-spacing: -1rpx; }
+
+.electricity-hourly__title { display: block; margin: 40rpx 0 20rpx; font-size: 28rpx; font-weight: 600; }
+.electricity-hourly { width: 100%; white-space: nowrap; }
+.electricity-hourly__row { display: inline-flex; align-items: flex-end; gap: 24rpx; }
+
+.electricity-hourly__item {
+  flex: none;
+  width: 76rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.electricity-hourly__value { color: var(--secondary-label); font-size: 20rpx; font-weight: 600; }
+
+.electricity-hourly__track {
+  width: 100%;
+  height: 160rpx;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.electricity-hourly__bar { width: 24rpx; background: var(--primary); border-radius: 12rpx; }
+.electricity-hourly__hour { font-size: 22rpx; font-weight: 500; }
+
+.electricity-form__gap { margin-top: 16rpx; }
+
+.electricity-detail { margin-bottom: 24rpx; display: flex; flex-direction: column; gap: 18rpx; }
+.electricity-detail__row { display: flex; align-items: flex-start; gap: 20rpx; }
+.electricity-detail__label { flex: none; width: 160rpx; color: var(--secondary-label); font-size: 26rpx; }
+.electricity-detail__value { min-width: 0; flex: 1; text-align: right; font-size: 26rpx; font-weight: 600; overflow-wrap: anywhere; }

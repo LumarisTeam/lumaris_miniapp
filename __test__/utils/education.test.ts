@@ -19,6 +19,8 @@ import {
   buildSemesterLabels,
   filterUpcomingBusTrips,
   summarizeElectricity,
+  displayCampusName,
+  splitArrivalDuration,
 } from '@/utils/education'
 
 describe('education domain helpers', () => {
@@ -163,6 +165,13 @@ describe('education domain helpers', () => {
     const future = normalizeBusTrip({ runTime: '10:00:00', departureStation: '雁塔', arrivalStation: '草堂' })
     expect(filterUpcomingBusTrips([past, future], '2026-09-01', new Date('2026-09-01T09:00:00')).map((trip) => trip.departureTime)).toEqual(['10:00'])
     expect(filterUpcomingBusTrips([past], '2026-09-02', new Date('2026-09-01T09:00:00'))).toEqual([past])
+  })
+
+  test('shortens campus names and splits bus durations like Flutter', () => {
+    expect(displayCampusName('草堂校区')).toBe('草堂')
+    expect(displayCampusName('雁塔')).toBe('雁塔')
+    expect(splitArrivalDuration('01:30')).toEqual({ hours: '01', minutes: '30' })
+    expect(splitArrivalDuration('30')).toBeNull()
   })
 
   test('matches Flutter electricity total, today, daily average and peak calculations', () => {

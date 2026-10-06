@@ -1,8 +1,27 @@
-.payment-balance { display: block; margin-top: 14rpx; font-size: 60rpx; font-weight: 750; }
-.payment-query { margin-top: 24rpx; }
-.payment-error { display: block; margin-top: 16rpx; color: var(--danger); font-size: 22rpx; }
-.payment-row { min-height: 108rpx; padding: 20rpx 24rpx; display: flex; align-items: center; gap: 18rpx; border-bottom: 1rpx solid var(--separator); }
+.payment-card {
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  color: var(--on-accent);
+  background: linear-gradient(135deg, var(--primary), var(--primary-soft));
+  border-radius: var(--radius-card);
+  box-shadow: 0 16rpx 30rpx -8rpx var(--primary-soft);
+}
+
+.payment-card__head { display: flex; align-items: center; justify-content: space-between; }
+.payment-card__brand { color: var(--on-accent); font-size: 26rpx; font-weight: 500; opacity: 0.75; }
+.payment-card__label { margin-top: 48rpx; color: var(--on-accent); font-size: 30rpx; font-weight: 400; }
+.payment-card__balance { color: var(--on-accent); font-size: 68rpx; font-weight: 800; letter-spacing: -2rpx; }
+
+.payment-cardid { padding: 12rpx 28rpx 28rpx; }
+.payment-cardid .form-label { margin-top: 16rpx; }
+
+.payment-error { padding: 0 40rpx 32rpx; display: block; color: var(--danger); font-size: 23rpx; text-align: center; }
+
+.payment-row { min-height: 108rpx; padding: 20rpx 28rpx; display: flex; align-items: center; gap: 18rpx; border-bottom: 1rpx solid var(--separator); }
 .payment-row:last-child { border-bottom: 0; }
-.payment-row__title { display: block; overflow-wrap: anywhere; font-size: 26rpx; font-weight: 600; }
-.payment-row__meta { display: block; margin-top: 7rpx; color: var(--secondary-label); font-size: 21rpx; }
-.payment-row__amount { flex: none; color: var(--danger); font-size: 28rpx; font-weight: 700; }
+.payment-row__title { display: block; overflow-wrap: anywhere; font-size: 28rpx; }
+.payment-row__meta { display: block; margin-top: 6rpx; color: var(--secondary-label); font-size: 23rpx; }
+.payment-row__amount { flex: none; font-size: 32rpx; font-weight: 700; letter-spacing: -1rpx; }
+.payment-row__amount--income { color: var(--success); }

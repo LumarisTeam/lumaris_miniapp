@@ -2,19 +2,31 @@ import { useState } from 'react'
 import { Button, Text, View, WebView } from '@tarojs/components'
 import { useRouter } from '@tarojs/taro'
 import { PageShell } from '@/components/common/PageShell'
+import { useTranslation } from '@/i18n'
 import { copyExternalUrl } from '@/utils/platform'
 import '@/styles/pages.scss'
 import './index.scss'
 
+/**
+ * 外部网页容器。
+ *
+ * 微信只允许打开业务域名下的网页，其余会直接失败，所以这里要有一个能复制链接
+ * 的回退页——对应 Flutter 侧 `url_launcher` 打不开时的处理。
+ */
 export default function WebViewPage() {
+  const t = useTranslation()
   const router = useRouter()
   const url = decodeURIComponent(router.params.url || '')
   const [failed, setFailed] = useState(!/^https?:\/\//.test(url))
 
   if (failed) {
     return (
-      <PageShell title='网页无法打开' showBack>
-        <View className='webview-fallback'><Text className='webview-fallback__title'>此网页不在微信业务域名中</Text><Text className='webview-fallback__description'>复制链接后可使用系统浏览器访问。</Text><Button className='primary-button' onClick={() => void copyExternalUrl(url)}>复制链接</Button></View>
+      <PageShell title={t('webviewTitle')} showBack>
+        <View className='webview-fallback'>
+          <Text className='webview-fallback__title'>{t('webviewDomainBlocked')}</Text>
+          <Text className='webview-fallback__description'>{t('webviewLimitHint')}</Text>
+          <Button className='primary-button' onClick={() => void copyExternalUrl(url)}>{t('webviewCopyLink')}</Button>
+        </View>
       </PageShell>
     )
   }

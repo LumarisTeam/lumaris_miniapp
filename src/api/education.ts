@@ -28,6 +28,20 @@ import {
 } from '@/utils/education'
 import { normalizeScheduleTables } from '@/utils/scheduleTime'
 
+/** 服务端可能返回 camelCase 或 PascalCase，Flutter 的 PlanCourse 两种都读。 */
+function normalizePlanCourse(item: Record<string, unknown>, term: string, index: number): PlanCourse {
+  const name = String(item.name ?? item.Name ?? '')
+  return {
+    id: String(item.id ?? `${term}-${name}-${index}`),
+    name,
+    lessonType: String(item.lessonType ?? item.LessonType ?? ''),
+    examMode: String(item.examMode ?? item.ExamMode ?? ''),
+    courseTypeName: String(item.courseTypeName ?? item.CourseTypeName ?? ''),
+    credits: toNumber(item.credits ?? item.Credits),
+    term: term || String(item.termStr ?? item.TermStr ?? ''),
+  }
+}
+
 function asRecords(value: unknown): Record<string, unknown>[] {
   return Array.isArray(value) ? value.filter((item): item is Record<string, unknown> => Boolean(item && typeof item === 'object')) : []
 }
@@ -94,6 +108,26 @@ export async function fetchBus(date: string): Promise<BusTrip[]> {
   return asRecords(records).map(normalizeBusTrip)
 }
 
+/**
+ * 新版校车数据（`GET /Bus/NewData/{time}?loc=`）。
+ *
+ * 与 Flutter `BusApi.getBusNewData` 对齐。Flutter 的页面只用 `/Bus/{date}`，
+ * 这两个接口目前没有调用方；保留是为了接口层与后端契约一致，接入前先确认
+ * 服务端返回结构未变。
+ */
+export async function fetchBusNewData(time: string, loc = 'ALL'): Promise<BusTrip[]> {
+  const raw = await request<unknown>(withQuery(`/Bus/NewData/${time}`, { loc }))
+  const records = Array.isArray(raw) ? raw : (raw as { items?: unknown[] })?.items
+  return asRecords(records).map(normalizeBusTrip)
+}
+
+/** 旧版校车数据（`GET /Bus/OldData/{time}?isShow=`），与 Flutter `BusApi.getBusOldData` 对齐。 */
+export async function fetchBusOldData(time: string, isShow = false): Promise<BusTrip[]> {
+  const raw = await request<unknown>(withQuery(`/Bus/OldData/${time}`, { isShow }))
+  const records = Array.isArray(raw) ? raw : (raw as { items?: unknown[] })?.items
+  return asRecords(records).map(normalizeBusTrip)
+}
+
 export async function fetchElectricity(url?: string): Promise<number> {
   const value = await request<unknown>(withQuery('/Electricity', { url }))
   return toNumber(value)
@@ -125,18 +159,21 @@ export async function fetchPayment(id: string, password?: string): Promise<{ bal
   return { balance: toNumber(raw?.balance), records: asRecords(raw?.records).map(normalizePayment) }
 }
 
+/**
+ * 培养方案扁平列表（`GET /Program?id=&name=`）。
+ *
+ * 与 Flutter `ProgramApi.getProgram` 对齐。页面用的是 `/Program/GetDic` 的分组
+ * 结果（Flutter 的 `ProgramPage` 也只读分组接口），这个方法留给按名称检索。
+ */
+export async function fetchProgramList(id: string, name?: string): Promise<PlanCourse[]> {
+  const raw = await request<unknown>(withQuery('/Program', { id, name }))
+  return asRecords(raw).map((item, index) => normalizePlanCourse(item, '', index))
+}
+
 export async function fetchProgram(id: string): Promise<PlanCourse[]> {
   const raw = await request<unknown>(withQuery('/Program/GetDic', { id }))
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return []
-  return Object.entries(raw as Record<string, unknown>).flatMap(([term, value]) => asRecords(value).map((item, index) => ({
-    id: String(item.id ?? `${term}-${item.name ?? item.Name ?? ''}-${index}`),
-    name: String(item.name ?? item.Name ?? ''),
-    lessonType: String(item.lessonType ?? item.LessonType ?? ''),
-    examMode: String(item.examMode ?? item.ExamMode ?? ''),
-    courseTypeName: String(item.courseTypeName ?? item.CourseTypeName ?? ''),
-    credits: toNumber(item.credits ?? item.Credits),
-    term,
-  })))
+  return Object.entries(raw as Record<string, unknown>).flatMap(([term, value]) => asRecords(value).map((item, index) => normalizePlanCourse(item, term, index)))
 }
 
 export async function fetchLinks(): Promise<LinkCategory[]> {
