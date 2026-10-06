@@ -5,7 +5,11 @@ import prodConfig from './prod'
 import vitePluginImp from 'vite-plugin-imp'
 
 const DEFAULT_API_BASE_URL = 'https://xauatapi.xauat.site/v1'
-const DEFAULT_BASIC_API_BASE_URL = 'https://xauatapi.xauat.site'
+// 学校目录 / 应用发布信息走独立的基础服务（与 Flutter BasicHttpClient 一致），
+// 不是教务 API 的 xauatapi.xauat.site。这里一旦写错，下面的 env 会把错值注入成
+// TARO_APP_BASIC_API_BASE_URL，src/api/client.ts 里那个正确的兜底就永远不会生效，
+// /api/v1/schools 会一直 404。
+const DEFAULT_BASIC_API_BASE_URL = 'https://luminous.xauat.site'
 
 // https://taro-docs.jd.com/docs/next/config#defineconfig-辅助函数
 export default defineConfig<'vite'>(async (merge, { command, mode }) => {
